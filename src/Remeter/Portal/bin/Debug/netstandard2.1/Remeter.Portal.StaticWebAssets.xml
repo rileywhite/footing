@@ -1,4 +1,0 @@
-﻿<StaticWebAssets Version="1.0">
-  <ContentRoot BasePath="_content/Microsoft.AspNetCore.Components.WebAssembly.Authentication" Path="/home/riley/.nuget/packages/microsoft.aspnetcore.components.webassembly.authentication/3.2.0/build/../staticwebassets/" />
-  <ContentRoot BasePath="/" Path="/home/riley/Documents/GitHub/remeter-portal/src/Remeter/Portal/bin/Debug/netstandard2.1/wwwroot/" />
-</StaticWebAssets>
