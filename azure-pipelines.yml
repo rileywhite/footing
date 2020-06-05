@@ -1,0 +1,59 @@
+# ASP.NET Core
+# Build and test ASP.NET Core projects targeting .NET Core.
+# Add steps that run tests, create a NuGet package, deploy, and more:
+# https://docs.microsoft.com/azure/devops/pipelines/languages/dotnet-core
+
+trigger:
+  branches:
+    include:
+      - master
+      - develop
+      - feature/*
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+variables:
+  buildConfiguration: 'Release'
+  SolutionPath: 'src/Remeter.sln'
+
+steps:
+- script: |
+    echo "##vso[task.setvariable variable=deploymentSlot]dev"
+  name: DefaultTarget
+
+- script: |
+    echo "##vso[task.setvariable variable=deploymentSlot]staging"
+  name: StagingTarget
+  condition: eq(variables['Build.SourceBranch'], 'refs/heads/master')
+
+- script: |
+    echo "##vso[task.setvariable variable=deploymentSlot]int"
+  name: IntegrationTarget
+  condition: eq(variables['Build.SourceBranch'], 'refs/heads/develop')
+
+- script: |
+    echo "##vso[task.setvariable variable=deploymentSlot;isOutput=true]$DEPLOYMENTSLOT"
+  name: DeploymentTarget
+
+- task: UseDotNet@2
+  inputs:
+    version: 3.1.300
+
+- task: DotNetCoreCLI@2
+  displayName: 'Publish and zip'
+  inputs:
+    command: publish
+    publishWebProjects: False
+    projects: $(SolutionPath)
+    arguments: '--configuration $(BuildConfiguration) --output $(Build.ArtifactStagingDirectory)'
+    zipAfterPublish: True
+
+- task: AzureWebApp@1
+  displayName: 'Deploy Azure Web App'
+  inputs:
+    azureSubscription: '$(azureSubscription)'
+    appName: 'remeter-portal'
+    SlotName: '$(DeploymentTarget.deploymentSlot)'
+    appType: 'webApp'
+    package: $(Build.ArtifactStagingDirectory)/**/*.zip
