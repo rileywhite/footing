@@ -1,0 +1,13 @@
+Income from @MoneyFlows.Inflows.Count sources for a total of <AmountDisplay Amount="@MoneyFlows.Inflows.Sum(inflow => inflow.GetWeeklyAmount())" /> Week
+
+@{
+    foreach (var inflow in this.MoneyFlows.Inflows)
+    { 
+        <div>@inflow.Name <AmountDisplay Amount="@inflow.Amount" /> @inflow.Period</div>
+    }
+}
+
+@code {
+    [Parameter]
+    public MoneyFlows MoneyFlows { get; set; }
+}

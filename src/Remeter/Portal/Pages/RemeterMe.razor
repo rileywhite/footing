@@ -6,3 +6,37 @@
     <em>Nothing you put in here will be sent to our servers.</em>
 </p>
 
+<MoneyFlowsInfoBox MoneyFlows="@MoneyFlows" />
+
+<dl>
+    <dt>I receive</dt>
+    <dd>
+        $<input @bind="NewInflowAmount" />
+        <select @bind="NewInflowPeriod">
+            @foreach (MoneyFlows.Period period in Enum.GetValues(typeof(MoneyFlows.Period)))
+            {
+                <option>@period</option>
+            }
+        </select>
+    </dd>
+    <dt>From</dt>
+    <dd><input placeholder="Income Source" @bind="NewInflowName" /></dd>
+</dl>
+
+
+<button class="btn btn-primary" @onclick="AddInflow">Click me</button>
+
+@code {
+    private MoneyFlows MoneyFlows { get; } = new MoneyFlows();
+    private string NewInflowName { get; set; }
+    private decimal NewInflowAmount { get; set; }
+    private MoneyFlows.Period NewInflowPeriod { get; set; }
+
+    private void AddInflow()
+    {
+        this.MoneyFlows.Inflows.Add(new MoneyFlows.Inflow { Name = this.NewInflowName, Amount = this.NewInflowAmount, Period = NewInflowPeriod });
+        this.NewInflowName = "";
+        this.NewInflowAmount = 0.0m;
+        this.NewInflowPeriod = default(MoneyFlows.Period);
+    }
+}
