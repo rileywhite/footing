@@ -8,35 +8,60 @@
 
 <MoneyFlowsInfoBox MoneyFlows="@MoneyFlows" />
 
-<dl>
-    <dt>I receive</dt>
-    <dd>
-        $<input @bind="NewInflowAmount" />
-        <select @bind="NewInflowPeriod">
-            @foreach (MoneyFlows.Period period in Enum.GetValues(typeof(MoneyFlows.Period)))
-            {
-                <option>@period</option>
-            }
-        </select>
-    </dd>
-    <dt>From</dt>
-    <dd><input placeholder="Income Source" @bind="NewInflowName" /></dd>
-</dl>
+<EditForm Model="@model" OnValidSubmit="AddInflow">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+    <dl>
+        <dt>
+            I receive a
+            <span
+                data-toggle="tooltip"
+                title="Amount deposited into my account after taxes and other garnishments"
+                data-placement="auto"
+                class="text-info">
+                net amount
+            </span>
+            of
+        </dt>
+        <dd>
+            $<input size="10" placeholder="xxx.xx" @bind="model.NewInflowAmount" />
+            <input size="20" placeholder="how often?" list="periods" @bind="model.NewInflowPeriod">
+            <datalist id="periods">
+                @foreach (MoneyFlows.Period period in Enum.GetValues(typeof(MoneyFlows.Period)))
+                {
+                    <option value="@period">@GetPeriodDescription(period)</option>
+                }
+            </datalist>
+        </dd>
+        <dt>from</dt>
+        <dd><input size="30" placeholder="Income Source" @bind="model.NewInflowName" /></dd>
+    </dl>
 
-
-<button class="btn btn-primary" @onclick="AddInflow">Click me</button>
+    <button type="submit" class="btn btn-primary">Add Income</button>
+</EditForm>
 
 @code {
     private MoneyFlows MoneyFlows { get; } = new MoneyFlows();
-    private string NewInflowName { get; set; }
-    private decimal NewInflowAmount { get; set; }
-    private MoneyFlows.Period NewInflowPeriod { get; set; }
+    private NewMoneyInflowModel model = new NewMoneyInflowModel();
 
     private void AddInflow()
     {
-        this.MoneyFlows.Inflows.Add(new MoneyFlows.Inflow { Name = this.NewInflowName, Amount = this.NewInflowAmount, Period = NewInflowPeriod });
-        this.NewInflowName = "";
-        this.NewInflowAmount = 0.0m;
-        this.NewInflowPeriod = default(MoneyFlows.Period);
+        this.MoneyFlows.Inflows.Add(
+            new MoneyFlows.Inflow
+            {
+                Name = this.model.NewInflowName ?? "",
+                Amount = this.model.NewInflowAmount ?? default,
+                Period = this.model.NewInflowPeriod ?? default,
+            });
+        this.model = new NewMoneyInflowModel();
     }
+
+    private string GetPeriodDescription(MoneyFlows.Period period) => period switch
+    {
+        MoneyFlows.Period.Weekly => "every week",
+        MoneyFlows.Period.BiWeekly => "every two weeks",
+        MoneyFlows.Period.Monthly => "every month",
+        MoneyFlows.Period.SemiMonthly => "twice per month",
+        _ => throw new ArgumentException($"Unknown period: {period}"),
+    };
 }
