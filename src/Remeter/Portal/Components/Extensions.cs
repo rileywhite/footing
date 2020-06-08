@@ -1,4 +1,6 @@
 using System;
+using System.Threading.Tasks;
+using Microsoft.JSInterop;
 
 namespace Remeter.Portal.Components
 {
@@ -12,5 +14,10 @@ namespace Remeter.Portal.Components
             MoneyFlows.Period.SemiMonthly => amount * 24m / 52m,
             var unsupported => throw new NotSupportedException($"Unknown Period: {unsupported}"),
         };
+
+        public static async Task InitializePopovers(this IJSRuntime jsRuntime)
+        {
+            await jsRuntime.InvokeVoidAsync("initializePopovers");
+        }
     }
 }

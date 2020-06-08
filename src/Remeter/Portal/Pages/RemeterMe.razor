@@ -1,5 +1,7 @@
 @page "/remeter-me"
 
+@inject IJSRuntime JSRuntime
+
 <h1>Remeter My Money</h1>
 
 <p>
@@ -64,4 +66,10 @@
         MoneyFlows.Period.SemiMonthly => "twice per month",
         _ => throw new ArgumentException($"Unknown period: {period}"),
     };
+
+    protected async override Task OnAfterRenderAsync(bool firstRender)
+    {
+        await JSRuntime.InitializePopovers();
+        await base.OnAfterRenderAsync(firstRender);
+    }
 }
