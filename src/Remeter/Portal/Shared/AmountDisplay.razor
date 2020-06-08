@@ -13,7 +13,7 @@
     [Parameter]
     public decimal Amount { get; set; }
 
-            public decimal RoundedAbsoluteAmount => Math.Abs(this.Amount);
+    public decimal RoundedAbsoluteAmount => Math.Round(Math.Abs(this.Amount), 2);
 
     public bool IsNegative => this.Amount < 0m;
 }

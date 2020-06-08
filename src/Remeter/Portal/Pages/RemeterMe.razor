@@ -12,7 +12,6 @@
 
 <EditForm Model="@model" OnValidSubmit="AddInflow">
     <DataAnnotationsValidator />
-    <ValidationSummary />
     <dl>
         <dt>
             I receive a
@@ -40,6 +39,7 @@
     </dl>
 
     <button type="submit" class="btn btn-primary">Add Income</button>
+    <ValidationSummary />
 </EditForm>
 
 @code {
