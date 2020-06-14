@@ -67,8 +67,11 @@
 
     public async Task ClearLocalStorage()
     {
-        this.RemeterAnalysis = new RemeterAnalysis();
-        await this.LocalStore.ClearAsync();
+        if (await this.JSRuntime.InvokeAsync<bool>("confirm", "This will clear all information that you have entered so far. Proceed?"))
+        {
+            this.RemeterAnalysis = new RemeterAnalysis();
+            await this.LocalStore.ClearAsync();
+        }
     }
 
     private MonetaryAmount NetTotalWeeklyAmount => this.RemeterAnalysis.WeeklyTotalMoneyFlow;
