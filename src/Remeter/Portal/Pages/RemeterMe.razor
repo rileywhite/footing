@@ -24,16 +24,8 @@
         </div>
         <div id="totalDetails" class="collapse" aria-labelledby="totalHeading" data-parent="#moneyFlows">
             <div class="card-body">
-                <div class="@this.NetTotalWeeklyAmount.AmountVisibleIfPositiveCssClass">
-                    <h5>
-                        <span class="oi oi-badge"></span> You're looking good so far
-                    </h5>
-                    <p>
-                        This could always change as you notice new expenses that you aren't yet tracking and as unexpected expenses
-                        appear. It's a good idea to stash your extra money somewhere where it will earn interest.
-                    </p>
-                </div>
-                <div class="@this.NetTotalWeeklyAmount.AmountVisibleIfNegativeCssClass">
+                @if (this.NetTotalWeeklyAmount.IsNegative)
+                {
                     <h5>
                         <span class="oi oi-wrench"></span> Time to roll up your sleeves
                     </h5>
@@ -41,7 +33,17 @@
                         It's a good time to take a hard look at your expenses. It's no fun, but with hard work, you can pull yourself back into the
                         net positive territory!
                     </p>
-                </div>
+                }
+                else
+                {
+                    <h5>
+                        <span class="oi oi-badge"></span> You're looking good so far
+                    </h5>
+                    <p>
+                        This could always change as you notice new expenses that you aren't yet tracking and as unexpected expenses
+                        appear. It's a good idea to stash your extra money somewhere where it will earn interest.
+                    </p>
+                }
             </div>
         </div>
     </div>

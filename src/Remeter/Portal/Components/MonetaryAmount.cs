@@ -22,18 +22,10 @@ namespace Remeter.Portal.Components
 
         public string AmountDynamicHighlightCssClass => this.IsNegative ? AmountHighlightNegativeCssClass : AmountHighlightPositiveCssClass;
 
-        public string AmountVisibleIfPositiveCssClass => this.IsNegative ? AmountHideCssClass : AmountDisplayCssClass;
-
-        public string AmountVisibleIfNegativeCssClass => this.IsNegative ? AmountDisplayCssClass : AmountHideCssClass;
-
         public static string AmountSensitiveCssClass => "monetary-amount-sensitive";
 
         public static string AmountHighlightNegativeCssClass => "monetary-amount-highlight-negative";
 
         public static string AmountHighlightPositiveCssClass => "monetary-amount-highlight-positive";
-
-        public static string AmountDisplayCssClass => "monetary-amount-visible";
-
-        public static string AmountHideCssClass => "monetary-amount-invisible";
     }
 }

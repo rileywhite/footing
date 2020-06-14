@@ -150,14 +150,6 @@ app {
     color: red;
 }
 
-.monetary-amount-sensitive .monetary-amount-visible {
-    visibility: visible;
-}
-
-.monetary-amount-sensitive .monetary-amount-invisible {
-    display: none;
-}
-
 @media (max-width: 767.98px) {
     .main .top-row:not(.auth) {
         display: none;
