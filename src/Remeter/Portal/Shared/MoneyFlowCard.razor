@@ -19,35 +19,38 @@
             </tr>
         }
         </table>
-    </div>
-    <EditForm Model="@Model" OnValidSubmit="AddMoneyFlow">
-        <DataAnnotationsValidator />
-        <dl>
-            <dt>
-                @((MarkupString)FormPrompt)
-            </dt>
-            <dd>
-                $<input size="10" placeholder="xxx.xx" @bind="Model.Amount" />
-                <input size="20" placeholder="how often?" list="periods" @bind="Model.Period">
-                <datalist id="periods">
-                    @foreach (Period period in Enum.GetValues(typeof(Period)))
-                    {
-                        <option value="@period">@GetPeriodDescription(period)</option>
-                    }
-                </datalist>
-            </dd>
-            <dt>from</dt>
-            <dd><input size="30" placeholder="@Label Source" @bind="Model.Name" /></dd>
-        </dl>
+        <EditForm Model="@Model" OnValidSubmit="AddMoneyFlow">
+            <DataAnnotationsValidator />
+            <dl>
+                <dt>
+                    @((MarkupString)FormPrompt)
+                </dt>
+                <dd>
+                    $<input size="10" placeholder="xxx.xx" @bind="Model.Amount" />
+                    <input size="20" placeholder="how often?" list="periods" @bind="Model.Period">
+                    <datalist id="periods">
+                        @foreach (Period period in Enum.GetValues(typeof(Period)))
+                        {
+                            <option value="@period">@GetPeriodDescription(period)</option>
+                        }
+                    </datalist>
+                </dd>
+                <dt>from</dt>
+                <dd><input size="30" placeholder="@Label Source" @bind="Model.Name" /></dd>
+            </dl>
 
-        <button type="submit" class="btn btn-primary">Add</button>
-        <ValidationSummary />
-    </EditForm>
+            <button type="submit" class="btn btn-primary">Add</button>
+            <ValidationSummary />
+        </EditForm>
+    </div>
 </div>
 
 @code{
     [Parameter]
     public MoneyFlows MoneyFlows { get; set; } = null!;
+
+    [Parameter]
+    public EventCallback<MoneyFlows> MoneyFlowsChanged { get; set; }
 
     [Parameter]
     public string Name { get; set; } = null!;
@@ -61,7 +64,7 @@
     private NewMoneyFlowModel Model { get; set; } = new NewMoneyFlowModel();
 
 
-    private void AddMoneyFlow()
+    private async Task AddMoneyFlow()
     {
         this.MoneyFlows.Add(
             new MoneyFlow
@@ -71,12 +74,14 @@
                 Period = this.Model.Period ?? default,
             });
         this.Model = new NewMoneyFlowModel();
+        await this.MoneyFlowsChanged.InvokeAsync(this.MoneyFlows);
     }
 
-    private void RemoveMoneyFlow(Guid id)
+    private async Task RemoveMoneyFlow(Guid id)
     {
         var moneyFlow = this.MoneyFlows.First(mf => mf.Id == id);
         this.MoneyFlows.Remove(moneyFlow);
+        await this.MoneyFlowsChanged.InvokeAsync(this.MoneyFlows);
     }
 
     private string GetPeriodDescription(Period period) => period switch

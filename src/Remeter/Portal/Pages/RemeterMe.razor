@@ -9,25 +9,49 @@
 </p>
 
 <div id="moneyFlows" class="accordion">
-    <MoneyFlowCard MoneyFlows="@this.RemeterAnalysis.Inflows" Name="income" Label="Income" FormPrompt="@IncomesFormPrompt" />
-    <MoneyFlowCard MoneyFlows="@this.RemeterAnalysis.RecurringBills" Name="recurringBills" Label="Recurring Bill" FormPrompt="@RecurringBillsFormPrompt" />
-    <MoneyFlowCard MoneyFlows="@this.RemeterAnalysis.HouseholdBudgets" Name="householdBudgets" Label="Household Budget" FormPrompt="@HouseholdBudgetsFormPrompt" />
-    <MoneyFlowCard MoneyFlows="@this.RemeterAnalysis.PersonalBudgets" Name="personalBudgets" Label="Personal Budget" FormPrompt="@PersonalBudgetsFormPrompt" />
-    <MoneyFlowCard MoneyFlows="@this.RemeterAnalysis.EventBudgets" Name="outgo" Label="Event Budget" FormPrompt="@EventBudgetsFormPrompt" />
-</div>
-<div class="card">
-    <div id="totalHeading" class="card-header">
-        <h5>
-            <button class="button btn btn-link btn-accordian-header" type="button" data-toggle="collapse" aria-expanded="false">
-                Net Total <AmountDisplay Amount="this.RemeterAnalysis.WeeklyTotalMoneyFlow" /> / Week
-            </button>
-        </h5>
+    <MoneyFlowCard @bind-MoneyFlows=this.RemeterAnalysis.Inflows Name="income" Label="Income" FormPrompt="@IncomesFormPrompt" />
+    <MoneyFlowCard @bind-MoneyFlows=this.RemeterAnalysis.RecurringBills Name="recurringBills" Label="Recurring Bill" FormPrompt="@RecurringBillsFormPrompt" />
+    <MoneyFlowCard @bind-MoneyFlows=this.RemeterAnalysis.HouseholdBudgets Name="householdBudgets" Label="Household Budget" FormPrompt="@HouseholdBudgetsFormPrompt" />
+    <MoneyFlowCard @bind-MoneyFlows=this.RemeterAnalysis.PersonalBudgets Name="personalBudgets" Label="Personal Budget" FormPrompt="@PersonalBudgetsFormPrompt" />
+    <MoneyFlowCard @bind-MoneyFlows=this.RemeterAnalysis.EventBudgets Name="outgo" Label="Event Budget" FormPrompt="@EventBudgetsFormPrompt" />
+    <div class="card @MonetaryAmount.AmountSensitiveCssClass">
+        <div id="totalHeading" class="card-header">
+            <h5>
+            <button class="button btn btn-link btn-accordian-header" type="button" data-toggle="collapse" data-target="#totalDetails" aria-expanded="true" aria-controls="totalDetails">
+                    Net Total <AmountDisplay Amount=@NetTotalWeeklyAmount /> / Week
+                </button>
+            </h5>
+        </div>
+        <div id="totalDetails" class="collapse" aria-labelledby="totalHeading" data-parent="#moneyFlows">
+            <div class="card-body">
+                <div class="@this.NetTotalWeeklyAmount.AmountVisibleIfPositiveCssClass">
+                    <h5>
+                        You're looking good so far!
+                    </h5>
+                    <p>
+                        This could always change as you notice new expenses that you aren't yet tracking and as unexpected expenses
+                        appear. It's a good idea to stash your extra money somewhere where it will earn interest.
+                    </p>
+                </div>
+                <div class="@this.NetTotalWeeklyAmount.AmountVisibleIfNegativeCssClass">
+                    <h5>
+                        Time to roll up your sleeves!
+                    </h5>
+                    <p>
+                        It's a good time to take a hard look at your expenses. It's no fun, but with hard work, you can pull yourself back into the
+                        net positive territory!
+                    </p>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 
 
 @code {
     private RemeterAnalysis RemeterAnalysis { get; } = new RemeterAnalysis();
+
+    private MonetaryAmount NetTotalWeeklyAmount => this.RemeterAnalysis.WeeklyTotalMoneyFlow;
 
     private string IncomesFormPrompt { get; } =
     @"I receive a

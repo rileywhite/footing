@@ -142,6 +142,23 @@ app {
     top: 0.5rem;
 }
 
+.monetary-amount-sensitive .monetary-amount-highlight-positive {
+    color: blue;
+}
+
+.monetary-amount-sensitive .monetary-amount-highlight-negative {
+    color: red;
+}
+
+.monetary-amount-sensitive .monetary-amount-visible {
+    visibility: visible;
+}
+
+.monetary-amount-sensitive .monetary-amount-invisible {
+    visibility: collapse;
+    display: none;
+}
+
 @media (max-width: 767.98px) {
     .main .top-row:not(.auth) {
         display: none;

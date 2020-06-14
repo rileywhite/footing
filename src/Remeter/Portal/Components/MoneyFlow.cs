@@ -8,7 +8,7 @@ namespace Remeter.Portal.Components
 
         public string Name { get; set; } = null!;
 
-        public decimal Amount { get; set; }
+        public MonetaryAmount Amount { get; set; }
 
         public Period Period { get; set; }
 

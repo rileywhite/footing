@@ -1,19 +1,15 @@
 @{
-    if (this.IsNegative)
+    if (this.Amount.IsNegative)
     {
-       <span>($@this.RoundedAbsoluteAmount)</span>
+       <span class="@this.Amount.AmountDynamicHighlightCssClass">-$@this.Amount.RoundedAbsoluteAmount</span>
     }
     else
     {
-       <span>$@this.RoundedAbsoluteAmount</span>
+       <span class="@this.Amount.AmountDynamicHighlightCssClass">$@this.Amount.RoundedAbsoluteAmount</span>
     }
 }
 
 @code {
     [Parameter]
-    public decimal Amount { get; set; }
-
-    public decimal RoundedAbsoluteAmount => Math.Round(Math.Abs(this.Amount), 2);
-
-    public bool IsNegative => this.Amount < 0m;
+    public MonetaryAmount Amount { get; set; }
 }
