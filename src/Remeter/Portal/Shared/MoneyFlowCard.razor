@@ -7,7 +7,7 @@
         </h5>
     </div>
 </div>
-<div id="@(Name)Details" class="collapse show" aria-labelledby="@(Name)Heading" data-parent="#moneyFlows">
+<div id="@(Name)Details" class="collapse" aria-labelledby="@(Name)Heading" data-parent="#moneyFlows">
     <div class="card-body">
         <table class="table">
         @foreach (var moneyFlow in this.MoneyFlows)
@@ -24,15 +24,7 @@
         <DataAnnotationsValidator />
         <dl>
             <dt>
-                I receive a
-                <span
-                    data-toggle="popover"
-                    title="Final amount deposited into your account after taxes and other garnishments"
-                    data-placement="auto"
-                    class="text-info">
-                    net amount
-                </span>
-                of
+                @((MarkupString)FormPrompt)
             </dt>
             <dd>
                 $<input size="10" placeholder="xxx.xx" @bind="Model.Amount" />
@@ -63,6 +55,9 @@
     [Parameter]
     public string Label { get; set; } = null!;
 
+    [Parameter]
+    public string FormPrompt { get; set; } = null!;
+
     private NewMoneyFlowModel Model { get; set; } = new NewMoneyFlowModel();
 
 
@@ -88,8 +83,11 @@
     {
         Period.Weekly => "every week",
         Period.BiWeekly => "every two weeks",
-        Period.Monthly => "every month",
         Period.SemiMonthly => "twice per month",
+        Period.Monthly => "every month",
+        Period.Quarterly => "every three months",
+        Period.SemiAnnually => "every six months",
+        Period.Annually => "every year",
         _ => throw new ArgumentException($"Unknown period: {period}"),
     };
 }

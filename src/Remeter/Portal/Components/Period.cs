@@ -6,7 +6,10 @@ namespace Remeter.Portal.Components
     {
         Weekly,
         BiWeekly,
-        Monthly,
         SemiMonthly,
+        Monthly,
+        Quarterly,
+        SemiAnnually,
+        Annually,
     }
 }

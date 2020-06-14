@@ -10,8 +10,11 @@ namespace Remeter.Portal.Components
         {
             Period.Weekly => amount,
             Period.BiWeekly => amount / 2m,
-            Period.Monthly => amount * 12m / 52m,
             Period.SemiMonthly => amount * 24m / 52m,
+            Period.Monthly => amount * 12m / 52m,
+            Period.Quarterly => amount * 4m / 52m,
+            Period.SemiAnnually => amount * 2m / 52m,
+            Period.Annually => amount / 52m,
             var unsupported => throw new NotSupportedException($"Unknown Period: {unsupported}"),
         };
 
