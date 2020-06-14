@@ -1,0 +1,25 @@
+@page "{{pagePath}}"
+
+<h1>{{name}}</h1>
+
+<p>Description</p>
+
+@if (state == null)
+{
+    <div>Loading...</div>
+}
+else
+{
+    <div>
+        @state
+    </div>
+}
+
+@code {
+    private string state;
+
+    protected override async Task OnInitializedAsync()
+    {
+        this.state = await Task.FromResult("state");
+    }
+}
