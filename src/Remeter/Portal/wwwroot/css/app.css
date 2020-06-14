@@ -155,7 +155,6 @@ app {
 }
 
 .monetary-amount-sensitive .monetary-amount-invisible {
-    visibility: collapse;
     display: none;
 }
 
