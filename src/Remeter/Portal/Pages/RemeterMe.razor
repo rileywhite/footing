@@ -1,11 +1,16 @@
 @page "/remeter-me"
 
 @inject IJSRuntime JSRuntime
+@inject Blazored.LocalStorage.ILocalStorageService LocalStore
 
 <h1>Remeter My Money</h1>
 
 <p>
-    <em>Nothing you put in here will be sent to our servers.</em>
+    <em>
+        Nothing you put in here will be sent to our servers. It will be saved to your local computer; however, you may
+        <a href="" @onclick=ClearLocalStorage @onclick:preventDefault>clear</a>
+        it at any time.
+    </em>
 </p>
 
 <div id="moneyFlows" class="accordion">
@@ -51,7 +56,23 @@
 
 
 @code {
-    private RemeterAnalysis RemeterAnalysis { get; } = new RemeterAnalysis();
+    private static string RemeterAnalysisStorageKey = "3794bdc6-f064-43e6-9a1e-8bb2c03d16cb";
+
+    private RemeterAnalysis RemeterAnalysis { get; set; } = new RemeterAnalysis();
+
+    public async Task UpdateLocalStorage()
+    {
+        await this.LocalStore.SetItemAsync(RemeterAnalysisStorageKey, this.RemeterAnalysis);
+    }
+
+    public async Task ClearLocalStorage()
+    {
+        if (await this.JSRuntime.InvokeAsync<bool>("confirm", "This will clear all information that you have entered so far. Proceed?"))
+        {
+            this.RemeterAnalysis = new RemeterAnalysis();
+            await this.LocalStore.ClearAsync();
+        }
+    }
 
     private MonetaryAmount NetTotalWeeklyAmount => this.RemeterAnalysis.WeeklyTotalMoneyFlow;
 
@@ -90,9 +111,23 @@
     </span>
     of";
 
+    protected override async Task OnInitializedAsync()
+    {
+        if (await this.LocalStore.ContainKeyAsync(RemeterAnalysisStorageKey))
+        {
+            this.RemeterAnalysis = await this.LocalStore.GetItemAsync<RemeterAnalysis>(RemeterAnalysisStorageKey) ?? new RemeterAnalysis();
+        }
+
+        if (this.RemeterAnalysis == null)
+        {
+            this.RemeterAnalysis = new RemeterAnalysis();
+        }
+    }
+
     protected async override Task OnAfterRenderAsync(bool firstRender)
     {
         await JSRuntime.InitializePopovers();
+        await this.UpdateLocalStorage();
         await base.OnAfterRenderAsync(firstRender);
     }
 }
