@@ -1,0 +1,15 @@
+@{
+    if (this.Amount.IsNegative)
+    {
+       <span class="@this.Amount.AmountDynamicHighlightCssClass">-$@this.Amount.RoundedAbsoluteAmount</span>
+    }
+    else
+    {
+       <span class="@this.Amount.AmountDynamicHighlightCssClass">$@this.Amount.RoundedAbsoluteAmount</span>
+    }
+}
+
+@code {
+    [Parameter]
+    public MonetaryAmount Amount { get; set; }
+}
