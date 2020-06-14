@@ -8,64 +8,13 @@
     <em>Nothing you put in here will be sent to our servers.</em>
 </p>
 
-<MoneyFlowsInfoBox MoneyFlows="@MoneyFlows" />
+<div id="moneyFlows" class="accordion">
+    <MoneyFlowCard MoneyFlows="@this.RemeterAnalysis.Inflows" Name="income" Label="Income" />
+</div>
 
-<EditForm Model="@model" OnValidSubmit="AddInflow">
-    <DataAnnotationsValidator />
-    <dl>
-        <dt>
-            I receive a
-            <span
-                data-toggle="popover"
-                title="Final amount deposited into your account after taxes and other garnishments"
-                data-placement="auto"
-                class="text-info">
-                net amount
-            </span>
-            of
-        </dt>
-        <dd>
-            $<input size="10" placeholder="xxx.xx" @bind="model.NewInflowAmount" />
-            <input size="20" placeholder="how often?" list="periods" @bind="model.NewInflowPeriod">
-            <datalist id="periods">
-                @foreach (MoneyFlows.Period period in Enum.GetValues(typeof(MoneyFlows.Period)))
-                {
-                    <option value="@period">@GetPeriodDescription(period)</option>
-                }
-            </datalist>
-        </dd>
-        <dt>from</dt>
-        <dd><input size="30" placeholder="Income Source" @bind="model.NewInflowName" /></dd>
-    </dl>
-
-    <button type="submit" class="btn btn-primary">Add Income</button>
-    <ValidationSummary />
-</EditForm>
 
 @code {
-    private MoneyFlows MoneyFlows { get; } = new MoneyFlows();
-    private NewMoneyInflowModel model = new NewMoneyInflowModel();
-
-    private void AddInflow()
-    {
-        this.MoneyFlows.Inflows.Add(
-            new MoneyFlows.Inflow
-            {
-                Name = this.model.NewInflowName ?? "",
-                Amount = this.model.NewInflowAmount ?? default,
-                Period = this.model.NewInflowPeriod ?? default,
-            });
-        this.model = new NewMoneyInflowModel();
-    }
-
-    private string GetPeriodDescription(MoneyFlows.Period period) => period switch
-    {
-        MoneyFlows.Period.Weekly => "every week",
-        MoneyFlows.Period.BiWeekly => "every two weeks",
-        MoneyFlows.Period.Monthly => "every month",
-        MoneyFlows.Period.SemiMonthly => "twice per month",
-        _ => throw new ArgumentException($"Unknown period: {period}"),
-    };
+    private RemeterAnalysis RemeterAnalysis { get; } = new RemeterAnalysis();
 
     protected async override Task OnAfterRenderAsync(bool firstRender)
     {

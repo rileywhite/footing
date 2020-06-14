@@ -14,6 +14,12 @@ a, .btn-link {
     border-color: #18ac61;
 }
 
+.btn-accordian-header:focus {
+    outline: none;
+    box-shadow: none;
+    text-decoration: none;
+}
+
 app {
     position: relative;
     display: flex;

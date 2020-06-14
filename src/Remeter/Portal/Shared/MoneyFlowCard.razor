@@ -1,0 +1,95 @@
+<div class="card">
+    <div id="@(Name)Heading" class="card-header">
+        <h5 class="mb-0">
+            <button class="button btn btn-link btn-accordian-header" type="button" data-toggle="collapse" data-target="#@(Name)Details" aria-expanded="true" aria-controls="@(Name)Details">
+                @Label <AmountDisplay Amount="this.MoneyFlows.WeeklyTotalMoneyFlow" /> / Week
+            </button>
+        </h5>
+    </div>
+</div>
+<div id="@(Name)Details" class="collapse show" aria-labelledby="@(Name)Heading" data-parent="#moneyFlows">
+    <div class="card-body">
+        <table class="table">
+        @foreach (var moneyFlow in this.MoneyFlows)
+        { 
+            <tr>
+                <td>@moneyFlow.Name</td>
+                <td><AmountDisplay Amount="@moneyFlow.Amount" /> @moneyFlow.Period</td>
+                <td><span class="oi oi-x" @onclick="@(e => this.RemoveMoneyFlow(moneyFlow.Id))" ></span></td>
+            </tr>
+        }
+        </table>
+    </div>
+    <EditForm Model="@Model" OnValidSubmit="AddMoneyFlow">
+        <DataAnnotationsValidator />
+        <dl>
+            <dt>
+                I receive a
+                <span
+                    data-toggle="popover"
+                    title="Final amount deposited into your account after taxes and other garnishments"
+                    data-placement="auto"
+                    class="text-info">
+                    net amount
+                </span>
+                of
+            </dt>
+            <dd>
+                $<input size="10" placeholder="xxx.xx" @bind="Model.Amount" />
+                <input size="20" placeholder="how often?" list="periods" @bind="Model.Period">
+                <datalist id="periods">
+                    @foreach (Period period in Enum.GetValues(typeof(Period)))
+                    {
+                        <option value="@period">@GetPeriodDescription(period)</option>
+                    }
+                </datalist>
+            </dd>
+            <dt>from</dt>
+            <dd><input size="30" placeholder="@Label Source" @bind="Model.Name" /></dd>
+        </dl>
+
+        <button type="submit" class="btn btn-primary">Add</button>
+        <ValidationSummary />
+    </EditForm>
+</div>
+
+@code{
+    [Parameter]
+    public MoneyFlows MoneyFlows { get; set; } = null!;
+
+    [Parameter]
+    public string Name { get; set; } = null!;
+
+    [Parameter]
+    public string Label { get; set; } = null!;
+
+    private NewMoneyFlowModel Model { get; set; } = new NewMoneyFlowModel();
+
+
+    private void AddMoneyFlow()
+    {
+        this.MoneyFlows.Add(
+            new MoneyFlow
+            {
+                Name = this.Model.Name ?? "",
+                Amount = this.Model.Amount ?? default,
+                Period = this.Model.Period ?? default,
+            });
+        this.Model = new NewMoneyFlowModel();
+    }
+
+    private void RemoveMoneyFlow(Guid id)
+    {
+        var moneyFlow = this.MoneyFlows.First(mf => mf.Id == id);
+        this.MoneyFlows.Remove(moneyFlow);
+    }
+
+    private string GetPeriodDescription(Period period) => period switch
+    {
+        Period.Weekly => "every week",
+        Period.BiWeekly => "every two weeks",
+        Period.Monthly => "every month",
+        Period.SemiMonthly => "twice per month",
+        _ => throw new ArgumentException($"Unknown period: {period}"),
+    };
+}
