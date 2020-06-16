@@ -14,11 +14,36 @@
 </p>
 
 <div id="moneyFlows" class="accordion">
-    <MoneyFlowCard @bind-MoneyFlows=this.RemeterAnalysis.Inflows Name="income" Label="Income" FormPrompt="@IncomesFormPrompt" />
-    <MoneyFlowCard @bind-MoneyFlows=this.RemeterAnalysis.RecurringBills Name="recurringBills" Label="Recurring Bill" FormPrompt="@RecurringBillsFormPrompt" />
-    <MoneyFlowCard @bind-MoneyFlows=this.RemeterAnalysis.HouseholdBudgets Name="householdBudgets" Label="Household Budget" FormPrompt="@HouseholdBudgetsFormPrompt" />
-    <MoneyFlowCard @bind-MoneyFlows=this.RemeterAnalysis.PersonalBudgets Name="personalBudgets" Label="Personal Budget" FormPrompt="@PersonalBudgetsFormPrompt" />
-    <MoneyFlowCard @bind-MoneyFlows=this.RemeterAnalysis.EventBudgets Name="outgo" Label="Event Budget" FormPrompt="@EventBudgetsFormPrompt" />
+    <MoneyFlowCard
+        @bind-MoneyFlows=this.RemeterAnalysis.Inflows
+        Name="income"
+        Label="Income"
+        FormPrompt="@IncomesFormPrompt"
+        FormAmountDescriptionConnectorWord="from" />
+    <MoneyFlowCard
+        @bind-MoneyFlows=this.RemeterAnalysis.RecurringBills
+        Name="recurringBills"
+        Label="Recurring Bill"
+        FormPrompt="@RecurringBillsFormPrompt"
+        FormAmountDescriptionConnectorWord="for" />
+    <MoneyFlowCard
+        @bind-MoneyFlows=this.RemeterAnalysis.HouseholdBudgets
+        Name="householdBudgets"
+        Label="Household Budget"
+        FormPrompt="@HouseholdBudgetsFormPrompt"
+        FormAmountDescriptionConnectorWord="for" />
+    <MoneyFlowCard
+        @bind-MoneyFlows=this.RemeterAnalysis.PersonalBudgets
+        Name="personalBudgets"
+        Label="Personal Budget"
+        FormPrompt="@PersonalBudgetsFormPrompt"
+        FormAmountDescriptionConnectorWord="for" />
+    <MoneyFlowCard
+        @bind-MoneyFlows=this.RemeterAnalysis.EventBudgets
+        Name="eventBudgets"
+        Label="Event Budget"
+        FormPrompt="@EventBudgetsFormPrompt"
+        FormAmountDescriptionConnectorWord="for" />
     <div class="card @MonetaryAmount.AmountSensitiveCssClass">
         <div id="totalHeading" class="card-header">
             <h5>
@@ -98,18 +123,18 @@
     of";
 
     private string PersonalBudgetsFormPrompt { get; } =
-    @"I estimate that I, or someone in my household, needs to budget
+    @"I estimate that someone in my household needs to budget a
     <span data-toggle=""popover"" title=""For a personal spending allowance, haircut, eating lunch at work, etc"" data-placement=""auto"" class=""text-info"">
-    a personally available
+    personally available
     </span>
     amount of";
 
     private string EventBudgetsFormPrompt { get; } =
-    @"I estimate that I need to create a budget for a
+    @"I estimate that I need a
     <span data-toggle=""popover"" title=""Differring amounts on strictly or loosely occuring time periods, e.g. Christmas, Birthdays, vacations, etc"" data-placement=""auto"" class=""text-info"">
     recurring event
     </span>
-    of";
+    budget of";
 
     protected override async Task OnInitializedAsync()
     {

@@ -35,8 +35,8 @@
                         }
                     </datalist>
                 </dd>
-                <dt>from</dt>
-                <dd><input size="30" placeholder="@Label Source" @bind="Model.Name" /></dd>
+                <dt>@FormAmountDescriptionConnectorWord</dt>
+                <dd><input size="30" placeholder="@Label Description" @bind="Model.Name" /></dd>
             </dl>
 
             <button type="submit" class="btn btn-primary">Add</button>
@@ -60,6 +60,9 @@
 
     [Parameter]
     public string FormPrompt { get; set; } = null!;
+
+    [Parameter]
+    public string FormAmountDescriptionConnectorWord { get; set; } = null!;
 
     private NewMoneyFlowModel Model { get; set; } = new NewMoneyFlowModel();
 
