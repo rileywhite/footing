@@ -8,7 +8,7 @@ namespace Remeter.Portal.Components
 {
     public class SimplexcelExporter
     {
-        private readonly static string DollarFormat = "$#,##0.00";
+        private readonly static string DollarFormat = "$#,##0.00;($#,##0.00)";
         private readonly static int NameColumnWidth = 20;
         private readonly static int AmountColumnWidth = 10;
 
