@@ -8,7 +8,9 @@ namespace Remeter.Portal.Components
 {
     public class SimplexcelExporter
     {
-        private static string DollarFormat = "$#,##0.00";
+        private readonly static string DollarFormat = "$#,##0.00";
+        private readonly static int NameColumnWidth = 20;
+        private readonly static int AmountColumnWidth = 10;
 
         public SimplexcelExporter(RemeterAnalysis remeterAnalysis)
         {
@@ -49,14 +51,22 @@ namespace Remeter.Portal.Components
         {
             var worksheet = new Worksheet("Summary");
 
-            worksheet["B1"] = "Weekly Avg";
-            worksheet["B1"].Bold = true;
+            worksheet.ColumnWidths[0] = NameColumnWidth;
+            worksheet.ColumnWidths[1] = AmountColumnWidth;
+
+            worksheet["A1"] = "Remeter Your Finances at https://remeter.org";
+            worksheet["A1"].Hyperlink = "https://remeter.org";
+            worksheet["A1"].Bold = true;
+
+            worksheet["B3"] = "Weekly Avg";
+            worksheet["B3"].Bold = true;
+            worksheet["B3"].HorizontalAlignment = HorizontalAlign.Center;
 
             for (var i = 0; i < detailWorksheets.Length; i++)
             {
                 var detailWorksheet = detailWorksheets[i].Worksheet;
                 var direction = detailWorksheets[i].Direction;
-                int rowIndex = i + 1;
+                int rowIndex = i + 3;
 
                 worksheet[rowIndex, 0] = detailWorksheet.Name;
                 worksheet[rowIndex, 0].Bold = true;
@@ -69,8 +79,8 @@ namespace Remeter.Portal.Components
                 worksheet[rowIndex, 1].Format = DollarFormat;
             }
 
-            var totalRowIndex = detailWorksheets.Length + 4;
-            var lastDetailRowNum = detailWorksheets.Length + 1;
+            var totalRowIndex = detailWorksheets.Length + 6;
+            var lastDetailRowNum = detailWorksheets.Length + 3;
 
             worksheet[totalRowIndex, 0] = "Net";
             worksheet[totalRowIndex, 0].Bold = true;
@@ -95,6 +105,11 @@ namespace Remeter.Portal.Components
         {
             var worksheet = new Worksheet(name);
 
+            worksheet.ColumnWidths[0] = NameColumnWidth;
+            worksheet.ColumnWidths[1] = AmountColumnWidth;
+            worksheet.ColumnWidths[2] = AmountColumnWidth;
+            worksheet.ColumnWidths[3] = AmountColumnWidth;
+
             worksheet["C1"] = "Total";
             worksheet["C1"].Bold = true;
 
@@ -113,6 +128,11 @@ namespace Remeter.Portal.Components
             worksheet["B2"].Bold = true;
             worksheet["C2"].Bold = true;
             worksheet["D2"].Bold = true;
+
+            worksheet["A2"].HorizontalAlignment = HorizontalAlign.Center;
+            worksheet["B2"].HorizontalAlignment = HorizontalAlign.Center;
+            worksheet["C2"].HorizontalAlignment = HorizontalAlign.Center;
+            worksheet["D2"].HorizontalAlignment = HorizontalAlign.Center;
 
             for (var i = 0; i < moneyFlows.Count; i++)
             {

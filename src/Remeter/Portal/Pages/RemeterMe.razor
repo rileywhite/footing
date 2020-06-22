@@ -80,17 +80,8 @@
         </div>
     </div>
     <div class="card">
-        <div id="exportHeader" class="card-header">
-            <h5>
-            <button class="button btn btn-link btn-accordian-header" type="button" data-toggle="collapse" data-target="#exportDetails" aria-expanded="true" aria-controls="exportDetails">
-                Export Data
-            </button>
-            </h5>
-        </div>
-        <div id="exportDetails" class="collapse" aria-labelledby="exportHeader" data-parent="#moneyFlows">
-            <div class="card-body">
-                <input type="button" class="btn btn-primary" @onclick="ExportToExcel" value="Download Excel Spreadsheet" />
-            </div>
+        <div class="card-body">
+            <input type="button" class="btn btn-primary" @onclick="ExportToExcel" value="Download Excel Spreadsheet" />
         </div>
     </div>
 </div>
