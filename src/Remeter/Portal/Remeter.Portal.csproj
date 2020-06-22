@@ -11,5 +11,7 @@
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Authentication" Version="3.2.0"/>
     <PackageReference Include="System.Net.Http.Json" Version="3.2.0"/>
     <PackageReference Include="Blazored.LocalStorage" Version="2.1.6"/>
+    <PackageReference Include="simplexcel" Version="3.0.1.184"/>
+    <PackageReference Include="Nito.AsyncEx" Version="5.0.0"/>
   </ItemGroup>
 </Project>

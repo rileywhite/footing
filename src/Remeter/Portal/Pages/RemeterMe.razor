@@ -1,5 +1,7 @@
 @page "/remeter-me"
 
+@using System.IO;
+
 @inject IJSRuntime JSRuntime
 @inject Blazored.LocalStorage.ILocalStorageService LocalStore
 
@@ -77,6 +79,11 @@
             </div>
         </div>
     </div>
+    <div class="card">
+        <div class="card-body">
+            <input type="button" class="btn btn-primary" @onclick="ExportToExcel" value="Download Excel Spreadsheet" />
+        </div>
+    </div>
 </div>
 
 
@@ -136,11 +143,25 @@
     </span>
     budget of";
 
+    private async Task ExportToExcel()
+    {
+        using var stream = new MemoryStream();
+
+        await new SimplexcelExporter(this.RemeterAnalysis).ExportTo(stream);
+
+        await this.JSRuntime.InvokeAsync<object>(
+           "saveAsFile",
+           "Remeter Me.xlsx",
+           "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+           Convert.ToBase64String(stream.ToArray()));
+    }
+
     protected override async Task OnInitializedAsync()
     {
         if (await this.LocalStore.ContainKeyAsync(RemeterAnalysisStorageKey))
         {
             this.RemeterAnalysis = await this.LocalStore.GetItemAsync<RemeterAnalysis>(RemeterAnalysisStorageKey) ?? new RemeterAnalysis();
+            this.RemeterAnalysis?.FixVersionIssues();
         }
 
         if (this.RemeterAnalysis == null)

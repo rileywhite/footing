@@ -4,6 +4,7 @@ namespace Remeter.Portal.Components
 {
     public enum Period
     {
+        Daily,
         Weekly,
         BiWeekly,
         SemiMonthly,
