@@ -24,29 +24,61 @@ namespace Remeter.Portal.Components
         {
             await Task.Yield();
 
-            var income = this.GenerateIncomeWorksheet("Income", this.RemeterAnalysis.Inflows);
-            var recurringBills = this.GenerateBudgetWorksheet("Recurring Bills", this.RemeterAnalysis.RecurringBills);
-            var householdBudget = this.GenerateBudgetWorksheet("Household Budget", this.RemeterAnalysis.HouseholdBudgets);
-            var personalBudget = this.GenerateBudgetWorksheet("Personal Budget", this.RemeterAnalysis.PersonalBudgets);
-            var eventBudget = this.GenerateBudgetWorksheet("Events Budget", this.RemeterAnalysis.EventBudgets);
+            (Worksheet Worksheet, MoneyFlowDirection Direction)[] detailWorksheets = new[]
+            {
+                (this.GenerateIncomeWorksheet("Income", this.RemeterAnalysis.Inflows), this.RemeterAnalysis.Inflows.Direction),
+                (this.GenerateBudgetWorksheet("Recurring Bills", this.RemeterAnalysis.RecurringBills), this.RemeterAnalysis.RecurringBills.Direction),
+                (this.GenerateBudgetWorksheet("Household Budget", this.RemeterAnalysis.HouseholdBudgets), this.RemeterAnalysis.HouseholdBudgets.Direction),
+                (this.GenerateBudgetWorksheet("Personal Budget", this.RemeterAnalysis.PersonalBudgets), this.RemeterAnalysis.PersonalBudgets.Direction),
+                (this.GenerateBudgetWorksheet("Events Budget", this.RemeterAnalysis.EventBudgets), this.RemeterAnalysis.EventBudgets.Direction),
+            };
 
-            var summary = new Worksheet("Summary");
-
-            var cell = new Cell(CellType.Text);
-            cell.Value = "hullo wurld";
-
-            var worksheet = new Worksheet("Test");
-            worksheet[0, 0] = cell;
+            var summary = this.GenerateSummaryWorksheet(detailWorksheets);
 
             var workbook = new Workbook();
             workbook.Add(summary);
-            workbook.Add(income);
-            workbook.Add(recurringBills);
-            workbook.Add(householdBudget);
-            workbook.Add(personalBudget);
-            workbook.Add(eventBudget);
+            foreach (var detailWorksheet in detailWorksheets)
+            {
+                workbook.Add(detailWorksheet.Worksheet);
+            }
 
             return workbook;
+        }
+
+        private Worksheet GenerateSummaryWorksheet((Worksheet Worksheet, MoneyFlowDirection Direction)[] detailWorksheets)
+        {
+            var worksheet = new Worksheet("Summary");
+
+            worksheet["B1"] = "Weekly Avg";
+            worksheet["B1"].Bold = true;
+
+            for (var i = 0; i < detailWorksheets.Length; i++)
+            {
+                var detailWorksheet = detailWorksheets[i].Worksheet;
+                var direction = detailWorksheets[i].Direction;
+                int rowIndex = i + 1;
+
+                worksheet[rowIndex, 0] = detailWorksheet.Name;
+                worksheet[rowIndex, 0].Bold = true;
+
+                worksheet[rowIndex, 1] =
+                    direction == MoneyFlowDirection.Income ?
+                        Cell.Formula($"'{detailWorksheet.Name}'!$D$1") :
+                        Cell.Formula($"-'{detailWorksheet.Name}'!$D$1");
+
+                worksheet[rowIndex, 1].Format = DollarFormat;
+            }
+
+            var totalRowIndex = detailWorksheets.Length + 4;
+            var lastDetailRowNum = detailWorksheets.Length + 1;
+
+            worksheet[totalRowIndex, 0] = "Net";
+            worksheet[totalRowIndex, 0].Bold = true;
+
+            worksheet[totalRowIndex, 1] = Cell.Formula($"SUM(B$2:B${lastDetailRowNum})");
+            worksheet[totalRowIndex, 1].Format = DollarFormat;
+
+            return worksheet;
         }
 
         private Worksheet GenerateIncomeWorksheet(string name, MoneyFlows moneyFlows)
@@ -63,7 +95,7 @@ namespace Remeter.Portal.Components
         {
             var worksheet = new Worksheet(name);
 
-            worksheet["C1"] = "Totals";
+            worksheet["C1"] = "Total";
             worksheet["C1"].Bold = true;
 
             worksheet["D1"] = Cell.Formula("SUM(D3:D1000)");

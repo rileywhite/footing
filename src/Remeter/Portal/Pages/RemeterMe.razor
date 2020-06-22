@@ -170,6 +170,7 @@
         if (await this.LocalStore.ContainKeyAsync(RemeterAnalysisStorageKey))
         {
             this.RemeterAnalysis = await this.LocalStore.GetItemAsync<RemeterAnalysis>(RemeterAnalysisStorageKey) ?? new RemeterAnalysis();
+            this.RemeterAnalysis?.FixVersionIssues();
         }
 
         if (this.RemeterAnalysis == null)
