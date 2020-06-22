@@ -89,6 +89,7 @@
 
     private string GetPeriodDescription(Period period) => period switch
     {
+        Period.Daily => "every day",
         Period.Weekly => "every week",
         Period.BiWeekly => "every two weeks",
         Period.SemiMonthly => "twice per month",
