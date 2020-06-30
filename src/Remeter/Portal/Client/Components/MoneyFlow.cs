@@ -1,6 +1,6 @@
 using System;
 
-namespace Remeter.Portal.Components
+namespace Remeter.Portal.Client.Components
 {
     public class MoneyFlow
     {

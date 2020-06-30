@@ -6,7 +6,7 @@ using System;
 using System.Net.Http;
 using System.Threading.Tasks;
 
-namespace Remeter.Portal
+namespace Remeter.Portal.Client
 {
     public class Program
     {

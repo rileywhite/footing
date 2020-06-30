@@ -1,8 +1,8 @@
 using System;
 using System.ComponentModel.DataAnnotations;
-using Remeter.Portal.Components;
+using Remeter.Portal.Client.Components;
 
-namespace Remeter.Portal.Model
+namespace Remeter.Portal.Client.Model
 {
     public class NewMoneyFlowModel
     {

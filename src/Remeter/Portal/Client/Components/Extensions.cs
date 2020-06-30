@@ -2,7 +2,7 @@ using System;
 using System.Threading.Tasks;
 using Microsoft.JSInterop;
 
-namespace Remeter.Portal.Components
+namespace Remeter.Portal.Client.Components
 {
     public static class Extensions
     {

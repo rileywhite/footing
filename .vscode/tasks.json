@@ -7,7 +7,7 @@
             "type": "process",
             "args": [
                 "build",
-                "${workspaceFolder}/src/Remeter/Portal/Remeter.Portal.csproj",
+                "${workspaceFolder}/src/Remeter/Portal/Client/Remeter.Portal.Client.csproj",
                 "/property:GenerateFullPaths=true",
                 "/consoleloggerparameters:NoSummary"
             ],
@@ -19,7 +19,7 @@
             "type": "process",
             "args": [
                 "publish",
-                "${workspaceFolder}/src/Remeter/Portal/Remeter.Portal.csproj",
+                "${workspaceFolder}/src/Remeter/Portal/Client/Remeter.Portal.Client.csproj",
                 "/property:GenerateFullPaths=true",
                 "/consoleloggerparameters:NoSummary"
             ],
@@ -32,7 +32,7 @@
             "args": [
                 "watch",
                 "run",
-                "${workspaceFolder}/src/Remeter/Portal/Remeter.Portal.csproj",
+                "${workspaceFolder}/src/Remeter/Portal/Client/Remeter.Portal.Client.csproj",
                 "/property:GenerateFullPaths=true",
                 "/consoleloggerparameters:NoSummary"
             ],
