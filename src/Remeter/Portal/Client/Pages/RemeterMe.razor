@@ -11,6 +11,12 @@
 
 <h1>Remeter My Money</h1>
 
+@if (this.PrerenderDetector.IsPrerendering)
+{
+    <LoadingState/>
+}
+else
+{
 <p>
     <em>
         Nothing you put in here will be sent to our servers. It will be saved to your local computer; however, you may
@@ -89,7 +95,7 @@
         </div>
     </div>
 </div>
-
+}
 
 @code {
     private static string RemeterAnalysisStorageKey = "3794bdc6-f064-43e6-9a1e-8bb2c03d16cb";
