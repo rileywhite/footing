@@ -156,24 +156,24 @@
            Convert.ToBase64String(stream.ToArray()));
     }
 
-    protected override async Task OnInitializedAsync()
-    {
-        if (await this.LocalStore.ContainKeyAsync(RemeterAnalysisStorageKey))
-        {
-            this.RemeterAnalysis = await this.LocalStore.GetItemAsync<RemeterAnalysis>(RemeterAnalysisStorageKey) ?? new RemeterAnalysis();
-            this.RemeterAnalysis?.FixVersionIssues();
-        }
+    //    protected override async Task OnInitializedAsync()
+    //    {
+    //        if (await this.LocalStore.ContainKeyAsync(RemeterAnalysisStorageKey))
+    //        {
+    //            this.RemeterAnalysis = await this.LocalStore.GetItemAsync<RemeterAnalysis>(RemeterAnalysisStorageKey) ?? new RemeterAnalysis();
+    //            this.RemeterAnalysis?.FixVersionIssues();
+    //        }
+    //
+    //        if (this.RemeterAnalysis == null)
+    //        {
+    //            this.RemeterAnalysis = new RemeterAnalysis();
+    //        }
+    //    }
 
-        if (this.RemeterAnalysis == null)
-        {
-            this.RemeterAnalysis = new RemeterAnalysis();
-        }
-    }
-
-    protected async override Task OnAfterRenderAsync(bool firstRender)
-    {
-        await JSRuntime.InitializePopovers();
-        await this.UpdateLocalStorage();
-        await base.OnAfterRenderAsync(firstRender);
-    }
+    //    protected async override Task OnAfterRenderAsync(bool firstRender)
+    //    {
+    //        await JSRuntime.InitializePopovers();
+    //        await this.UpdateLocalStorage();
+    //        await base.OnAfterRenderAsync(firstRender);
+    //    }
 }

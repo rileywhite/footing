@@ -1,0 +1,37 @@
+@page "/"
+@namespace Remeter.Portal.Server.Pages
+@using Remeter.Portal.Client
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <meta property="og:image" content="facebook.png" />
+    <meta property="og:title" content="Remeter" />
+    <meta property="og:description" content="Take control of your financial well being with this budgeting tool" />
+    <title>Remeter Your Finances</title>
+    <link rel="icon" href="/favicon.ico" sizes="16x16 24x24 32x32 64x64" type="image/vnd.microsoft.icon">
+    <base href="/" />
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css"
+        integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
+    <link rel="stylesheet" href="cookiealert.css" />
+    <link href="css/app.css" rel="stylesheet" />
+
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-151344533-3"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+        gtag('js', new Date());
+
+        gtag('config', 'UA-151344533-3');
+    </script>
+</head>
+<body>
+    <app>@(await Html.RenderComponentAsync<App>(RenderMode.ServerPrerendered))</app>
+
+    <script src="_framework/blazor.webassembly.js"></script>
+</body>
+</html>

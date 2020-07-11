@@ -1,7 +1,7 @@
-<CascadingAuthenticationState>
+@* <CascadingAuthenticationState> *@
     <Router AppAssembly="@typeof(Program).Assembly">
         <Found Context="routeData">
-            <AuthorizeRouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)">
+            @* <AuthorizeRouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)">
                 <NotAuthorized>
                     @if (!context.User.Identity.IsAuthenticated)
                     {
@@ -12,7 +12,8 @@
                         <p>You are not authorized to access this resource.</p>
                     }
                 </NotAuthorized>
-            </AuthorizeRouteView>
+            </AuthorizeRouteView> *@
+            <RouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)" />
         </Found>
         <NotFound>
             <LayoutView Layout="@typeof(MainLayout)">
@@ -20,4 +21,4 @@
             </LayoutView>
         </NotFound>
     </Router>
-</CascadingAuthenticationState>
+@* </CascadingAuthenticationState> *@
