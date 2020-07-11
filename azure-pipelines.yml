@@ -58,7 +58,7 @@ steps:
   displayName: 'Publish and zip'
   inputs:
     command: publish
-    publishWebProjects: True
+    publishWebProjects: False
     projects: '$(MainProjectPath)'
     arguments: '--configuration $(BuildConfiguration) --output $(Build.ArtifactStagingDirectory)'
     zipAfterPublish: True
