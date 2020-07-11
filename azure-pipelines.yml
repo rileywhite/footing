@@ -41,11 +41,24 @@ steps:
     version: 3.1.x
 
 - task: DotNetCoreCLI@2
+  displayName: Restore
+  inputs:
+    command: restore
+    projects: '$(SolutionPath)'
+
+- task: DotNetCoreCLI@2
+  displayName: Build
+  inputs:
+    command: build
+    projects: '$(SolutionPath)'
+    arguments: '--configuration $(buildConfiguration)'
+
+- task: DotNetCoreCLI@2
   displayName: 'Publish and zip'
   inputs:
     command: publish
     publishWebProjects: True
-    projects: $(SolutionPath)
+    projects: '$(SolutionPath)'
     arguments: '--configuration $(BuildConfiguration) --output $(Build.ArtifactStagingDirectory)'
     zipAfterPublish: True
 
