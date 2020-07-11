@@ -16,6 +16,7 @@ pool:
 variables:
   buildConfiguration: 'Release'
   SolutionPath: 'src/Remeter.sln'
+  MainProjectPath: 'src/Remeter/Portal/Server/Remeter.Portal.Server.csproj'
 
 steps:
 - script: |
@@ -38,14 +39,27 @@ steps:
 
 - task: UseDotNet@2
   inputs:
-    version: 3.1.300
+    version: 3.1.x
+
+- task: DotNetCoreCLI@2
+  displayName: Restore
+  inputs:
+    command: restore
+    projects: '$(SolutionPath)'
+
+- task: DotNetCoreCLI@2
+  displayName: Build
+  inputs:
+    command: build
+    projects: '$(SolutionPath)'
+    arguments: '--configuration $(buildConfiguration)'
 
 - task: DotNetCoreCLI@2
   displayName: 'Publish and zip'
   inputs:
     command: publish
     publishWebProjects: False
-    projects: $(SolutionPath)
+    projects: '$(MainProjectPath)'
     arguments: '--configuration $(BuildConfiguration) --output $(Build.ArtifactStagingDirectory)'
     zipAfterPublish: True
 

@@ -4,7 +4,7 @@ using System;
 using System.IO;
 using System.Threading.Tasks;
 
-namespace Remeter.Portal.Components
+namespace Remeter.Portal.Client.Components
 {
     public class SimplexcelExporter
     {
