@@ -16,6 +16,7 @@ pool:
 variables:
   buildConfiguration: 'Release'
   SolutionPath: 'src/Remeter.sln'
+  MainProjectPath: 'src/Remeter/Portal/Server/Remeter.Portal.Server.csproj'
 
 steps:
 - script: |
@@ -58,7 +59,7 @@ steps:
   inputs:
     command: publish
     publishWebProjects: True
-    projects: '$(SolutionPath)'
+    projects: '$(MainProjectPath)'
     arguments: '--configuration $(BuildConfiguration) --output $(Build.ArtifactStagingDirectory)'
     zipAfterPublish: True
 
