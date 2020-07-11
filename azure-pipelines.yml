@@ -38,13 +38,13 @@ steps:
 
 - task: UseDotNet@2
   inputs:
-    version: 3.1.300
+    version: 3.1.x
 
 - task: DotNetCoreCLI@2
   displayName: 'Publish and zip'
   inputs:
     command: publish
-    publishWebProjects: False
+    publishWebProjects: True
     projects: $(SolutionPath)
     arguments: '--configuration $(BuildConfiguration) --output $(Build.ArtifactStagingDirectory)'
     zipAfterPublish: True
