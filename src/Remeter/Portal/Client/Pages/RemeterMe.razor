@@ -1,9 +1,13 @@
 @page "/remeter-me"
 
+@using Microsoft.Extensions.Logging
+@using Remeter.Portal.Shared
 @using System.IO;
 
 @inject IJSRuntime JSRuntime
 @inject Blazored.LocalStorage.ILocalStorageService LocalStore
+@inject ILogger<RemeterMe> Logger
+@inject IBlazorPrerenderDetector PrerenderDetector
 
 <h1>Remeter My Money</h1>
 
@@ -156,24 +160,30 @@
            Convert.ToBase64String(stream.ToArray()));
     }
 
-    //    protected override async Task OnInitializedAsync()
-    //    {
-    //        if (await this.LocalStore.ContainKeyAsync(RemeterAnalysisStorageKey))
-    //        {
-    //            this.RemeterAnalysis = await this.LocalStore.GetItemAsync<RemeterAnalysis>(RemeterAnalysisStorageKey) ?? new RemeterAnalysis();
-    //            this.RemeterAnalysis?.FixVersionIssues();
-    //        }
-    //
-    //        if (this.RemeterAnalysis == null)
-    //        {
-    //            this.RemeterAnalysis = new RemeterAnalysis();
-    //        }
-    //    }
+    protected override async Task OnInitializedAsync()
+    {
+        if (!this.PrerenderDetector.IsPrerendering)
+        {
+            if (await this.LocalStore.ContainKeyAsync(RemeterAnalysisStorageKey))
+            {
+                this.RemeterAnalysis = await this.LocalStore.GetItemAsync<RemeterAnalysis>(RemeterAnalysisStorageKey) ?? new RemeterAnalysis();
+                this.RemeterAnalysis?.FixVersionIssues();
+            }
 
-    //    protected async override Task OnAfterRenderAsync(bool firstRender)
-    //    {
-    //        await JSRuntime.InitializePopovers();
-    //        await this.UpdateLocalStorage();
-    //        await base.OnAfterRenderAsync(firstRender);
-    //    }
+            if (this.RemeterAnalysis == null)
+            {
+                this.RemeterAnalysis = new RemeterAnalysis();
+            }
+        }
+    }
+
+    protected async override Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!this.PrerenderDetector.IsPrerendering)
+        {
+            await JSRuntime.InitializePopovers();
+            await this.UpdateLocalStorage();
+        }
+        await base.OnAfterRenderAsync(firstRender);
+    }
 }

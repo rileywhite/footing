@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.ResponseCompression;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Remeter.Portal.Shared;
 
 namespace Remeter.Portal.Server
 {
@@ -21,6 +22,11 @@ namespace Remeter.Portal.Server
 
         public IConfiguration Configuration { get; }
 
+        private class IsPrerenderDetection : IBlazorPrerenderDetector
+        {
+            public bool IsPrerendering => true;
+        }
+
         // This method gets called by the runtime. Use this method to add services to the container.
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
@@ -28,18 +34,7 @@ namespace Remeter.Portal.Server
             services.AddBlazoredLocalStorage();
             services.AddControllersWithViews();
             services.AddRazorPages();
-
-            // services.AddTransient(sp => new HttpClient { BaseAddress = new Uri("/") });
-
-            // services.AddScoped<HttpClient>(s =>
-            // {
-            //     var navigationManager = s.GetRequiredService<NavigationManager>();
-            //     return new HttpClient
-            //     {
-            //         BaseAddress = new Uri(navigationManager.BaseUri)
-            //     };
-            // });
-            // services.AddControllersWithViews();
+            services.AddSingleton<IBlazorPrerenderDetector>(new IsPrerenderDetection());
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
