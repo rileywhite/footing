@@ -25,25 +25,21 @@ namespace Remeter.Portal.Server
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddMvc().AddNewtonsoftJson();
-            services.AddResponseCompression(opts =>
-            {
-                opts.MimeTypes = ResponseCompressionDefaults.MimeTypes.Concat(new[] { "application/octet-stream" });
-            });
-
             services.AddBlazoredLocalStorage();
-            services.AddTransient(sp => new HttpClient { BaseAddress = new Uri("/") });
+            services.AddControllersWithViews();
+            services.AddRazorPages();
 
-            services.AddScoped<HttpClient>(s =>
-            {
-                var navigationManager = s.GetRequiredService<NavigationManager>();
-                return new HttpClient
-                {
-                    BaseAddress = new Uri(navigationManager.BaseUri)
-                };
-            });
+            // services.AddTransient(sp => new HttpClient { BaseAddress = new Uri("/") });
+
+            // services.AddScoped<HttpClient>(s =>
+            // {
+            //     var navigationManager = s.GetRequiredService<NavigationManager>();
+            //     return new HttpClient
+            //     {
+            //         BaseAddress = new Uri(navigationManager.BaseUri)
+            //     };
+            // });
             // services.AddControllersWithViews();
-            // services.AddRazorPages();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -57,9 +53,9 @@ namespace Remeter.Portal.Server
             else
             {
                 app.UseExceptionHandler("/Error");
-                app.UseHttpsRedirection();
                 // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
+                app.UseHttpsRedirection();
             }
 
             app.UseBlazorFrameworkFiles();
@@ -70,9 +66,8 @@ namespace Remeter.Portal.Server
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapRazorPages();
-                // endpoints.MapControllers();
-                // endpoints.MapDefaultControllerRoute();
-                endpoints.MapFallbackToFile("/_Host");
+                endpoints.MapControllers();
+                endpoints.MapFallbackToPage("/_Host");
             });
         }
     }
