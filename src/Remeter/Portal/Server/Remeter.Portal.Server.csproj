@@ -1,0 +1,14 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Server" Version="3.2.0"/>
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="3.1.5"/>
+    <PackageReference Include="Blazored.LocalStorage" Version="2.1.6"/>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Shared\Remeter.Portal.Shared.csproj"/>
+    <ProjectReference Include="..\Client\Remeter.Portal.Client.csproj"/>
+  </ItemGroup>
+</Project>
