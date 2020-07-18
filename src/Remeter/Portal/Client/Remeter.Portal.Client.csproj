@@ -10,12 +10,13 @@
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Build" Version="3.2.0" PrivateAssets="all" />
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="3.2.0" PrivateAssets="all" />
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Authentication" Version="3.2.0" />
-    <PackageReference Include="Microsoft.Extensions.Logging.Configuration" Version="3.1.5"/>
+    <PackageReference Include="Microsoft.Extensions.Logging.Configuration" Version="3.1.5" />
     <PackageReference Include="Nito.AsyncEx" Version="5.0.0" />
     <PackageReference Include="simplexcel" Version="3.0.1.184" />
     <PackageReference Include="System.Net.Http.Json" Version="3.2.0" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Shared\Remeter.Portal.Shared.csproj" />
+    <ProjectReference Include="..\Models\Remeter.Portal.Models.csproj" />
   </ItemGroup>
 </Project>
