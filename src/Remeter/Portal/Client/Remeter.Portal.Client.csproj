@@ -18,5 +18,6 @@
   <ItemGroup>
     <ProjectReference Include="..\Shared\Remeter.Portal.Shared.csproj" />
     <ProjectReference Include="..\Models\Remeter.Portal.Models.csproj" />
+    <ProjectReference Include="..\JSInterop\Remeter.Portal.JSInterop.csproj" />
   </ItemGroup>
 </Project>
