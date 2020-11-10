@@ -6,7 +6,7 @@
 trigger:
   branches:
     include:
-      - master
+      - main
       - develop
       - feature/*
 
@@ -39,7 +39,8 @@ steps:
 
 - task: UseDotNet@2
   inputs:
-    version: 3.1.x
+    packageType: 'sdk'
+    version: 5.0.x
 
 - task: DotNetCoreCLI@2
   displayName: Restore
