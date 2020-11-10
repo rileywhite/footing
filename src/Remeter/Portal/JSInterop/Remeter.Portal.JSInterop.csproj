@@ -8,6 +8,6 @@
     <Optimize>true</Optimize>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Microsoft.JSInterop" Version="3.1.6" />
+    <PackageReference Include="Microsoft.JSInterop" Version="5.0.0" />
   </ItemGroup>
 </Project>
