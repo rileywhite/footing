@@ -29,7 +29,7 @@ namespace Remeter.Portal.Client
                 .AddTransient(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) })
                 .AddBlazoredLocalStorage()
                 .AddSingleton<IBlazorPrerenderDetector>(new IsPrerenderDetection())
-                .AddSingleton<IJSInterop>(services => new JSInteropProvider(services.GetService<IJSRuntime>()));
+                .AddSingleton<IJSInterop>(services => new JSInteropProvider(services.GetService<IJSRuntime>()!));
 
             // builder.Services.AddOidcAuthentication(options =>
             // {
