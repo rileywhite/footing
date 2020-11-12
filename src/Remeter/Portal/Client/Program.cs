@@ -23,7 +23,6 @@ namespace Remeter.Portal.Client
         {
             var builder = WebAssemblyHostBuilder.CreateDefault(args);
             builder.Logging.AddConfiguration(builder.Configuration.GetSection("Logging"));
-            builder.RootComponents.Add<App>("app");
 
             builder.Services
                 .AddTransient(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) })

@@ -21,7 +21,7 @@ a, .btn-link {
     text-decoration: none;
 }
 
-app {
+.app {
     position: relative;
     display: flex;
     flex-direction: column;
