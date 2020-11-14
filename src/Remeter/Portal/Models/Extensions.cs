@@ -1,8 +1,6 @@
 using System;
-using System.Threading.Tasks;
-using Microsoft.JSInterop;
 
-namespace Remeter.Portal.Client.Components
+namespace Remeter.Portal.Models
 {
     public static class Extensions
     {
@@ -31,10 +29,5 @@ namespace Remeter.Portal.Client.Components
             Period.Annually => 1,
             var unsupported => throw new NotSupportedException($"Unknown Period: {unsupported}"),
         };
-
-        public static async Task InitializePopovers(this IJSRuntime jsRuntime)
-        {
-            await jsRuntime.InvokeVoidAsync("initializePopovers");
-        }
     }
 }

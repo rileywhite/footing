@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.ResponseCompression;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Remeter.Portal.JSInterop;
 using Remeter.Portal.Shared;
 
 namespace Remeter.Portal.Server
@@ -35,6 +36,7 @@ namespace Remeter.Portal.Server
             services.AddControllersWithViews();
             services.AddRazorPages();
             services.AddSingleton<IBlazorPrerenderDetector>(new IsPrerenderDetection());
+            services.AddSingleton<IJSInterop>(new ServerPrerenderJSInteropProvider());
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

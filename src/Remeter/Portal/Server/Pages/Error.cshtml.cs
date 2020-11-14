@@ -9,7 +9,7 @@ namespace Remeter.Portal.Server.Pages
     [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
     public class ErrorModel : PageModel
     {
-        public string RequestId { get; set; }
+        public string RequestId { get; set; } = null!;
 
         public bool ShowRequestId => !string.IsNullOrEmpty(RequestId);
 

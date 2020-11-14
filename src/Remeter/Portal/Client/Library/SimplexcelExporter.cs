@@ -1,10 +1,11 @@
 using Nito.AsyncEx;
+using Remeter.Portal.Models;
 using Simplexcel;
 using System;
 using System.IO;
 using System.Threading.Tasks;
 
-namespace Remeter.Portal.Client.Components
+namespace Remeter.Portal.Client.Library
 {
     public class SimplexcelExporter
     {
