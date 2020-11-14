@@ -26,7 +26,7 @@ steps:
 - script: |
     echo "##vso[task.setvariable variable=deploymentSlot]staging"
   name: StagingTarget
-  condition: eq(variables['Build.SourceBranch'], 'refs/heads/master')
+  condition: eq(variables['Build.SourceBranch'], 'refs/heads/main')
 
 - script: |
     echo "##vso[task.setvariable variable=deploymentSlot]int"
