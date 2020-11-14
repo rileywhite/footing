@@ -24,7 +24,6 @@ namespace Remeter.Portal.Client
         {
             var builder = WebAssemblyHostBuilder.CreateDefault(args);
             builder.Logging.AddConfiguration(builder.Configuration.GetSection("Logging"));
-            Console.WriteLine("RootComponents End");
 
             var wasPrerendered = builder.RootComponents.Any();
 
