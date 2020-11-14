@@ -7,6 +7,7 @@ using Microsoft.JSInterop;
 using Remeter.Portal.JSInterop;
 using Remeter.Portal.Shared;
 using System;
+using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
 
@@ -23,6 +24,14 @@ namespace Remeter.Portal.Client
         {
             var builder = WebAssemblyHostBuilder.CreateDefault(args);
             builder.Logging.AddConfiguration(builder.Configuration.GetSection("Logging"));
+            Console.WriteLine("RootComponents End");
+
+            var wasPrerendered = builder.RootComponents.Any();
+
+            if (!wasPrerendered)
+            {
+                builder.RootComponents.Add<App>("app");
+            }
 
             builder.Services
                 .AddTransient(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) })

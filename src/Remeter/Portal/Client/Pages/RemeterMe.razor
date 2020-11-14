@@ -1,75 +1,16 @@
 @page "/remeter-me"
 
-@using Microsoft.Extensions.Logging
 @using Remeter.Portal.Shared
 
-@inject IJSInterop JSInterop
-@inject Blazored.LocalStorage.ILocalStorageService LocalStore
-@inject ILogger<RemeterMe> Logger
 @inject IBlazorPrerenderDetector PrerenderDetector
 
 <h1>Remeter My Money</h1>
 
 @if (this.PrerenderDetector.IsPrerendering)
 {
-    <LoadingState/>
+    <LoadingState />
 }
 else
 {
-    <p>
-        <em>
-            Nothing you put in here will be sent to our servers. It will be saved to your local computer; however, you may
-            <a href="" @onclick=ClearLocalStorage @onclick:preventDefault>clear</a>
-            it at any time.
-        </em>
-    </p>
-
-    <RemeterAnalysisEditor RemeterAnalysis="@RemeterAnalysis" />
-}
-
-@code {
-    private static string RemeterAnalysisStorageKey = "3794bdc6-f064-43e6-9a1e-8bb2c03d16cb";
-
-    private RemeterAnalysis RemeterAnalysis { get; set; } = new RemeterAnalysis();
-
-    public async Task UpdateLocalStorage()
-    {
-        await this.LocalStore.SetItemAsync(RemeterAnalysisStorageKey, this.RemeterAnalysis);
-    }
-
-    public async Task ClearLocalStorage()
-    {
-        if (await this.JSInterop.Confirm("This will clear all information that you have entered so far. Proceed?"))
-        {
-            this.RemeterAnalysis = new RemeterAnalysis();
-            await this.LocalStore.ClearAsync();
-        }
-    }
-
-    protected override async Task OnInitializedAsync()
-    {
-        if (!this.PrerenderDetector.IsPrerendering)
-        {
-            if (await this.LocalStore.ContainKeyAsync(RemeterAnalysisStorageKey))
-            {
-                this.RemeterAnalysis = await this.LocalStore.GetItemAsync<RemeterAnalysis>(RemeterAnalysisStorageKey) ?? new RemeterAnalysis();
-                this.RemeterAnalysis?.FixVersionIssues();
-            }
-
-            if (this.RemeterAnalysis == null)
-            {
-                this.RemeterAnalysis = new RemeterAnalysis();
-            }
-        }
-    }
-
-    protected async override Task OnAfterRenderAsync(bool firstRender)
-    {
-        if (!this.PrerenderDetector.IsPrerendering)
-        {
-            await this.JSInterop.InitializePopovers();
-            await this.UpdateLocalStorage();
-        }
-        await base.OnAfterRenderAsync(firstRender);
-    }
+    <RemeterAnalysisEditor />
 }

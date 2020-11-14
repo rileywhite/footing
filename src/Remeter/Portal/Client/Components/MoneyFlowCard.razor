@@ -10,14 +10,14 @@
 <div id="@(Name)Details" class="collapse" aria-labelledby="@(Name)Heading" data-parent="#moneyFlows">
     <div class="card-body">
         <table class="table">
-        @foreach (var moneyFlow in this.MoneyFlows)
-        { 
-            <tr>
-                <td>@moneyFlow.Name</td>
-                <td><MonetaryAmountDisplay Amount="@moneyFlow.Amount" /> @moneyFlow.Period</td>
-                <td><span class="oi oi-x" @onclick="@(e => this.RemoveMoneyFlow(moneyFlow.Id))" ></span></td>
-            </tr>
-        }
+            @foreach (var moneyFlow in this.MoneyFlows)
+            {
+                <tr>
+                    <td>@moneyFlow.Name</td>
+                    <td><MonetaryAmountDisplay Amount="@moneyFlow.Amount" /> @moneyFlow.Period</td>
+                    <td><span class="oi oi-x" @onclick="@(e => this.RemoveMoneyFlow(moneyFlow.Id))"></span></td>
+                </tr>
+            }
         </table>
         <EditForm Model="@Model" OnValidSubmit="AddMoneyFlow">
             <DataAnnotationsValidator />

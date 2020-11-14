@@ -8,15 +8,7 @@
     }
   },
   "profiles": {
-    "IIS Express": {
-      "commandName": "IISExpress",
-      "launchBrowser": true,
-      "inspectUri": "{wsProtocol}://{url.hostname}:{url.port}/_framework/debug/ws-proxy?browser={browserInspectUri}",
-      "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Development"
-      }
-    },
-    "Blah.Server": {
+    "Debug Browser": {
       "commandName": "Project",
       "launchBrowser": true,
       "inspectUri": "{wsProtocol}://{url.hostname}:{url.port}/_framework/debug/ws-proxy?browser={browserInspectUri}",
@@ -25,7 +17,7 @@
         "ASPNETCORE_ENVIRONMENT": "Development"
       }
     },
-    "Remeter.Portal.Server": {
+    "Default Browser": {
       "commandName": "Project",
       "launchBrowser": true,
       "applicationUrl": "https://localhost:43367;http://localhost:24879",
