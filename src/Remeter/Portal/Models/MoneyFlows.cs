@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Remeter.Portal.Client.Components
+namespace Remeter.Portal.Models
 {
     public class MoneyFlows : List<MoneyFlow>
     {

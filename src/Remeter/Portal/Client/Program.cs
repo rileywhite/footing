@@ -3,8 +3,11 @@ using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Microsoft.JSInterop;
+using Remeter.Portal.JSInterop;
 using Remeter.Portal.Shared;
 using System;
+using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
 
@@ -21,12 +24,19 @@ namespace Remeter.Portal.Client
         {
             var builder = WebAssemblyHostBuilder.CreateDefault(args);
             builder.Logging.AddConfiguration(builder.Configuration.GetSection("Logging"));
-            builder.RootComponents.Add<App>("app");
+
+            var wasPrerendered = builder.RootComponents.Any();
+
+            if (!wasPrerendered)
+            {
+                builder.RootComponents.Add<App>("app");
+            }
 
             builder.Services
                 .AddTransient(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) })
                 .AddBlazoredLocalStorage()
-                .AddSingleton<IBlazorPrerenderDetector>(new IsPrerenderDetection());
+                .AddSingleton<IBlazorPrerenderDetector>(new IsPrerenderDetection())
+                .AddSingleton<IJSInterop>(services => new JSInteropProvider(services.GetService<IJSRuntime>()!));
 
             // builder.Services.AddOidcAuthentication(options =>
             // {

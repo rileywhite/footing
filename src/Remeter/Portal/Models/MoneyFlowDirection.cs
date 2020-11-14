@@ -1,6 +1,6 @@
 using System;
 
-namespace Remeter.Portal.Client.Components
+namespace Remeter.Portal.Models
 {
     public enum MoneyFlowDirection
     {
