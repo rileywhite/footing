@@ -13,7 +13,7 @@ trigger:
 variables:
   azureContainerRegistryName: 'crvemotueus2'
   azureContainerRegistryUrl: '$(azureContainerRegistryName).azurecr.io'
-  dockerComposeFile: 'src/dockerCompose.yml'
+  dockerComposeFile: 'src/docker-compose.yml'
 
 steps:
 - task: DockerCompose@0
