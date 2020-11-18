@@ -10,65 +10,17 @@ trigger:
       - develop
       - feature/*
 
-pool:
-  vmImage: 'ubuntu-latest'
-
 variables:
-  buildConfiguration: 'Release'
-  SolutionPath: 'src/Remeter.sln'
-  MainProjectPath: 'src/Remeter/Portal/Server/Remeter.Portal.Server.csproj'
+  azureContainerRegistryName: 'crvemotueus2'
+  azureContainerRegistryUrl: '$(azureContainerRegistryName).azurecr.io'
+  dockerComposeFile: 'src/dockerComposeFile.yml'
 
 steps:
-- script: |
-    echo "##vso[task.setvariable variable=deploymentSlot]dev"
-  name: DefaultTarget
-
-- script: |
-    echo "##vso[task.setvariable variable=deploymentSlot]staging"
-  name: StagingTarget
-  condition: eq(variables['Build.SourceBranch'], 'refs/heads/main')
-
-- script: |
-    echo "##vso[task.setvariable variable=deploymentSlot]int"
-  name: IntegrationTarget
-  condition: eq(variables['Build.SourceBranch'], 'refs/heads/develop')
-
-- script: |
-    echo "##vso[task.setvariable variable=deploymentSlot;isOutput=true]$DEPLOYMENTSLOT"
-  name: DeploymentTarget
-
-- task: UseDotNet@2
+- task: DockerCompose@0
   inputs:
-    packageType: 'sdk'
-    version: 5.0.x
-
-- task: DotNetCoreCLI@2
-  displayName: Restore
-  inputs:
-    command: restore
-    projects: '$(SolutionPath)'
-
-- task: DotNetCoreCLI@2
-  displayName: Build
-  inputs:
-    command: build
-    projects: '$(SolutionPath)'
-    arguments: '--configuration $(buildConfiguration)'
-
-- task: DotNetCoreCLI@2
-  displayName: 'Publish and zip'
-  inputs:
-    command: publish
-    publishWebProjects: False
-    projects: '$(MainProjectPath)'
-    arguments: '--configuration $(BuildConfiguration) --output $(Build.ArtifactStagingDirectory)'
-    zipAfterPublish: True
-
-- task: AzureWebApp@1
-  displayName: 'Deploy Azure Web App'
-  inputs:
+    containerregistrytype: 'Azure Container Registry'
     azureSubscription: '$(azureSubscription)'
-    appName: 'remeter-portal'
-    SlotName: '$(DeploymentTarget.deploymentSlot)'
-    appType: 'webApp'
-    package: $(Build.ArtifactStagingDirectory)/**/*.zip
+    azureContainerRegistry: '{"loginServer":"$(azureContainerRegistryUrl)", "id" : "/subscriptions/$(azureSubscriptionUuid)/resourceGroups/$(azureContainerResourceGroup)/providers/Microsoft.ContainerRegistry/registries/$(azureContainerRegistryName)"}'
+    dockerComposeFile: '$(dockerComposeFile)'
+    action: 'Run a Docker Compose command'
+    dockerComposeCommand: 'buildAndPush'

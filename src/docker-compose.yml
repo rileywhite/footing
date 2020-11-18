@@ -1,0 +1,8 @@
+version: '3.4'
+
+services:
+  remeter.portal.server:
+    image: ${DOCKER_REGISTRY-}remeterportal
+    build:
+      context: .
+      dockerfile: Remeter/Portal/Server/Dockerfile
