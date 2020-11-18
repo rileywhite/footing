@@ -19,9 +19,10 @@ variables:
   dockerComposeFile: 'src/docker-compose.yml'
 
 steps:
-- task: Docker@2
+- task: DockerCompose@0
   inputs:
-    containerRegistry: 'remeterRegistry001'
-    command: 'buildAndPush'
-    Dockerfile: 'src/Remeter/Portal/Server/Dockerfile'
-    buildContext: '.'
+    containerregistrytype: 'Azure Container Registry'
+    azureSubscription: '$(azureSubscription)'
+    azureContainerRegistry: '{"loginServer":"crvemotueus2.azurecr.io", "id" : "/subscriptions/$(azureSubscriptionUuid)/resourceGroups/$(azureCRResourceGroup)/providers/Microsoft.ContainerRegistry/registries/crvemotueus2"}'
+    dockerComposeFile: 'src/docker-compose.yml'
+    action: 'Build services'
