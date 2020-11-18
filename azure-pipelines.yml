@@ -23,4 +23,5 @@ steps:
   inputs:
     containerRegistry: 'remeterRegistry001'
     command: 'buildAndPush'
-    Dockerfile: '**/Dockerfile'
+    Dockerfile: 'src/Remeter/Portal/Server/Dockerfile'
+    buildContext: '.'
