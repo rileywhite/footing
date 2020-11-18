@@ -25,4 +25,4 @@ steps:
     azureSubscription: '$(azureSubscription)'
     azureContainerRegistry: '{"loginServer":"crvemotueus2.azurecr.io", "id" : "/subscriptions/$(azureSubscriptionUuid)/resourceGroups/$(azureCRResourceGroup)/providers/Microsoft.ContainerRegistry/registries/crvemotueus2"}'
     dockerComposeFile: 'src/docker-compose.yml'
-    action: 'Build services'
+    action: 'Push services'
