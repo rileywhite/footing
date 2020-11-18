@@ -10,17 +10,17 @@ trigger:
       - develop
       - feature/*
 
+pool:
+  vmImage: 'ubuntu-latest'
+
 variables:
   azureContainerRegistryName: 'crvemotueus2'
   azureContainerRegistryUrl: '$(azureContainerRegistryName).azurecr.io'
   dockerComposeFile: 'src/docker-compose.yml'
 
 steps:
-- task: DockerCompose@0
+- task: Docker@2
   inputs:
-    containerregistrytype: 'Azure Container Registry'
-    azureSubscription: '$(azureSubscription)'
-    azureContainerRegistry: '{"loginServer":"$(azureContainerRegistryUrl)", "id" : "/subscriptions/$(azureSubscriptionUuid)/resourceGroups/$(azureContainerResourceGroup)/providers/Microsoft.ContainerRegistry/registries/$(azureContainerRegistryName)"}'
-    dockerComposeFile: '$(dockerComposeFile)'
-    action: 'Run a Docker Compose command'
-    dockerComposeCommand: 'buildAndPush'
+    containerRegistry: 'remeterRegistry001'
+    command: 'buildAndPush'
+    Dockerfile: '**/Dockerfile'
