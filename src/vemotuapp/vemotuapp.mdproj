@@ -25,7 +25,7 @@
     <None Include="Chart.yaml" />
     <None Include="values.yaml" />
     <None Include="vemotuapp.mdproj" />
-    <None Include="ManualKubes\cert-manager-cluster-issuer-nonprod.yaml" />
-    <None Include="ManualKubes\cert-manager-cluster-issuer-prod.yaml" />
+    <None Include="templates\issuer.yaml" />
+    <None Include="ManualKubes\api-key.yaml" />
   </ItemGroup>
 </Project>

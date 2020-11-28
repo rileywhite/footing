@@ -38,22 +38,25 @@ securityContext: {}
 
 service:
   type: LoadBalancer
-  loadBalancerIP: 52.167.76.207
+  loadBalancerIP: 52.177.246.77
   port: 80
+
+issuer:
+  enabled: true
 
 ingress:
   enabled: true
   annotations:
     kubernetes.io/ingress.class: nginx
-    cert-manager.io/cluster-issuer: letsencrypt-prod
+    cert-manager.io/issuer: letsencrypt
   hosts:
-    - host: dev.vemotu.com
+    - host: int.vemotu.com
       paths:
       - /
   tls:
   - hosts:
-    - dev.vemotu.com
-    secretName: dev-vemotu-com-tls
+    - int.vemotu.com
+    secretName: vemotu-com-tls
 
 resources: {}
   # We usually recommend not to specify default resources and to leave this as a conscious
