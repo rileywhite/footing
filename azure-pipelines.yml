@@ -21,6 +21,9 @@ variables:
 steps:
 - task: DockerCompose@0
   inputs:
+    containerregistrytype: 'Azure Container Registry'
+    azureSubscription: '$(azureSubscription)'
+    azureContainerRegistry: '{"loginServer":"crvemotueus2.azurecr.io", "id" : "/subscriptions/$(azureSubscriptionUuid)/resourceGroups/$(azureCRResourceGroup)/providers/Microsoft.ContainerRegistry/registries/crvemotueus2"}'
     dockerComposeFile: 'src/docker-compose.yml'
     action: 'Build services'
     arguments: '--build-arg version=0.2.0 --build-arg assembly_version=0.2.0.0 --build-arg configuration=Debug'
