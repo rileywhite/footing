@@ -22,9 +22,10 @@ variables:
 steps:
 - script: |
     echo "##vso[task.setvariable variable=verion]$(cat version)"
-  name: Read Version
+  name: ReadVersionFromFile
 
 - task: DockerCompose@0
+  name: DockerComposeBuild
   inputs:
     containerregistrytype: 'Azure Container Registry'
     azureSubscription: '$(azureSubscription)'
@@ -35,6 +36,7 @@ steps:
 
 - task: DockerCompose@0
   condition: in(variables['Build.Reason'], 'Manual', 'IndividualCI', 'BatchedCI', 'Schedule')
+  name: DockerComposePush
   inputs:
     containerregistrytype: 'Azure Container Registry'
     azureSubscription: '$(azureSubscription)'
