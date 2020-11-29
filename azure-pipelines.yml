@@ -29,6 +29,7 @@ steps:
     arguments: '--build-arg version=0.2.0 --build-arg assembly_version=0.2.0.0 --build-arg configuration=Debug'
 
 - task: DockerCompose@0
+  condition: in(variables['Build.Reason'], 'Manual', 'IndividualCI', 'BatchedCI', 'Schedule')
   inputs:
     containerregistrytype: 'Azure Container Registry'
     azureSubscription: '$(azureSubscription)'
