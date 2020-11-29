@@ -47,7 +47,7 @@ steps:
     echo "##vso[task.setvariable variable=configuration;isOutput=true]$CONFIGURATIONDECISION"
   name: SetConfiguration
 
-- script: |
+- powershell: |
     $date=$(Get-Date -Format yyyyMMddTHHmmssfffffffZ);
     Write-Host "##vso[task.setvariable variable=timestamp]$date"
   name: SetTimestamp
