@@ -49,20 +49,16 @@ steps:
 
 - powershell: |
     $date=$(Get-Date -Format yyyyMMddTHHmmssfffffffZ);
-    Write-Host "##vso[task.setvariable variable=timestamp]$date"
+    Write-Host "##vso[task.setvariable variable=timestamp;isOutput=true]$date"
   name: SetTimestamp
 
 - script: |
-    echo "##vso[task.setvariable variable=version;isOutput=true]$VERSIONPREFIX-$ALPHAORBETA+build.$(Build.BuildId)-$TIMESTAMP"
+    echo "##vso[task.setvariable variable=version;isOutput=true]$VERSIONPREFIX-$ALPHAORBETA.$(Build.BuildId)"
   name: SetVersion
 
 - script: |
     echo "##vso[task.setvariable variable=assemblyVersion;isOutput=true]$VERSIONPREFIX.$(Build.BuildId)"
   name: SetAssemblyVersion
-
-- script: |
-    echo "##vso[task.setvariable variable=versionTag;isOutput=true]$VERSIONPREFIX-$ALPHAORBETA.$(Build.BuildId)"
-  name: SetVersionTag
 
 - task: DockerCompose@0
   name: DockerComposeBuild
@@ -72,7 +68,7 @@ steps:
     azureContainerRegistry: '{"loginServer":"crvemotueus2.azurecr.io", "id" : "/subscriptions/$(azureSubscriptionUuid)/resourceGroups/$(azureCRResourceGroup)/providers/Microsoft.ContainerRegistry/registries/crvemotueus2"}'
     dockerComposeFile: 'src/docker-compose.yml'
     action: 'Build services'
-    arguments: '--build-arg version=$(SetVersion.version) --build-arg assembly_version=$(SetAssemblyVersion.assemblyVersion) --build-arg configuration=$(SetConfiguration.configuration)'
+    arguments: '--build-arg version=$(SetVersion.version)+$(SetTimestamp.timestamp) --build-arg assembly_version=$(SetAssemblyVersion.assemblyVersion)+ --build-arg configuration=$(SetConfiguration.configuration)'
 
 - task: DockerCompose@0
   condition: in(variables['Build.Reason'], 'Manual', 'IndividualCI', 'BatchedCI', 'Schedule')
@@ -83,5 +79,5 @@ steps:
     azureContainerRegistry: '{"loginServer":"crvemotueus2.azurecr.io", "id" : "/subscriptions/$(azureSubscriptionUuid)/resourceGroups/$(azureCRResourceGroup)/providers/Microsoft.ContainerRegistry/registries/crvemotueus2"}'
     dockerComposeFile: 'src/docker-compose.yml'
     action: 'Push services'
-    additionalImageTags: '$(SetVersionTag.versionTag)'
+    additionalImageTags: '$(SetVersion.version)'
     includeLatestTag: false
