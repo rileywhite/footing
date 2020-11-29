@@ -4,9 +4,9 @@
 # https://docs.microsoft.com/azure/devops/pipelines/languages/dotnet-core
 
 trigger:
+  batch: true
   branches:
     include:
-      - main
       - develop
       - feature/*
 
@@ -17,8 +17,13 @@ variables:
   azureContainerRegistryName: 'crvemotueus2'
   azureContainerRegistryUrl: '$(azureContainerRegistryName).azurecr.io'
   dockerComposeFile: 'src/docker-compose.yml'
+  
 
 steps:
+- script: |
+    echo "##vso[task.setvariable variable=verion]$(cat version)"
+  name: Read Version
+
 - task: DockerCompose@0
   inputs:
     containerregistrytype: 'Azure Container Registry'
@@ -26,7 +31,7 @@ steps:
     azureContainerRegistry: '{"loginServer":"crvemotueus2.azurecr.io", "id" : "/subscriptions/$(azureSubscriptionUuid)/resourceGroups/$(azureCRResourceGroup)/providers/Microsoft.ContainerRegistry/registries/crvemotueus2"}'
     dockerComposeFile: 'src/docker-compose.yml'
     action: 'Build services'
-    arguments: '--build-arg version=0.2.0 --build-arg assembly_version=0.2.0.0 --build-arg configuration=Debug'
+    arguments: '--build-arg version=$(version) --build-arg assembly_version=0.2.0.0 --build-arg configuration=Debug'
 
 - task: DockerCompose@0
   condition: in(variables['Build.Reason'], 'Manual', 'IndividualCI', 'BatchedCI', 'Schedule')
