@@ -5,7 +5,8 @@ WORKDIR /app
 EXPOSE 80
 EXPOSE 443
 
-FROM mcr.microsoft.com/dotnet/sdk:5.0-buster-slim AS build
+FROM mcr.microsoft.com/dotnet/sdk:5.0-buster-slim AS publish
+
 WORKDIR /src
 COPY Remeter/Portal/Server/Remeter.Portal.Server.csproj Remeter/Portal/Server/
 COPY Remeter/Portal/Shared/Remeter.Portal.Shared.csproj Remeter/Portal/Shared/
@@ -15,10 +16,13 @@ COPY Remeter/Portal/JSInterop/Remeter.Portal.JSInterop.csproj Remeter/Portal/JSI
 RUN dotnet restore "Remeter/Portal/Server/Remeter.Portal.Server.csproj"
 COPY . .
 WORKDIR "/src/Remeter/Portal/Server"
-RUN dotnet build "Remeter.Portal.Server.csproj" -c Release -o /app/build
 
-FROM build AS publish
-RUN dotnet publish "Remeter.Portal.Server.csproj" -c Release -o /app/publish
+ARG version=0.0.1
+ARG assembly_version=0.0.1.0
+ARG configuration=Debug
+
+RUN echo "Building configuration $configuration with version $version and assembly version $assembly_version"
+RUN dotnet publish "Remeter.Portal.Server.csproj" -c "$configuration" "/p:Version=$version;AssemblyVersion=$assembly_version" -o /app/publish
 
 FROM base AS final
 WORKDIR /app
