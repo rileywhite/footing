@@ -26,7 +26,7 @@ steps:
   name: ReadVersionFromFile
 
 - script: |
-    echo "##vso[task.setvariable variable=alphaOrBeta]alpha"
+    echo "##vso[task.setvariable variable=alphaOrBeta]alpha.$(Build.SourceBranchName)"
   name: DefaultToAlpha
 
 - script: |
