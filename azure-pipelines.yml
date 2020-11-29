@@ -32,7 +32,7 @@ steps:
     azureContainerRegistry: '{"loginServer":"crvemotueus2.azurecr.io", "id" : "/subscriptions/$(azureSubscriptionUuid)/resourceGroups/$(azureCRResourceGroup)/providers/Microsoft.ContainerRegistry/registries/crvemotueus2"}'
     dockerComposeFile: 'src/docker-compose.yml'
     action: 'Build services'
-    arguments: "--build-arg version=$VERSION --build-arg assembly_version=0.2.0.0 --build-arg configuration=Debug"
+    arguments: '--build-arg version=$(ReadVersionFromFile.version) --build-arg assembly_version=0.2.0.0 --build-arg configuration=Debug'
 
 - task: DockerCompose@0
   condition: in(variables['Build.Reason'], 'Manual', 'IndividualCI', 'BatchedCI', 'Schedule')
