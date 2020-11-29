@@ -60,6 +60,10 @@ steps:
     echo "##vso[task.setvariable variable=assemblyVersion;isOutput=true]$VERSIONPREFIX.$(Build.BuildId)"
   name: SetAssemblyVersion
 
+- script: |
+    echo "##vso[task.setvariable variable=versionTag;isOutput=true]$VERSIONPREFIX-$ALPHAORBETA.$(Build.BuildId)"
+  name: SetVersionTag
+
 - task: DockerCompose@0
   name: DockerComposeBuild
   inputs:
@@ -79,3 +83,5 @@ steps:
     azureContainerRegistry: '{"loginServer":"crvemotueus2.azurecr.io", "id" : "/subscriptions/$(azureSubscriptionUuid)/resourceGroups/$(azureCRResourceGroup)/providers/Microsoft.ContainerRegistry/registries/crvemotueus2"}'
     dockerComposeFile: 'src/docker-compose.yml'
     action: 'Push services'
+    additionalImageTags: '$(SetVersionTag.versionTag)'
+    includeLatestTag: false
