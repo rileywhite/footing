@@ -18,7 +18,8 @@ variables:
   azureContainerRegistryUrl: '$(azureContainerRegistryName).azurecr.io'
   dockerComposeFile: 'src/docker-compose.yml'
   timestamp: $(Get-Date -Format yyyyMMddTHHmmssfffffffZ)
-  
+  vemotuappChartPath: 'src/vemotuapp'
+  vemotuappChartFilePath: '$(vemotuappChartPath)/Chart.yaml'
 
 steps:
 - script: |
@@ -49,12 +50,16 @@ steps:
 
 - powershell: |
     $date=$(Get-Date -Format yyyyMMddTHHmmssfffffffZ);
-    Write-Host "##vso[task.setvariable variable=timestamp;isOutput=true]$date"
+    Write-Host "##vso[task.setvariable variable=timestamp]$date"
   name: SetTimestamp
 
 - script: |
     echo "##vso[task.setvariable variable=version;isOutput=true]$VERSIONPREFIX-$ALPHAORBETA.$(Build.BuildId)"
   name: SetVersion
+
+- script: |
+    echo "##vso[task.setvariable variable=fullVersion;isOutput=true]$VERSION+$TIMESTAMP"
+  name: SetFullVersion
 
 - script: |
     echo "##vso[task.setvariable variable=assemblyVersion;isOutput=true]$VERSIONPREFIX.$(Build.BuildId)"
@@ -68,7 +73,7 @@ steps:
     azureContainerRegistry: '{"loginServer":"crvemotueus2.azurecr.io", "id" : "/subscriptions/$(azureSubscriptionUuid)/resourceGroups/$(azureCRResourceGroup)/providers/Microsoft.ContainerRegistry/registries/crvemotueus2"}'
     dockerComposeFile: 'src/docker-compose.yml'
     action: 'Build services'
-    arguments: '--build-arg version=$(SetVersion.version)+$(SetTimestamp.timestamp) --build-arg assembly_version=$(SetAssemblyVersion.assemblyVersion) --build-arg configuration=$(SetConfiguration.configuration)'
+    arguments: '--build-arg version=$(SetFullVersion.fullVersion) --build-arg assembly_version=$(SetAssemblyVersion.assemblyVersion) --build-arg configuration=$(SetConfiguration.configuration)'
     dockerComposeFileArgs: |
       DOCKER_IMAGE_VERSION_TAG=$(SetVersion.version)
     includeLatestTag: false
@@ -92,6 +97,28 @@ steps:
     installKubectl: true
     kubectlVersion: '1.19.4'
 
+- task: AzurePowerShell@5
+  name: SetChartVersion
+  inputs:
+    ScriptType: 'InlineScript'
+    Inline: |
+      $line = Get-Content $(vemotuappChartFilePath) | Select-String version | Select-Object -ExpandProperty Line
+      $content = Get-Content $(vemotuappChartFilePath)
+      $content | ForEach-Object {$_ -replace $line,"version=$(SetVersion.version)"} | Set-Content $(vemotuappChartFilePath)
+    FailOnStandardError: true
+    azurePowerShellVersion: 'LatestVersion'
+
+- task: AzurePowerShell@5
+  name: SetChartAppVersion
+  inputs:
+    ScriptType: 'InlineScript'
+    Inline: |
+      $line = Get-Content $(vemotuappChartFilePath) | Select-String appVersion | Select-Object -ExpandProperty Line
+      $content = Get-Content $(vemotuappChartFilePath)
+      $content | ForEach-Object {$_ -replace $line,"appVersion=$(SetFullVersion.fullVersion)"} | Set-Content $(vemotuappChartFilePath)
+    FailOnStandardError: true
+    azurePowerShellVersion: 'LatestVersion'
+
 - task: HelmDeploy@0
   inputs:
     azureSubscriptionForACR: 'Azure subscription 1(ce6a314f-4d4b-43d3-bbb9-195fdc4939d9)'
@@ -99,4 +126,4 @@ steps:
     azureContainerRegistry: 'crvemotueus2.azurecr.io'
     command: 'save'
     chartNameForACR: 'vemotuapp:$(SetVersion.version)'
-    chartPathForACR: 'src/vemotuapp'
+    chartPathForACR: '$(vemotuappChartPath)'
