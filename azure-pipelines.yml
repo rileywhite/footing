@@ -66,16 +66,12 @@ steps:
   name: SetAssemblyVersion
 
 - powershell: |
-    $line = Get-Content $(vemotuappChartFilePath) | Select-String version | Select-Object -ExpandProperty Line
-    $content = Get-Content $(vemotuappChartFilePath)
-    $content | ForEach-Object {$_ -replace $line,"version: $(SetVersion.version)"} | Set-Content $(vemotuappChartFilePath)
-  name: SetChartVersion
+    $versionLine = Get-Content $(vemotuappChartFilePath) | Select-String version | Select-Object -ExpandProperty Line
+    $appVersionLine = Get-Content $(vemotuappChartFilePath) | Select-String appVersion | Select-Object -ExpandProperty Line
 
-- powershell: |
-    $line = Get-Content $(vemotuappChartFilePath) | Select-String appVersion | Select-Object -ExpandProperty Line
     $content = Get-Content $(vemotuappChartFilePath)
-    $content | ForEach-Object {$_ -replace $line,"appVersion: $(SetFullVersion.fullVersion)"} | Set-Content $(vemotuappChartFilePath)
-  name: SetChartAppVersion
+    $content | ForEach-Object {$_ -replace $versionLine, "version: $(SetVersion.version)"} | ForEach-Object {$_ -replace $appVersionLine, "appVersion: $(SetFullVersion.fullVersion)"} | Set-Content $(vemotuappChartFilePath)
+  name: SetChartVersions
 
 - task: DockerCompose@0
   name: DockerComposeBuild
