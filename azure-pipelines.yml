@@ -100,12 +100,14 @@ steps:
     includeLatestTag: false
 
 - task: HelmInstaller@0
+  condition: in(variables['Build.Reason'], 'Manual', 'IndividualCI', 'BatchedCI', 'Schedule')
   inputs:
     helmVersion: '3.4.1'
     installKubectl: true
     kubectlVersion: '1.19.4'
 
 - task: HelmDeploy@0
+  condition: in(variables['Build.Reason'], 'Manual', 'IndividualCI', 'BatchedCI', 'Schedule')
   inputs:
     azureSubscriptionForACR: 'Azure subscription 1(ce6a314f-4d4b-43d3-bbb9-195fdc4939d9)'
     azureResourceGroupForACR: 'rg-vemotu-eus2-001'
