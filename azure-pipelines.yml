@@ -62,8 +62,8 @@ steps:
 
 - task: DockerCompose@0
   name: DockerComposeBuild
-  workingDirectory: '/src'
   inputs:
+    workingDirectory: '/src'
     containerregistrytype: 'Azure Container Registry'
     azureSubscription: '$(azureSubscription)'
     azureContainerRegistry: '{"loginServer":"crvemotueus2.azurecr.io", "id" : "/subscriptions/$(azureSubscriptionUuid)/resourceGroups/$(azureCRResourceGroup)/providers/Microsoft.ContainerRegistry/registries/crvemotueus2"}'
@@ -76,8 +76,8 @@ steps:
 - task: DockerCompose@0
   condition: in(variables['Build.Reason'], 'Manual', 'IndividualCI', 'BatchedCI', 'Schedule')
   name: DockerComposePush
-  workingDirectory: '/src'
   inputs:
+    workingDirectory: '/src'
     containerregistrytype: 'Azure Container Registry'
     azureSubscription: '$(azureSubscription)'
     azureContainerRegistry: '{"loginServer":"crvemotueus2.azurecr.io", "id" : "/subscriptions/$(azureSubscriptionUuid)/resourceGroups/$(azureCRResourceGroup)/providers/Microsoft.ContainerRegistry/registries/crvemotueus2"}'
