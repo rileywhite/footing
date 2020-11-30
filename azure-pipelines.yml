@@ -62,11 +62,12 @@ steps:
 
 - task: DockerCompose@0
   name: DockerComposeBuild
+  workingDirectory: '/src'
   inputs:
     containerregistrytype: 'Azure Container Registry'
     azureSubscription: '$(azureSubscription)'
     azureContainerRegistry: '{"loginServer":"crvemotueus2.azurecr.io", "id" : "/subscriptions/$(azureSubscriptionUuid)/resourceGroups/$(azureCRResourceGroup)/providers/Microsoft.ContainerRegistry/registries/crvemotueus2"}'
-    dockerComposeFile: 'src/docker-compose.yml'
+    dockerComposeFile: 'docker-compose.yml'
     action: 'Build services'
     arguments: '--build-arg version=$(SetVersion.version)+$(SetTimestamp.timestamp) --build-arg assembly_version=$(SetAssemblyVersion.assemblyVersion) --build-arg configuration=$(SetConfiguration.configuration)'
     additionalImageTags: '$(SetVersion.version)'
@@ -75,11 +76,12 @@ steps:
 - task: DockerCompose@0
   condition: in(variables['Build.Reason'], 'Manual', 'IndividualCI', 'BatchedCI', 'Schedule')
   name: DockerComposePush
+  workingDirectory: '/src'
   inputs:
     containerregistrytype: 'Azure Container Registry'
     azureSubscription: '$(azureSubscription)'
     azureContainerRegistry: '{"loginServer":"crvemotueus2.azurecr.io", "id" : "/subscriptions/$(azureSubscriptionUuid)/resourceGroups/$(azureCRResourceGroup)/providers/Microsoft.ContainerRegistry/registries/crvemotueus2"}'
-    dockerComposeFile: 'src/docker-compose.yml'
+    dockerComposeFile: 'docker-compose.yml'
     action: 'Push services'
     additionalImageTags: '$(SetVersion.version)'
     includeLatestTag: false
