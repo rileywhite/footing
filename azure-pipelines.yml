@@ -85,3 +85,18 @@ steps:
     dockerComposeFileArgs: |
       DOCKER_IMAGE_VERSION_TAG=$(SetVersion.version)
     includeLatestTag: false
+
+- task: HelmInstaller@0
+  inputs:
+    helmVersion: '3.4.1'
+    installKubectl: true
+    kubectlVersion: '1.19.4'
+
+- task: HelmDeploy@0
+  inputs:
+    azureSubscriptionForACR: 'Azure subscription 1(ce6a314f-4d4b-43d3-bbb9-195fdc4939d9)'
+    azureResourceGroupForACR: 'rg-vemotu-eus2-001'
+    azureContainerRegistry: 'crvemotueus2.azurecr.io'
+    command: 'save'
+    chartNameForACR: 'vemotuapp:$(SetVersion.version)'
+    chartPathForACR: 'vemotuapp'
