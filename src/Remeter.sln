@@ -19,6 +19,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Remeter.Portal.JSInterop", 
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{E6274E4A-6612-478A-8B76-11558C415F1C}"
 	ProjectSection(SolutionItems) = preProject
+		..\.env = ..\env
 		..\azure-pipelines.yml = ..\azure-pipelines.yml
 		..\README.md = ..\README.md
 		..\icons\favicon16.png = ..\icons\favicon16.png
