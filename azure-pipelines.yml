@@ -99,4 +99,4 @@ steps:
     azureContainerRegistry: 'crvemotueus2.azurecr.io'
     command: 'save'
     chartNameForACR: 'vemotuapp:$(SetVersion.version)'
-    chartPathForACR: 'vemotuapp'
+    chartPathForACR: 'src/vemotuapp'
