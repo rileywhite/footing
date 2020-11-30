@@ -68,13 +68,13 @@ steps:
 - powershell: |
     $line = Get-Content $(vemotuappChartFilePath) | Select-String version | Select-Object -ExpandProperty Line
     $content = Get-Content $(vemotuappChartFilePath)
-    $content | ForEach-Object {$_ -replace $line,"version=$(SetVersion.version)"} | Set-Content $(vemotuappChartFilePath)
+    $content | ForEach-Object {$_ -replace $line,"version: $(SetVersion.version)"} | Set-Content $(vemotuappChartFilePath)
   name: SetChartVersion
 
 - powershell: |
-      $line = Get-Content $(vemotuappChartFilePath) | Select-String appVersion | Select-Object -ExpandProperty Line
-      $content = Get-Content $(vemotuappChartFilePath)
-      $content | ForEach-Object {$_ -replace $line,"appVersion=$(SetFullVersion.fullVersion)"} | Set-Content $(vemotuappChartFilePath)
+    $line = Get-Content $(vemotuappChartFilePath) | Select-String appVersion | Select-Object -ExpandProperty Line
+    $content = Get-Content $(vemotuappChartFilePath)
+    $content | ForEach-Object {$_ -replace $line,"appVersion: $(SetFullVersion.fullVersion)"} | Set-Content $(vemotuappChartFilePath)
   name: SetChartAppVersion
 
 - task: DockerCompose@0
