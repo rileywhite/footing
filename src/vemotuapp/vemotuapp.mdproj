@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Default</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ItemType>GenericProject</ItemType>
+    <ProjectGuid>{4BD3E9CA-675D-4A64-B774-2AB48F6DD2E3}</ProjectGuid>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Default|AnyCPU' ">
+    <OutputPath>.\</OutputPath>
+  </PropertyGroup>
+  <ItemGroup>
+    <Folder Include="charts\" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="templates\deployment.yaml" />
+    <None Include="templates\NOTES.txt" />
+    <None Include="templates\ingress.yaml" />
+    <None Include="templates\service.yaml" />
+    <None Include="templates\hpa.yaml" />
+    <None Include="templates\serviceaccount.yaml" />
+    <None Include="templates\_helpers.tpl" />
+    <None Include="templates\tests\test-connection.yaml" />
+    <None Include="Chart.yaml" />
+    <None Include="values.yaml" />
+    <None Include="vemotuapp.mdproj" />
+    <None Include="templates\issuer.yaml" />
+  </ItemGroup>
+</Project>

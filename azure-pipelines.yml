@@ -4,9 +4,9 @@
 # https://docs.microsoft.com/azure/devops/pipelines/languages/dotnet-core
 
 trigger:
+  batch: true
   branches:
     include:
-      - main
       - develop
       - feature/*
 
@@ -14,61 +14,74 @@ pool:
   vmImage: 'ubuntu-latest'
 
 variables:
-  buildConfiguration: 'Release'
-  SolutionPath: 'src/Remeter.sln'
-  MainProjectPath: 'src/Remeter/Portal/Server/Remeter.Portal.Server.csproj'
+  azureContainerRegistryName: 'crvemotueus2'
+  azureContainerRegistryUrl: '$(azureContainerRegistryName).azurecr.io'
+  dockerComposeFile: 'src/docker-compose.yml'
+  timestamp: $(Get-Date -Format yyyyMMddTHHmmssfffffffZ)
+  
 
 steps:
 - script: |
-    echo "##vso[task.setvariable variable=deploymentSlot]dev"
-  name: DefaultTarget
+    echo "##vso[task.setvariable variable=versionPrefix]$(cat src/version)"
+  name: ReadVersionFromFile
 
 - script: |
-    echo "##vso[task.setvariable variable=deploymentSlot]staging"
-  name: StagingTarget
-  condition: eq(variables['Build.SourceBranch'], 'refs/heads/main')
+    echo "##vso[task.setvariable variable=alphaOrBeta]alpha.$(Build.SourceBranchName)"
+  name: DefaultToAlpha
 
 - script: |
-    echo "##vso[task.setvariable variable=deploymentSlot]int"
-  name: IntegrationTarget
+    echo "##vso[task.setvariable variable=alphaOrBeta]beta"
+  name: UseBetaForDevelop
   condition: eq(variables['Build.SourceBranch'], 'refs/heads/develop')
 
 - script: |
-    echo "##vso[task.setvariable variable=deploymentSlot;isOutput=true]$DEPLOYMENTSLOT"
-  name: DeploymentTarget
+    echo "##vso[task.setvariable variable=configurationDecision]Debug"
+  name: DefaultToDebug
 
-- task: UseDotNet@2
-  inputs:
-    packageType: 'sdk'
-    version: 5.0.x
+- script: |
+    echo "##vso[task.setvariable variable=configurationDecision]Release"
+  name: UseReleaseForDevelop
+  condition: eq(variables['Build.SourceBranch'], 'refs/heads/develop')
 
-- task: DotNetCoreCLI@2
-  displayName: Restore
-  inputs:
-    command: restore
-    projects: '$(SolutionPath)'
+- script: |
+    echo "##vso[task.setvariable variable=configuration;isOutput=true]$CONFIGURATIONDECISION"
+  name: SetConfiguration
 
-- task: DotNetCoreCLI@2
-  displayName: Build
-  inputs:
-    command: build
-    projects: '$(SolutionPath)'
-    arguments: '--configuration $(buildConfiguration)'
+- powershell: |
+    $date=$(Get-Date -Format yyyyMMddTHHmmssfffffffZ);
+    Write-Host "##vso[task.setvariable variable=timestamp;isOutput=true]$date"
+  name: SetTimestamp
 
-- task: DotNetCoreCLI@2
-  displayName: 'Publish and zip'
-  inputs:
-    command: publish
-    publishWebProjects: False
-    projects: '$(MainProjectPath)'
-    arguments: '--configuration $(BuildConfiguration) --output $(Build.ArtifactStagingDirectory)'
-    zipAfterPublish: True
+- script: |
+    echo "##vso[task.setvariable variable=version;isOutput=true]$VERSIONPREFIX-$ALPHAORBETA.$(Build.BuildId)"
+  name: SetVersion
 
-- task: AzureWebApp@1
-  displayName: 'Deploy Azure Web App'
+- script: |
+    echo "##vso[task.setvariable variable=assemblyVersion;isOutput=true]$VERSIONPREFIX.$(Build.BuildId)"
+  name: SetAssemblyVersion
+
+- task: DockerCompose@0
+  name: DockerComposeBuild
   inputs:
+    containerregistrytype: 'Azure Container Registry'
     azureSubscription: '$(azureSubscription)'
-    appName: 'remeter-portal'
-    SlotName: '$(DeploymentTarget.deploymentSlot)'
-    appType: 'webApp'
-    package: $(Build.ArtifactStagingDirectory)/**/*.zip
+    azureContainerRegistry: '{"loginServer":"crvemotueus2.azurecr.io", "id" : "/subscriptions/$(azureSubscriptionUuid)/resourceGroups/$(azureCRResourceGroup)/providers/Microsoft.ContainerRegistry/registries/crvemotueus2"}'
+    dockerComposeFile: 'src/docker-compose.yml'
+    action: 'Build services'
+    arguments: '--build-arg version=$(SetVersion.version)+$(SetTimestamp.timestamp) --build-arg assembly_version=$(SetAssemblyVersion.assemblyVersion) --build-arg configuration=$(SetConfiguration.configuration)'
+    dockerComposeFileArgs: |
+      DOCKER_IMAGE_VERSION_TAG=$(SetVersion.version)
+    includeLatestTag: false
+
+- task: DockerCompose@0
+  condition: in(variables['Build.Reason'], 'Manual', 'IndividualCI', 'BatchedCI', 'Schedule')
+  name: DockerComposePush
+  inputs:
+    containerregistrytype: 'Azure Container Registry'
+    azureSubscription: '$(azureSubscription)'
+    azureContainerRegistry: '{"loginServer":"crvemotueus2.azurecr.io", "id" : "/subscriptions/$(azureSubscriptionUuid)/resourceGroups/$(azureCRResourceGroup)/providers/Microsoft.ContainerRegistry/registries/crvemotueus2"}'
+    dockerComposeFile: 'src/docker-compose.yml'
+    action: 'Push services'
+    dockerComposeFileArgs: |
+      DOCKER_IMAGE_VERSION_TAG=$(SetVersion.version)
+    includeLatestTag: false
