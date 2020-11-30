@@ -58,12 +58,24 @@ steps:
   name: SetVersion
 
 - script: |
-    echo "##vso[task.setvariable variable=fullVersion;isOutput=true]$VERSION+$TIMESTAMP"
+    echo "##vso[task.setvariable variable=fullVersion;isOutput=true]$(SetVersion.version)+$TIMESTAMP"
   name: SetFullVersion
 
 - script: |
     echo "##vso[task.setvariable variable=assemblyVersion;isOutput=true]$VERSIONPREFIX.$(Build.BuildId)"
   name: SetAssemblyVersion
+
+- powershell: |
+    $line = Get-Content $(vemotuappChartFilePath) | Select-String version | Select-Object -ExpandProperty Line
+    $content = Get-Content $(vemotuappChartFilePath)
+    $content | ForEach-Object {$_ -replace $line,"version=$(SetVersion.version)"} | Set-Content $(vemotuappChartFilePath)
+  name: SetChartVersion
+
+- powershell: |
+      $line = Get-Content $(vemotuappChartFilePath) | Select-String appVersion | Select-Object -ExpandProperty Line
+      $content = Get-Content $(vemotuappChartFilePath)
+      $content | ForEach-Object {$_ -replace $line,"appVersion=$(SetFullVersion.fullVersion)"} | Set-Content $(vemotuappChartFilePath)
+  name: SetChartAppVersion
 
 - task: DockerCompose@0
   name: DockerComposeBuild
@@ -96,28 +108,6 @@ steps:
     helmVersion: '3.4.1'
     installKubectl: true
     kubectlVersion: '1.19.4'
-
-- task: AzurePowerShell@5
-  name: SetChartVersion
-  inputs:
-    ScriptType: 'InlineScript'
-    Inline: |
-      $line = Get-Content $(vemotuappChartFilePath) | Select-String version | Select-Object -ExpandProperty Line
-      $content = Get-Content $(vemotuappChartFilePath)
-      $content | ForEach-Object {$_ -replace $line,"version=$(SetVersion.version)"} | Set-Content $(vemotuappChartFilePath)
-    FailOnStandardError: true
-    azurePowerShellVersion: 'LatestVersion'
-
-- task: AzurePowerShell@5
-  name: SetChartAppVersion
-  inputs:
-    ScriptType: 'InlineScript'
-    Inline: |
-      $line = Get-Content $(vemotuappChartFilePath) | Select-String appVersion | Select-Object -ExpandProperty Line
-      $content = Get-Content $(vemotuappChartFilePath)
-      $content | ForEach-Object {$_ -replace $line,"appVersion=$(SetFullVersion.fullVersion)"} | Set-Content $(vemotuappChartFilePath)
-    FailOnStandardError: true
-    azurePowerShellVersion: 'LatestVersion'
 
 - task: HelmDeploy@0
   inputs:
