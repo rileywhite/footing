@@ -58,10 +58,6 @@ steps:
   name: SetVersion
 
 - script: |
-    echo "##vso[task.setvariable variable=chartVersion;isOutput=true]$VERSIONPREFIX$(Build.BuildId)"
-  name: SetChartVersion
-
-- script: |
     echo "##vso[task.setvariable variable=fullVersion;isOutput=true]$(SetVersion.version)+$TIMESTAMP"
   name: SetFullVersion
 
@@ -74,7 +70,7 @@ steps:
     $versionLine = $content | Select-String -Pattern '^version:' -CaseSensitive | Select-Object -ExpandProperty Line
     $appVersionLine = $content | Select-String -Pattern '^appVersion:' -CaseSensitive | Select-Object -ExpandProperty Line
 
-    $content | ForEach-Object {$_ -replace $versionLine, "version: $(SetChartVersion.chartVersion)"} | ForEach-Object {$_ -replace $appVersionLine, "appVersion: $(SetFullVersion.fullVersion)"} | Set-Content $(vemotuappChartFilePath)
+    $content | ForEach-Object {$_ -replace $versionLine, "version: $(SetVersion.version)"} | ForEach-Object {$_ -replace $appVersionLine, "appVersion: $(SetFullVersion.fullVersion)"} | Set-Content $(vemotuappChartFilePath)
   name: UpdateChartYamlVersions
 
 - task: DockerCompose@0
