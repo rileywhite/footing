@@ -136,7 +136,7 @@ steps:
     command: 'upgrade'
     releaseName: 'vemotuapp'
     chartType: 'FilePath'
-    chartName: 'src/vemotuapp'
+    chartPath: 'src/vemotuapp'
     chartVersion: '$(SetOutputVariables.version)'
     updateDependency: true
     overrideValues: |
