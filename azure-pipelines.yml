@@ -59,7 +59,7 @@ steps:
     echo "##vso[task.setvariable variable=assemblyVersion;isOutput=true]$VERSIONPREFIX.$(Build.BuildId)"
     echo "##vso[task.setvariable variable=vemotuHost;isOutput=true]$VEMOTUHOSTDECISION"
     echo "##vso[task.setvariable variable=remeterHost;isOutput=true]$REMETERHOSTDECISION"
-    echo "##vso[task.setvariable variable=deployNamespace;isOutput=true]DEPLOYNAMESPACEDECISION"
+    echo "##vso[task.setvariable variable=deployNamespace;isOutput=true]$DEPLOYNAMESPACEDECISION"
     echo "##vso[task.setvariable variable=loadBalancerIP]$LOADBALANCERIPDECISION"
   name: SetOutputVariables
 
