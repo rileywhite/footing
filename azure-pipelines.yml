@@ -55,7 +55,7 @@ steps:
 - script: |
     echo "##vso[task.setvariable variable=configuration;isOutput=true]$CONFIGURATIONDECISION"
     echo "##vso[task.setvariable variable=version;isOutput=true]$VERSIONPREFIX-$ALPHAORBETA.$(Build.BuildId)"
-    echo "##vso[task.setvariable variable=fullVersion;isOutput=true]$(SetVersion.version)+$TIMESTAMP"
+    echo "##vso[task.setvariable variable=fullVersion;isOutput=true]$VERSION+$TIMESTAMP"
     echo "##vso[task.setvariable variable=assemblyVersion;isOutput=true]$VERSIONPREFIX.$(Build.BuildId)"
     echo "##vso[task.setvariable variable=vemotuHost;isOutput=true]$VEMOTUHOSTDECISION"
     echo "##vso[task.setvariable variable=remeterHost;isOutput=true]$REMETERHOSTDECISION"
@@ -85,7 +85,7 @@ steps:
     includeLatestTag: false
 
 - task: DockerCompose@0
-  condition: in(variables['Build.Reason'], 'Manual', 'IndividualCI', 'BatchedCI', 'Schedule')
+  condition: and(succeeded(), in(variables['Build.Reason'], 'Manual', 'IndividualCI', 'BatchedCI', 'Schedule'))
   name: DockerComposePush
   inputs:
     containerregistrytype: 'Azure Container Registry'
@@ -98,14 +98,14 @@ steps:
     includeLatestTag: false
 
 - task: HelmInstaller@0
-  condition: in(variables['Build.Reason'], 'Manual', 'IndividualCI', 'BatchedCI', 'Schedule')
+  condition: and(succeeded(), in(variables['Build.Reason'], 'Manual', 'IndividualCI', 'BatchedCI', 'Schedule'))
   inputs:
     helmVersion: '3.4.1'
     installKubectl: true
     kubectlVersion: '1.19.4'
 
 - task: HelmDeploy@0
-  condition: in(variables['Build.Reason'], 'Manual', 'IndividualCI', 'BatchedCI', 'Schedule')
+  condition: and(succeeded(), in(variables['Build.Reason'], 'Manual', 'IndividualCI', 'BatchedCI', 'Schedule'))
   inputs:
     azureSubscriptionForACR: '$(azureSubscription)'
     azureResourceGroupForACR: 'rg-vemotu-eus2-001'
@@ -116,12 +116,12 @@ steps:
 
 
 - task: HelmDeploy@0
-  condition: in(variables['Build.Reason'], 'Manual', 'IndividualCI', 'BatchedCI', 'Schedule')
+  condition: and(succeeded(), in(variables['Build.Reason'], 'Manual', 'IndividualCI', 'BatchedCI', 'Schedule'))
   inputs:
     connectionType: 'Azure Resource Manager'
     azureSubscription: '$(azureSubscription)'
     azureResourceGroup: '$(azureResourceGroup)'
-    kubernetesCluster: 'nonProdKubernetesCluster'
+    kubernetesCluster: '$(nonProdKubernetesCluster)'
     namespace: '$(deployNamespace)'
     command: 'upgrade'
     chartType: 'FilePath'
