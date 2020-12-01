@@ -131,7 +131,7 @@ steps:
     namespace: '$(SetOutputVariables.deployNamespace)'
     command: 'upgrade'
     chartType: 'Name'
-    chartName: 'vemotuapp'
+    chartName: 'crvemotueus2.azurecr.io/helm/vemotuapp'
     chartVersion: '$(SetOutputVariables.version)'
     updateDependency: true
     overrideValues: |
