@@ -128,7 +128,7 @@ steps:
     azureSubscription: '$(azureSubscription)'
     azureResourceGroup: '$(azureResourceGroup)'
     kubernetesCluster: '$(nonProdKubernetesCluster)'
-    namespace: '$(deployNamespace)'
+    namespace: '$(SetOutputVariables.deployNamespace)'
     command: 'upgrade'
     chartType: 'FilePath'
     chartPath: 'src/vemotuapp'
@@ -143,4 +143,4 @@ steps:
         ingress.tls[0].secretName=$(vemotuTlsSecretName)
         ingress.tls[1].hosts[0]=$(SetOutputVariables.remeterHost)
         ingress.tls[1].secretName=$(remeterTlsSecretName)
-        ingress-nginx.controller.service.loadBalancerIP="$(SetOutputVariables.loadBalancerIP)"
+        ingress-nginx.controller.service.loadBalancerIP=$(SetOutputVariables.loadBalancerIP)
