@@ -61,7 +61,7 @@ steps:
     echo "##vso[task.setvariable variable=vemotuHost;isOutput=true]$VEMOTUHOSTDECISION"
     echo "##vso[task.setvariable variable=remeterHost;isOutput=true]$REMETERHOSTDECISION"
     echo "##vso[task.setvariable variable=deployNamespace;isOutput=true]$DEPLOYNAMESPACEDECISION"
-    echo "##vso[task.setvariable variable=loadBalancerIP]$LOADBALANCERIPDECISION"
+    echo "##vso[task.setvariable variable=loadBalancerIP;isOutput=true]$LOADBALANCERIPDECISION"
   name: SetOutputVariables
 
 - powershell: |
