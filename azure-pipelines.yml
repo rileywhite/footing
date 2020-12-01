@@ -127,6 +127,7 @@ steps:
     chartType: 'FilePath'
     chartPath: 'src/vemotuapp'
     chartVersion: '$(SetOutputVariables.version)'
+    updateDependency: true
     overrideValues: |
         ingress.hosts[0].host=$(SetOutputVariables.vemotuHost)
         ingress.hosts[0].paths[0]=/
