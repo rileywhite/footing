@@ -20,8 +20,7 @@ variables:
   timestamp: $(Get-Date -Format yyyyMMddTHHmmssfffffffZ)
   vemotuappChartPath: 'src/vemotuapp'
   vemotuappChartFilePath: '$(vemotuappChartPath)/Chart.yaml'
-  vemotuTlsSecretName: 'vemotu-com-tls'
-  remeterTlsSecretName: 'remeter-com-tls'
+  tlsSecretName: 'vemotu-com-tls'
 
 steps:
 - script: |
@@ -98,6 +97,7 @@ steps:
     includeLatestTag: false
 
 - task: HelmInstaller@0
+  name: HelmInstall
   condition: and(succeeded(), in(variables['Build.Reason'], 'Manual', 'IndividualCI', 'BatchedCI', 'Schedule'))
   inputs:
     helmVersion: '3.4.1'
@@ -106,6 +106,7 @@ steps:
 
 - task: HelmDeploy@0
   condition: and(succeeded(), in(variables['Build.Reason'], 'Manual', 'IndividualCI', 'BatchedCI', 'Schedule'))
+  name: HelmPushToCR
   inputs:
     azureSubscriptionForACR: '$(azureSubscription)'
     azureResourceGroupForACR: 'rg-vemotu-eus2-001'
@@ -115,10 +116,12 @@ steps:
     chartPathForACR: '$(vemotuappChartPath)'
 
 - script: 'helm dependency update src/vemotuapp'
+  condition: and(succeeded(), in(variables['Build.Reason'], 'Manual', 'IndividualCI', 'BatchedCI', 'Schedule'))
   name: HelmDependencyUpdate
 
 - task: HelmDeploy@0
   condition: and(succeeded(), in(variables['Build.Reason'], 'Manual', 'IndividualCI', 'BatchedCI', 'Schedule'))
+  name: HelmUpgrade
   inputs:
     connectionType: 'Azure Resource Manager'
     azureSubscription: '$(azureSubscription)'
@@ -133,9 +136,9 @@ steps:
     overrideValues: |
         ingress.hosts[0].host=$(SetOutputVariables.vemotuHost)
         ingress.hosts[0].paths[0]=/
-        ingress.tls.hosts[0]=$(SetOutputVariables.vemotuHost)
-        ingress.tls.hosts[0].secretName=$(vemotuTlsSecretName)
         ingress.hosts[1].host=$(SetOutputVariables.remeterHost)
         ingress.hosts[1].paths[0]=/
-        ingress.tls.hosts[0].secretName=$(remeterTlsSecretName)
+        ingress.tls.hosts[0]=$(SetOutputVariables.vemotuHost)
+        ingress.tls.hosts[1]=$(SetOutputVariables.remeterHost)
+        ingress.tls.secretName=$(tlsSecretName)
         ingress-nginx.controller.service.loadBalancerIP=$(SetOutputVariables.loadBalancerIP)
