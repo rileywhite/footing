@@ -68,7 +68,7 @@ steps:
     $content = Get-Content $(vemotuappChartFilePath)
     $versionLine = $content | Select-String -Pattern '^version:' -CaseSensitive | Select-Object -ExpandProperty Line
     $appVersionLine = $content | Select-String -Pattern '^appVersion:' -CaseSensitive | Select-Object -ExpandProperty Line
-    $content | ForEach-Object {$_ -replace $versionLine, "version: $(SetOutputVariables.version)"} | ForEach-Object {$_ -replace $appVersionLine, "appVersion: $(SetOutputVariables.fullVersion)"} | Set-Content $(vemotuappChartFilePath)
+    $content | ForEach-Object {$_ -replace $versionLine, "version: $(SetOutputVariables.version)"} | ForEach-Object {$_ -replace $appVersionLine, "appVersion: $(SetOutputVariables.version)"} | Set-Content $(vemotuappChartFilePath)
 
     $content = Get-Content $(vemotuappValuesFilePath)
     $imageTagLine = $content | Select-String -Pattern '^  tag:' -CaseSensitive | Select-Object -ExpandProperty Line
