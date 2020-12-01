@@ -20,6 +20,7 @@ variables:
   timestamp: $(Get-Date -Format yyyyMMddTHHmmssfffffffZ)
   vemotuappChartPath: 'src/vemotuapp'
   vemotuappChartFilePath: '$(vemotuappChartPath)/Chart.yaml'
+  vemotuappValuesFilePath: '$(vemotuappChartPath)/values.yaml'
   vemotuTlsSecretName: 'vemotu-com-tls'
   remeterTlsSecretName: 'remeter-org-tls'
 
@@ -67,9 +68,12 @@ steps:
     $content = Get-Content $(vemotuappChartFilePath)
     $versionLine = $content | Select-String -Pattern '^version:' -CaseSensitive | Select-Object -ExpandProperty Line
     $appVersionLine = $content | Select-String -Pattern '^appVersion:' -CaseSensitive | Select-Object -ExpandProperty Line
-
     $content | ForEach-Object {$_ -replace $versionLine, "version: $(SetOutputVariables.version)"} | ForEach-Object {$_ -replace $appVersionLine, "appVersion: $(SetOutputVariables.fullVersion)"} | Set-Content $(vemotuappChartFilePath)
-  name: UpdateChartYamlVersions
+
+    $content = Get-Content $(vemotuappValuesFilePath)
+    $imageTagLine = $content | Select-String -Pattern '^  tag:' -CaseSensitive | Select-Object -ExpandProperty Line
+    $content | ForEach-Object {$_ -replace $imageTagLine, "  tag: $(SetOutputVariables.version)"} | Set-Content $(vemotuappValuesFilePath)
+  name: UpdateChartYamlFiles
 
 - task: DockerCompose@0
   name: DockerComposeBuild
@@ -130,8 +134,9 @@ steps:
     kubernetesCluster: '$(nonProdKubernetesCluster)'
     namespace: '$(SetOutputVariables.deployNamespace)'
     command: 'upgrade'
-    chartType: 'Name'
-    chartName: 'crvemotueus2.azurecr.io/helm/vemotuapp'
+    releaseName: 'vemotuapp'
+    chartType: 'FilePath'
+    chartName: 'src/vemotuapp'
     chartVersion: '$(SetOutputVariables.version)'
     updateDependency: true
     overrideValues: |
