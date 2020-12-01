@@ -114,6 +114,8 @@ steps:
     chartNameForACR: 'vemotuapp:$(SetOutputVariables.version)'
     chartPathForACR: '$(vemotuappChartPath)'
 
+- script: 'helm dependency update src/vemotuapp'
+  name: HelmDependencyUpdate
 
 - task: HelmDeploy@0
   condition: and(succeeded(), in(variables['Build.Reason'], 'Manual', 'IndividualCI', 'BatchedCI', 'Schedule'))
