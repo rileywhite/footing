@@ -130,8 +130,8 @@ steps:
     kubernetesCluster: '$(nonProdKubernetesCluster)'
     namespace: '$(SetOutputVariables.deployNamespace)'
     command: 'upgrade'
-    chartType: 'FilePath'
-    chartPath: 'src/vemotuapp'
+    chartType: 'Name'
+    chartName: 'vemotuapp'
     chartVersion: '$(SetOutputVariables.version)'
     updateDependency: true
     overrideValues: |
