@@ -55,7 +55,7 @@ steps:
 - script: |
     echo "##vso[task.setvariable variable=configuration;isOutput=true]$CONFIGURATIONDECISION"
     echo "##vso[task.setvariable variable=version;isOutput=true]$VERSIONPREFIX-$ALPHAORBETA.$(Build.BuildId)"
-    echo "##vso[task.setvariable variable=fullVersion;isOutput=true]$VERSION+$TIMESTAMP"
+    echo "##vso[task.setvariable variable=fullVersion;isOutput=true]$(SetOutputVariables.version)+$TIMESTAMP"
     echo "##vso[task.setvariable variable=assemblyVersion;isOutput=true]$VERSIONPREFIX.$(Build.BuildId)"
     echo "##vso[task.setvariable variable=vemotuHost;isOutput=true]$VEMOTUHOSTDECISION"
     echo "##vso[task.setvariable variable=remeterHost;isOutput=true]$REMETERHOSTDECISION"
