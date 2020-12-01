@@ -20,7 +20,8 @@ variables:
   timestamp: $(Get-Date -Format yyyyMMddTHHmmssfffffffZ)
   vemotuappChartPath: 'src/vemotuapp'
   vemotuappChartFilePath: '$(vemotuappChartPath)/Chart.yaml'
-  tlsSecretName: 'vemotu-com-tls'
+  vemotuTlsSecretName: 'vemotu-com-tls'
+  remeterTlsSecretName: 'remeter-org-tls'
 
 steps:
 - script: |
@@ -138,7 +139,8 @@ steps:
         ingress.hosts[0].paths[0]=/
         ingress.hosts[1].host=$(SetOutputVariables.remeterHost)
         ingress.hosts[1].paths[0]=/
-        ingress.tls.hosts[0]=$(SetOutputVariables.vemotuHost)
-        ingress.tls.hosts[1]=$(SetOutputVariables.remeterHost)
-        ingress.tls.secretName=$(tlsSecretName)
+        ingress.tls[0].hosts[0]=$(SetOutputVariables.vemotuHost)
+        ingress.tls[0].secretName=$(vemotuTlsSecretName)
+        ingress.tls[1].hosts[0]=$(SetOutputVariables.remeterHost)
+        ingress.tls[1].secretName=$(remeterTlsSecretName)
         ingress-nginx.controller.service.loadBalancerIP=$(SetOutputVariables.loadBalancerIP)
