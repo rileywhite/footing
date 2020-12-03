@@ -35,32 +35,29 @@ steps:
   name: SetTimestamp
 
 - script: |
+    echo "##vso[task.setvariable variable=envName]dev"
     echo "##vso[task.setvariable variable=alphaOrBeta]alpha.$(Build.SourceBranchName)"
     echo "##vso[task.setvariable variable=configurationDecision]Debug"
-    echo "##vso[task.setvariable variable=vemotuHostDecision]dev.vemotu.com"
-    echo "##vso[task.setvariable variable=remeterHostDecision]dev.remeter.org"
-    echo "##vso[task.setvariable variable=deployNamespaceDecision]vemotu-dev"
     echo "##vso[task.setvariable variable=loadBalancerIPDecision]52.167.76.207"
   name: SetVariableDefaults
 
 - script: |
+    echo "##vso[task.setvariable variable=envName]int"
     echo "##vso[task.setvariable variable=alphaOrBeta]beta"
     echo "##vso[task.setvariable variable=configurationDecision]Release"
-    echo "##vso[task.setvariable variable=vemotuHostDecision]int.vemotu.com"
-    echo "##vso[task.setvariable variable=remeterHostDecision]int.remeter.org"
-    echo "##vso[task.setvariable variable=deployNamespaceDecision]vemotu-int"
     echo "##vso[task.setvariable variable=loadBalancerIPDecision]52.177.246.77"
   name: SetVariablesForDevelop
   condition: eq(variables['Build.SourceBranch'], 'refs/heads/develop')
 
 - script: |
+    echo "##vso[task.setvariable variable=deployNamespace;isOutput=true]vemotu-$ENVNAME"
+    echo "##vso[task.setvariable variable=releaseName;isOutput=true]vemotuapp-$ENVNAME"
+    echo "##vso[task.setvariable variable=vemotuHost;isOutput=true]$ENVNAME.vemotu.com"
+    echo "##vso[task.setvariable variable=remeterHost;isOutput=true]$ENVNAME.remeter.org"
     echo "##vso[task.setvariable variable=configuration;isOutput=true]$CONFIGURATIONDECISION"
     echo "##vso[task.setvariable variable=version;isOutput=true]$VERSIONPREFIX-$ALPHAORBETA.$(Build.BuildId)"
     echo "##vso[task.setvariable variable=fullVersion;isOutput=true]$VERSIONPREFIX-$ALPHAORBETA.$(Build.BuildId)+$TIMESTAMP"
     echo "##vso[task.setvariable variable=assemblyVersion;isOutput=true]$VERSIONPREFIX.$(Build.BuildId)"
-    echo "##vso[task.setvariable variable=vemotuHost;isOutput=true]$VEMOTUHOSTDECISION"
-    echo "##vso[task.setvariable variable=remeterHost;isOutput=true]$REMETERHOSTDECISION"
-    echo "##vso[task.setvariable variable=deployNamespace;isOutput=true]$DEPLOYNAMESPACEDECISION"
     echo "##vso[task.setvariable variable=loadBalancerIP;isOutput=true]$LOADBALANCERIPDECISION"
   name: SetOutputVariables
 
@@ -134,7 +131,7 @@ steps:
     kubernetesCluster: '$(nonProdKubernetesCluster)'
     namespace: '$(SetOutputVariables.deployNamespace)'
     command: 'upgrade'
-    releaseName: 'vemotuapp'
+    releaseName: 'vemotuapp-$(SetOutputVariables.releaseName)'
     chartType: 'FilePath'
     chartPath: 'src/vemotuapp'
     chartVersion: '$(SetOutputVariables.version)'
