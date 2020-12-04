@@ -19,7 +19,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Remeter.Portal.JSInterop", 
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{E6274E4A-6612-478A-8B76-11558C415F1C}"
 	ProjectSection(SolutionItems) = preProject
-		..\.env = ..\env
+		..\.env = ..\.env
 		..\azure-pipelines.yml = ..\azure-pipelines.yml
 		..\README.md = ..\README.md
 		..\icons\favicon16.png = ..\icons\favicon16.png
@@ -28,6 +28,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		..\icons\favicon64.png = ..\icons\favicon64.png
 		..\icons\Remeter Icon.xcf = ..\icons\Remeter Icon.xcf
 		version = version
+		..\azure-pipelines-release.yml = ..\azure-pipelines-release.yml
 	EndProjectSection
 EndProject
 Project("{E53339B2-1760-4266-BCC7-CA923CBCF16C}") = "docker-compose", "docker-compose.dcproj", "{DC8CB009-BA60-4D83-A120-BFE663F53050}"
