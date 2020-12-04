@@ -7,8 +7,7 @@ trigger:
   batch: true
   branches:
     include:
-      - develop
-      - feature/*
+      - main
 
 pool:
   vmImage: 'ubuntu-latest'
@@ -16,13 +15,25 @@ pool:
 variables:
   azureContainerRegistryName: 'crvemotueus2'
   azureContainerRegistryUrl: '$(azureContainerRegistryName).azurecr.io'
-  dockerComposeFile: 'src/docker-compose.yml'
+
   timestamp: $(Get-Date -Format yyyyMMddTHHmmssfffffffZ)
+
+  dockerComposeFile: 'src/docker-compose.yml'
   vemotuappChartPath: 'src/vemotuapp'
   vemotuappChartFilePath: '$(vemotuappChartPath)/Chart.yaml'
   vemotuappValuesFilePath: '$(vemotuappChartPath)/values.yaml'
+
   vemotuTlsSecretName: 'vemotu-com-tls'
   remeterTlsSecretName: 'remeter-org-tls'
+
+  stagingDeployNamespace: vemotu-staging
+  stagingReleaseName: vemotuapp-staging
+  stagingVemotuHost: staging.vemotu.com
+  stagingRemeterHost: staging.remeter.org
+  stagingLoadBalancerIP: 52.138.105.11
+
+  prodDeployNamespace: vemotu-prod
+  buildConfiguration: Release
 
 steps:
 - script: |
@@ -35,30 +46,10 @@ steps:
   name: SetTimestamp
 
 - script: |
-    echo "##vso[task.setvariable variable=envName]dev"
-    echo "##vso[task.setvariable variable=alphaOrBeta]alpha.$(Build.SourceBranchName)"
-    echo "##vso[task.setvariable variable=configurationDecision]Debug"
-    echo "##vso[task.setvariable variable=loadBalancerIPDecision]52.167.76.207"
-  name: SetVariableDefaults
-
-- script: |
-    echo "##vso[task.setvariable variable=envName]int"
-    echo "##vso[task.setvariable variable=alphaOrBeta]beta"
-    echo "##vso[task.setvariable variable=configurationDecision]Release"
-    echo "##vso[task.setvariable variable=loadBalancerIPDecision]52.177.246.77"
-  name: SetVariablesForDevelop
-  condition: eq(variables['Build.SourceBranch'], 'refs/heads/develop')
-
-- script: |
-    echo "##vso[task.setvariable variable=deployNamespace;isOutput=true]vemotu-$ENVNAME"
-    echo "##vso[task.setvariable variable=releaseName;isOutput=true]vemotuapp-$ENVNAME"
-    echo "##vso[task.setvariable variable=vemotuHost;isOutput=true]$ENVNAME.vemotu.com"
-    echo "##vso[task.setvariable variable=remeterHost;isOutput=true]$ENVNAME.remeter.org"
-    echo "##vso[task.setvariable variable=configuration;isOutput=true]$CONFIGURATIONDECISION"
-    echo "##vso[task.setvariable variable=version;isOutput=true]$VERSIONPREFIX-$ALPHAORBETA.$(Build.BuildId)"
-    echo "##vso[task.setvariable variable=fullVersion;isOutput=true]$VERSIONPREFIX-$ALPHAORBETA.$(Build.BuildId)+$TIMESTAMP"
+    echo "##vso[task.setvariable variable=version;isOutput=true]$VERSIONPREFIX"
+    echo "##vso[task.setvariable variable=fullVersion;isOutput=true]$VERSIONPREFIX+build.$(Build.BuildId)-timestamp.$TIMESTAMP"
     echo "##vso[task.setvariable variable=assemblyVersion;isOutput=true]$VERSIONPREFIX.$(Build.BuildId)"
-    echo "##vso[task.setvariable variable=loadBalancerIP;isOutput=true]$LOADBALANCERIPDECISION"
+    echo "##vso[task.setvariable variable=loadBalancerIP;isOutput=true]52.184.202.52"
   name: SetOutputVariables
 
 - powershell: |
@@ -80,10 +71,10 @@ steps:
     azureContainerRegistry: '{"loginServer":"crvemotueus2.azurecr.io", "id" : "/subscriptions/$(azureSubscriptionUuid)/resourceGroups/$(azureResourceGroup)/providers/Microsoft.ContainerRegistry/registries/crvemotueus2"}'
     dockerComposeFile: 'src/docker-compose.yml'
     action: 'Build services'
-    arguments: '--build-arg version=$(SetOutputVariables.fullVersion) --build-arg assembly_version=$(SetOutputVariables.assemblyVersion) --build-arg configuration=$(SetOutputVariables.configuration)'
+    arguments: '--build-arg version=$(SetOutputVariables.fullVersion) --build-arg assembly_version=$(SetOutputVariables.assemblyVersion) --build-arg configuration=$(buildConfiguration)'
     dockerComposeFileArgs: |
       DOCKER_IMAGE_VERSION_TAG=$(SetOutputVariables.version)
-    includeLatestTag: false
+    includeLatestTag: true
 
 - task: DockerCompose@0
   condition: and(succeeded(), in(variables['Build.Reason'], 'Manual', 'IndividualCI', 'BatchedCI', 'Schedule'))
@@ -96,7 +87,7 @@ steps:
     action: 'Push services'
     dockerComposeFileArgs: |
       DOCKER_IMAGE_VERSION_TAG=$(SetOutputVariables.version)
-    includeLatestTag: false
+    includeLatestTag: true
 
 - task: HelmInstaller@0
   name: HelmInstall
@@ -129,20 +120,20 @@ steps:
     azureSubscription: '$(azureSubscription)'
     azureResourceGroup: '$(azureResourceGroup)'
     kubernetesCluster: '$(nonProdKubernetesCluster)'
-    namespace: '$(SetOutputVariables.deployNamespace)'
+    namespace: '$(stagingDeployNamespace)'
     command: 'upgrade'
-    releaseName: '$(SetOutputVariables.releaseName)'
+    releaseName: '$(stagingReleaseName)'
     chartType: 'FilePath'
     chartPath: 'src/vemotuapp'
     chartVersion: '$(SetOutputVariables.version)'
     updateDependency: true
     overrideValues: |
-        ingress.hosts[0].host=$(SetOutputVariables.vemotuHost)
+        ingress.hosts[0].host=$(stagingVemotuHost)
         ingress.hosts[0].paths[0]=/
-        ingress.hosts[1].host=$(SetOutputVariables.remeterHost)
+        ingress.hosts[1].host=$(stagingRemeterHost)
         ingress.hosts[1].paths[0]=/
-        ingress.tls[0].hosts[0]=$(SetOutputVariables.vemotuHost)
+        ingress.tls[0].hosts[0]=$(stagingVemotuHost)
         ingress.tls[0].secretName=$(vemotuTlsSecretName)
-        ingress.tls[1].hosts[0]=$(SetOutputVariables.remeterHost)
+        ingress.tls[1].hosts[0]=$(stagingRemeterHost)
         ingress.tls[1].secretName=$(remeterTlsSecretName)
-        ingress-nginx.controller.service.loadBalancerIP="$(SetOutputVariables.loadBalancerIP)"
+        ingress-nginx.controller.service.loadBalancerIP="$(stagingLoadBalancerIP)"
