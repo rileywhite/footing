@@ -16,6 +16,7 @@ variables:
   azureContainerRegistryName: 'crvemotueus2'
   azureContainerRegistryUrl: '$(azureContainerRegistryName).azurecr.io'
 
+  buildConfiguration: Release
   timestamp: $(Get-Date -Format yyyyMMddTHHmmssfffffffZ)
 
   dockerComposeFile: 'src/docker-compose.yml'
@@ -33,9 +34,19 @@ variables:
   stagingLoadBalancerIP: 52.138.105.11
 
   prodDeployNamespace: vemotu-prod
-  buildConfiguration: Release
+  prodReleaseName: vemotuapp-prod
+  prodVemotuHost: prod.vemotu.com
+  prodRemeterHost: prod.remeter.org
+  stagingLoadBalancerIP: 52.184.202.52
 
 steps:
+<<<<<<< Updated upstream
+=======
+- checkout: self
+  name: CheckoutMainBranchAndPersistCredentials
+  persistCredentials: true
+
+>>>>>>> Stashed changes
 - script: |
     echo "##vso[task.setvariable variable=versionPrefix]$(cat src/version)"
   name: ReadVersionFromFile
@@ -49,7 +60,7 @@ steps:
     echo "##vso[task.setvariable variable=version;isOutput=true]$VERSIONPREFIX"
     echo "##vso[task.setvariable variable=fullVersion;isOutput=true]$VERSIONPREFIX+build.$(Build.BuildId)-timestamp.$TIMESTAMP"
     echo "##vso[task.setvariable variable=assemblyVersion;isOutput=true]$VERSIONPREFIX.$(Build.BuildId)"
-    echo "##vso[task.setvariable variable=loadBalancerIP;isOutput=true]52.184.202.52"
+    echo "##vso[task.setvariable variable=loadBalancerIP;isOutput=true]$(stagingLoadBalancerIP)"
   name: SetOutputVariables
 
 - powershell: |
@@ -68,8 +79,13 @@ steps:
   inputs:
     containerregistrytype: 'Azure Container Registry'
     azureSubscription: '$(azureSubscription)'
+<<<<<<< Updated upstream
     azureContainerRegistry: '{"loginServer":"crvemotueus2.azurecr.io", "id" : "/subscriptions/$(azureSubscriptionUuid)/resourceGroups/$(azureResourceGroup)/providers/Microsoft.ContainerRegistry/registries/crvemotueus2"}'
     dockerComposeFile: 'src/docker-compose.yml'
+=======
+    azureContainerRegistry: '{"loginServer":"$(azureContainerRegistryName).azurecr.io", "id" : "/subscriptions/$(azureSubscriptionUuid)/resourceGroups/$(azureResourceGroup)/providers/Microsoft.ContainerRegistry/registries/$(azureContainerRegistryName)"}'
+    dockerComposeFilePath: 'src/docker-compose.yml'
+>>>>>>> Stashed changes
     action: 'Build services'
     arguments: '--build-arg version=$(SetOutputVariables.fullVersion) --build-arg assembly_version=$(SetOutputVariables.assemblyVersion) --build-arg configuration=$(buildConfiguration)'
     dockerComposeFileArgs: |
@@ -82,8 +98,13 @@ steps:
   inputs:
     containerregistrytype: 'Azure Container Registry'
     azureSubscription: '$(azureSubscription)'
+<<<<<<< Updated upstream
     azureContainerRegistry: '{"loginServer":"crvemotueus2.azurecr.io", "id" : "/subscriptions/$(azureSubscriptionUuid)/resourceGroups/$(azureResourceGroup)/providers/Microsoft.ContainerRegistry/registries/crvemotueus2"}'
     dockerComposeFile: 'src/docker-compose.yml'
+=======
+    azureContainerRegistry: '{"loginServer":"$(azureContainerRegistryName).azurecr.io", "id" : "/subscriptions/$(azureSubscriptionUuid)/resourceGroups/$(azureResourceGroup)/providers/Microsoft.ContainerRegistry/registries/$(azureContainerRegistryName)"}'
+    dockerComposeFilePath: 'src/docker-compose.yml'
+>>>>>>> Stashed changes
     action: 'Push services'
     dockerComposeFileArgs: |
       DOCKER_IMAGE_VERSION_TAG=$(SetOutputVariables.version)
@@ -103,7 +124,7 @@ steps:
   inputs:
     azureSubscriptionForACR: '$(azureSubscription)'
     azureResourceGroupForACR: 'rg-vemotu-eus2-001'
-    azureContainerRegistry: 'crvemotueus2.azurecr.io'
+    azureContainerRegistry: '$(azureContainerRegistryName).azurecr.io'
     command: 'save'
     chartNameForACR: 'vemotuapp:$(SetOutputVariables.version)'
     chartPathForACR: '$(vemotuappChartPath)'
