@@ -1,13 +1,10 @@
-# ASP.NET Core
-# Build and test ASP.NET Core projects targeting .NET Core.
-# Add steps that run tests, create a NuGet package, deploy, and more:
-# https://docs.microsoft.com/azure/devops/pipelines/languages/dotnet-core
-
 trigger:
   batch: true
   branches:
     include:
       - main
+    exclude:
+      - 'refs/pull/*'
 
 pool:
   vmImage: 'ubuntu-latest'
@@ -19,7 +16,8 @@ variables:
   buildConfiguration: Release
   timestamp: $(Get-Date -Format yyyyMMddTHHmmssfffffffZ)
 
-  dockerComposeFile: 'src/docker-compose.yml'
+  versionFilePath: 'src/version'
+  dockerComposeFilePath: 'src/docker-compose.yml'
   vemotuappChartPath: 'src/vemotuapp'
   vemotuappChartFilePath: '$(vemotuappChartPath)/Chart.yaml'
   vemotuappValuesFilePath: '$(vemotuappChartPath)/values.yaml'
@@ -37,18 +35,15 @@ variables:
   prodReleaseName: vemotuapp-prod
   prodVemotuHost: prod.vemotu.com
   prodRemeterHost: prod.remeter.org
-  stagingLoadBalancerIP: 52.184.202.52
+  prodLoadBalancerIP: 52.184.202.52
 
 steps:
-<<<<<<< Updated upstream
-=======
 - checkout: self
   name: CheckoutMainBranchAndPersistCredentials
   persistCredentials: true
 
->>>>>>> Stashed changes
 - script: |
-    echo "##vso[task.setvariable variable=versionPrefix]$(cat src/version)"
+    echo "##vso[task.setvariable variable=versionPrefix]$(cat $(versionFilePath))"
   name: ReadVersionFromFile
 
 - powershell: |
@@ -79,18 +74,83 @@ steps:
   inputs:
     containerregistrytype: 'Azure Container Registry'
     azureSubscription: '$(azureSubscription)'
-<<<<<<< Updated upstream
-    azureContainerRegistry: '{"loginServer":"crvemotueus2.azurecr.io", "id" : "/subscriptions/$(azureSubscriptionUuid)/resourceGroups/$(azureResourceGroup)/providers/Microsoft.ContainerRegistry/registries/crvemotueus2"}'
-    dockerComposeFile: 'src/docker-compose.yml'
-=======
     azureContainerRegistry: '{"loginServer":"$(azureContainerRegistryName).azurecr.io", "id" : "/subscriptions/$(azureSubscriptionUuid)/resourceGroups/$(azureResourceGroup)/providers/Microsoft.ContainerRegistry/registries/$(azureContainerRegistryName)"}'
     dockerComposeFilePath: 'src/docker-compose.yml'
->>>>>>> Stashed changes
     action: 'Build services'
     arguments: '--build-arg version=$(SetOutputVariables.fullVersion) --build-arg assembly_version=$(SetOutputVariables.assemblyVersion) --build-arg configuration=$(buildConfiguration)'
     dockerComposeFileArgs: |
       DOCKER_IMAGE_VERSION_TAG=$(SetOutputVariables.version)
     includeLatestTag: true
+
+- script: |
+     git tag v$(SetOutputVariables.version)
+     git push origin v$(SetOutputVariables.version)
+  condition: and(succeeded(), in(variables['Build.Reason'], 'Manual', 'IndividualCI', 'BatchedCI', 'Schedule'))
+  name: GitTagVersionOnMainBranch
+  workingDirectory: $(Build.SourcesDirectory)
+
+- task: GitHubRelease@1
+  condition: and(succeeded(), in(variables['Build.Reason'], 'Manual', 'IndividualCI', 'BatchedCI', 'Schedule'))
+  name: CreateDraftRelease
+  inputs:
+    gitHubConnection: 'rileywhite'
+    repositoryName: '$(Build.Repository.Name)'
+    action: 'create'
+    target: '$(Build.SourceVersion)'
+    tagSource: 'userSpecifiedTag'
+    tag: 'v$(SetOutputVariables.version)'
+    isDraft: true
+    changeLogCompareToRelease: 'lastFullRelease'
+    changeLogType: 'commitBased'
+
+- script: |
+    echo "##vso[task.setvariable variable=success;isOutput=true]true"
+  condition: and(succeeded(), in(variables['Build.Reason'], 'Manual', 'IndividualCI', 'BatchedCI', 'Schedule'))
+  name: SetDraftReleaseCreated
+  workingDirectory: $(Build.SourcesDirectory)
+
+- checkout: self@develop
+  name: CheckoutDevelopBranchAndPersistCredentials
+  persistCredentials: true
+
+- powershell: |
+    $content =  Get-Content $(versionFilePath);
+    if ($LASTEXITCODE -ne 0)
+    {
+        Write-Error 'Could not read version file $(versionFilePath)'
+        Exit 1
+    }
+
+    $valid = $content -match '([0-9]+\.[0-9]+\.)([0-9]+)'
+    if (-Not $valid)
+    {
+        Write-Error 'Invalid version. Expected Major.Minor.Patch'
+        Exit 1
+    }
+
+    $newVersion = $Matches[1] + ([convert]::ToInt64($Matches[2], 10) + 1)
+    if ($LASTEXITCODE -ne 0)
+    {
+        Write-Error 'Could generate new patch version'
+        Exit 1
+    }
+
+    Set-Content $(versionFilePath) $newVersion
+    if ($LASTEXITCODE -ne 0)
+    {
+        Write-Error 'Could write new patch version to version file'
+        Exit 1
+    }
+
+    git commit -m "Set new patch version $newVersion"
+    git push
+  condition: and(succeeded(), in(variables['Build.Reason'], 'Manual', 'IndividualCI', 'BatchedCI', 'Schedule'))
+  name: GitIncrementPatchVersionOnDevelopBranch
+  workingDirectory: $(Build.SourcesDirectory)
+
+- checkout: self@main
+  name: CheckoutMainBranchAndPersistCredentialsAgain
+  persistCredentials: true
 
 - task: DockerCompose@0
   condition: and(succeeded(), in(variables['Build.Reason'], 'Manual', 'IndividualCI', 'BatchedCI', 'Schedule'))
@@ -98,13 +158,8 @@ steps:
   inputs:
     containerregistrytype: 'Azure Container Registry'
     azureSubscription: '$(azureSubscription)'
-<<<<<<< Updated upstream
-    azureContainerRegistry: '{"loginServer":"crvemotueus2.azurecr.io", "id" : "/subscriptions/$(azureSubscriptionUuid)/resourceGroups/$(azureResourceGroup)/providers/Microsoft.ContainerRegistry/registries/crvemotueus2"}'
-    dockerComposeFile: 'src/docker-compose.yml'
-=======
     azureContainerRegistry: '{"loginServer":"$(azureContainerRegistryName).azurecr.io", "id" : "/subscriptions/$(azureSubscriptionUuid)/resourceGroups/$(azureResourceGroup)/providers/Microsoft.ContainerRegistry/registries/$(azureContainerRegistryName)"}'
     dockerComposeFilePath: 'src/docker-compose.yml'
->>>>>>> Stashed changes
     action: 'Push services'
     dockerComposeFileArgs: |
       DOCKER_IMAGE_VERSION_TAG=$(SetOutputVariables.version)
@@ -158,3 +213,32 @@ steps:
         ingress.tls[1].hosts[0]=$(stagingRemeterHost)
         ingress.tls[1].secretName=$(remeterTlsSecretName)
         ingress-nginx.controller.service.loadBalancerIP="$(stagingLoadBalancerIP)"
+
+- task: ManualValidation@0
+  condition: and(succeeded(), in(variables['Build.Reason'], 'Manual', 'IndividualCI', 'BatchedCI', 'Schedule'))
+  name: ApproveForRelease
+  inputs:
+    notifyUsers: 'rileywhite@gmail.com'
+    instructions: 'Approve?'
+
+- task: GitHubRelease@1
+  condition: and(succeeded(), in(variables['Build.Reason'], 'Manual', 'IndividualCI', 'BatchedCI', 'Schedule'))
+  name: UpdateToNonDraftRelease
+  inputs:
+    gitHubConnection: 'rileywhite'
+    repositoryName: '$(Build.Repository.Name)'
+    action: 'edit'
+    target: '$(Build.SourceVersion)'
+    tag: 'v$(SetOutputVariables.version)'
+    assetUploadMode: 'replace'
+    changeLogCompareToRelease: 'lastFullRelease'
+    changeLogType: 'commitBased'
+
+- task: GitHubRelease@1
+  condition: and(failed(), eq($(SetDraftReleaseCreated.success), 'true'), in(variables['Build.Reason'], 'Manual', 'IndividualCI', 'BatchedCI', 'Schedule'))
+  name: DeleteFailedDraftRelease
+  inputs:
+    gitHubConnection: 'rileywhite'
+    repositoryName: '$(Build.Repository.Name)'
+    action: 'delete'
+    tag: 'v$(SetOutputVariables.version)'
