@@ -40,6 +40,7 @@ variables:
 - jobs:
   - job: DeployToStaging
     steps:
+
     - checkout: self
       name: CheckoutMainBranchAndPersistCredentials
       persistCredentials: true
@@ -218,7 +219,10 @@ variables:
 
 
   - job: GetApproval
+    steps:
+    - dependsOn: DeployToStaging
     - pool: pool
+
     - task: ManualValidation@0
       condition: and(succeeded(), in(variables['Build.Reason'], 'Manual', 'IndividualCI', 'BatchedCI', 'Schedule'))
       name: ApproveForRelease
@@ -226,7 +230,56 @@ variables:
         notifyUsers: 'rileywhite@gmail.com'
         instructions: 'Approve?'
 
+    - task: GitHubRelease@1
+      condition: and(failed(), eq($(SetDraftReleaseCreated.success), 'true'), in(variables['Build.Reason'], 'Manual', 'IndividualCI', 'BatchedCI', 'Schedule'))
+      name: DeleteFailedDraftRelease
+      inputs:
+        gitHubConnection: 'rileywhite'
+        repositoryName: '$(Build.Repository.Name)'
+        action: 'delete'
+        tag: 'v$(SetOutputVariables.version)'
+
+
+
   - job: DeployToProd
+    - dependsOn: GetApproval
+
+    steps:
+    - task: HelmDeploy@0
+      condition: and(succeeded(), in(variables['Build.Reason'], 'Manual', 'IndividualCI', 'BatchedCI', 'Schedule'))
+      name: HelmUpgrade
+      inputs:
+        connectionType: 'Azure Resource Manager'
+        azureSubscription: '$(azureSubscription)'
+        azureResourceGroup: '$(azureResourceGroup)'
+        kubernetesCluster: '$(prodKubernetesCluster)'
+        namespace: '$(prodDeployNamespace)'
+        command: 'upgrade'
+        releaseName: '$(prodReleaseName)'
+        chartType: 'FilePath'
+        chartPath: 'src/vemotuapp'
+        chartVersion: '$(SetOutputVariables.version)'
+        updateDependency: true
+        overrideValues: |
+            ingress.hosts[0].host=$(prodVemotuHost)
+            ingress.hosts[0].paths[0]=/
+            ingress.hosts[1].host=$(prodRemeterHost)
+            ingress.hosts[1].paths[0]=/
+            ingress.tls[0].hosts[0]=$(prodVemotuHost)
+            ingress.tls[0].secretName=$(vemotuTlsSecretName)
+            ingress.tls[1].hosts[0]=$(prodRemeterHost)
+            ingress.tls[1].secretName=$(remeterTlsSecretName)
+            ingress-nginx.controller.service.loadBalancerIP="$(prodLoadBalancerIP)"
+
+    - task: GitHubRelease@1
+      condition: and(failed(), eq($(SetDraftReleaseCreated.success), 'true'), in(variables['Build.Reason'], 'Manual', 'IndividualCI', 'BatchedCI', 'Schedule'))
+      name: DeleteFailedDraftRelease
+      inputs:
+        gitHubConnection: 'rileywhite'
+        repositoryName: '$(Build.Repository.Name)'
+        action: 'delete'
+        tag: 'v$(SetOutputVariables.version)'
+
     - task: GitHubRelease@1
       condition: and(succeeded(), in(variables['Build.Reason'], 'Manual', 'IndividualCI', 'BatchedCI', 'Schedule'))
       name: UpdateToNonDraftRelease
@@ -239,12 +292,3 @@ variables:
         assetUploadMode: 'replace'
         changeLogCompareToRelease: 'lastFullRelease'
         changeLogType: 'commitBased'
-
-    - task: GitHubRelease@1
-      condition: and(failed(), eq($(SetDraftReleaseCreated.success), 'true'), in(variables['Build.Reason'], 'Manual', 'IndividualCI', 'BatchedCI', 'Schedule'))
-      name: DeleteFailedDraftRelease
-      inputs:
-        gitHubConnection: 'rileywhite'
-        repositoryName: '$(Build.Repository.Name)'
-        action: 'delete'
-        tag: 'v$(SetOutputVariables.version)'
