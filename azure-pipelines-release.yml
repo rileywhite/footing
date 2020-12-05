@@ -150,7 +150,7 @@ jobs:
     name: GitIncrementPatchVersionOnDevelopBranch
     workingDirectory: $(Build.SourcesDirectory)
 
-  - checkout: self@main
+  - checkout: self
     name: CheckoutMainBranchAndPersistCredentialsAgain
     persistCredentials: true
 
@@ -219,8 +219,7 @@ jobs:
 
 - job: GetApproval
   dependsOn: DeployToStaging
-  pool:
-    vmImage: 'ubuntu-latest'
+  pool: server
   steps:
   - task: ManualValidation@0
     condition: and(succeeded(), in(variables['Build.Reason'], 'Manual', 'IndividualCI', 'BatchedCI', 'Schedule'))
