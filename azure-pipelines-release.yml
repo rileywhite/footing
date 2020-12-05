@@ -219,6 +219,7 @@ jobs:
 
 - job: GetApproval
   dependsOn: DeployToStaging
+  continueOnError: true
   pool: server
   steps:
   - task: ManualValidation@0
@@ -228,6 +229,12 @@ jobs:
       notifyUsers: 'rileywhite@gmail.com'
       instructions: 'Approve?'
 
+- job: RemoveDraftRelease
+  dependsOn: GetApproval
+  condition: and(failed(), eq($(SetDraftReleaseCreated.success), 'true'), in(variables['Build.Reason'], 'Manual', 'IndividualCI', 'BatchedCI', 'Schedule'))
+  pool:
+    vmImage: 'ubuntu-latest'
+  steps:
   - task: GitHubRelease@1
     condition: and(failed(), eq($(SetDraftReleaseCreated.success), 'true'), in(variables['Build.Reason'], 'Manual', 'IndividualCI', 'BatchedCI', 'Schedule'))
     name: DeleteFailedDraftRelease
@@ -237,10 +244,9 @@ jobs:
       action: 'delete'
       tag: 'v$(SetOutputVariables.version)'
 
-
-
 - job: DeployToProd
   dependsOn: GetApproval
+  condition: and(succeeded(), in(variables['Build.Reason'], 'Manual', 'IndividualCI', 'BatchedCI', 'Schedule'))
   pool:
     vmImage: 'ubuntu-latest'
 
