@@ -222,8 +222,7 @@ jobs:
   pool:
     vmImage: 'ubuntu-latest'
   steps:
-  - pool: pool
-   - task: ManualValidation@0
+  - task: ManualValidation@0
     condition: and(succeeded(), in(variables['Build.Reason'], 'Manual', 'IndividualCI', 'BatchedCI', 'Schedule'))
     name: ApproveForRelease
     inputs:
