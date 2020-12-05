@@ -1,10 +1,10 @@
 trigger:
   batch: true
   branches:
-  include:
-    - main
-  exclude:
-    - 'refs/pull/*'
+    include:
+      - main
+    exclude:
+      - 'refs/pull/*'
 
 variables:
   azureContainerRegistryName: 'crvemotueus2'
