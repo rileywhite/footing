@@ -1,10 +1,3 @@
-trigger:
-  batch: true
-  branches:
-    include:
-      - main
-    exclude:
-      - 'refs/pull/*'
 
 pool:
   vmImage: 'ubuntu-latest'
@@ -39,6 +32,15 @@ variables:
 
 - jobs:
   - job: DeployToStaging
+
+  trigger:
+    batch: true
+    branches:
+    include:
+      - main
+    exclude:
+      - 'refs/pull/*'
+
     steps:
 
     - checkout: self
