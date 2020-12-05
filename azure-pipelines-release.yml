@@ -1,6 +1,10 @@
-
-pool:
-  vmImage: 'ubuntu-latest'
+trigger:
+  batch: true
+  branches:
+  include:
+    - main
+  exclude:
+    - 'refs/pull/*'
 
 variables:
   azureContainerRegistryName: 'crvemotueus2'
@@ -32,15 +36,8 @@ variables:
 
 - jobs:
   - job: DeployToStaging
-
-  trigger:
-    batch: true
-    branches:
-    include:
-      - main
-    exclude:
-      - 'refs/pull/*'
-
+    pool:
+      vmImage: 'ubuntu-latest'
     steps:
 
     - checkout: self
@@ -221,8 +218,10 @@ variables:
 
 
   - job: GetApproval
+    dependsOn: DeployToStaging
+    pool:
+      vmImage: 'ubuntu-latest'
     steps:
-    - dependsOn: DeployToStaging
     - pool: pool
 
     - task: ManualValidation@0
@@ -244,7 +243,9 @@ variables:
 
 
   - job: DeployToProd
-    - dependsOn: GetApproval
+    dependsOn: GetApproval
+    pool:
+      vmImage: 'ubuntu-latest'
 
     steps:
     - task: HelmDeploy@0
