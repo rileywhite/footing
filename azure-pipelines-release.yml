@@ -2,11 +2,11 @@ resources:
   repositories:
   - repository: MainBranch
     type: github
-    endpoint: rileywhite oauth connection
+    endpoint: $(GitHubServiceConnection)
     name: rileywhite/remeter-portal
   - repository: DevelopBranch
     type: github
-    endpoint: rileywhite oauth connection
+    endpoint: $(GitHubServiceConnection)
     name: rileywhite/remeter-portal
     ref: develop
 
@@ -300,7 +300,7 @@ jobs:
   - task: GitHubRelease@1
     name: DeleteFailedDraftRelease
     inputs:
-      gitHubConnection: 'rileywhite'
+      gitHubConnection: '$(GitHubServiceConnection)'
       repositoryName: '$(Build.Repository.Name)'
       action: 'delete'
       tag: 'v$(SetOutputVariables.version)'
@@ -320,7 +320,7 @@ jobs:
   - task: GitHubRelease@1
     name: UpdateToNonDraftRelease
     inputs:
-      gitHubConnection: 'rileywhite oauth connection'
+      gitHubConnection: '$(GitHubServiceConnection)'
       repositoryName: '$(Build.Repository.Name)'
       action: 'edit'
       target: '$(Build.SourceVersion)'
