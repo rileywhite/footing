@@ -81,56 +81,49 @@ jobs:
       $content = Get-Content $(vemotuappChartFilePath)
       if ($LASTEXITCODE -ne 0)
       {
-          Write-Error 'Could not read $(vemotuappChartFilePath)'
-          Get-Location | Write-Error
+          Write-Error 'Could not read $(vemotuappChartFilePath) from ' + Get-Location
           Exit 1
       }
 
       $versionLine = $content | Select-String -Pattern '^version:' -CaseSensitive | Select-Object -ExpandProperty Line
       if ($LASTEXITCODE -ne 0)
       {
-          Write-Error 'Could not read version line matching expected pattern \'^version:\''
-          Get-Location | Write-Error
+          Write-Error 'Could not read version line matching expected pattern \'^version:\' from ' + Get-Location
           Exit 1
       }
 
       $appVersionLine = $content | Select-String -Pattern '^appVersion:' -CaseSensitive | Select-Object -ExpandProperty Line
       if ($LASTEXITCODE -ne 0)
       {
-          Write-Error 'Could not read appVersion line matching expected pattern \'^appVersion:\''
-          Get-Location | Write-Error
+          Write-Error 'Could not read appVersion line matching expected pattern \'^appVersion:\' from ' + Get-Location
           Exit 1
       }
 
       $content | ForEach-Object {$_ -replace $versionLine, "version: $(SetOutputVariables.version)"} | ForEach-Object {$_ -replace $appVersionLine, "appVersion: $(SetOutputVariables.version)"} | Set-Content $(vemotuappChartFilePath)
       if ($LASTEXITCODE -ne 0)
       {
-          Write-Error 'Could not set updated content in $(vemotuappChartFilePath)'
-          Get-Location | Write-Error
+          Write-Error 'Could not set updated content in \'$(vemotuappChartFilePath)\' from ' + Get-Location
           Exit 1
       }
 
       $content = Get-Content $(vemotuappValuesFilePath)
       if ($LASTEXITCODE -ne 0)
       {
-          Write-Error 'Could not read $(vemotuappValuesFilePath)'
-          Get-Location | Write-Error
+          Write-Error 'Could not read \'$(vemotuappValuesFilePath)\' from ' + Get-Location
           Exit 1
       }
 
       $imageTagLine = $content | Select-String -Pattern '^  tag:' -CaseSensitive | Select-Object -ExpandProperty Line
       if ($LASTEXITCODE -ne 0)
       {
-          Write-Error 'Could not read tag line matching expected pattern \'^  tag::\''
-          Get-Location | Write-Error
+          Write-Error 'Could not read tag line matching expected pattern \'^  tag::\' from ' + Get-Location
           Exit 1
       }
 
       $content | ForEach-Object {$_ -replace $imageTagLine, "  tag: $(SetOutputVariables.version)"} | Set-Content $(vemotuappValuesFilePath)
       if ($LASTEXITCODE -ne 0)
       {
-          Write-Error 'Could not set updated content in $(vemotuappValuesFilePath)'
-          Get-Location | Write-Error
+          Write-Error 'Could not set updated content in \'$(vemotuappValuesFilePath)\' from ' + Get-Location
           Exit 1
       }
 
@@ -187,56 +180,49 @@ jobs:
       $content =  Get-Content $(developVersionFilePath);
       if ($LASTEXITCODE -ne 0)
       {
-          Write-Error 'Could not read version file $(developVersionFilePath)'
-          Get-Location | Write-Error
+          Write-Error 'Could not read version file \'$(developVersionFilePath)\' from ' + Get-Location
           Exit 1
       }
 
       $valid = $content -match '([0-9]+\.[0-9]+\.)([0-9]+)'
       if (-Not $valid)
       {
-          Write-Error 'Invalid version. Expected Major.Minor.Patch'
-          Get-Location | Write-Error
+          Write-Error 'Invalid version. Expected Major.Minor.Patch from ' + Get-Location
           Exit 1
       }
 
       $newVersion = $Matches[1] + ([convert]::ToInt64($Matches[2], 10) + 1)
       if ($LASTEXITCODE -ne 0)
       {
-          Write-Error 'Could generate new patch version'
-          Get-Location | Write-Error
+          Write-Error 'Could generate new patch version from ' + Get-Location
           Exit 1
       }
 
       Set-Content $(developVersionFilePath) $newVersion
       if ($LASTEXITCODE -ne 0)
       {
-          Write-Error 'Could not write new patch version to version file'
-          Get-Location | Write-Error
+          Write-Error 'Could not write new patch version to version file from ' + Get-Location
           Exit 1
       }
 
       cd $(developBranchPath)
       if ($LASTEXITCODE -ne 0)
       {
-          Write-Error 'Could not cd to $(developBranchPath)'
-          Get-Location | Write-Error
+          Write-Error 'Could not cd to \'$(developBranchPath)\' from ' + Get-Location
           Exit 1
       }
 
       git commit -m "Set new patch version $newVersion"
       if ($LASTEXITCODE -ne 0)
       {
-          Write-Error 'Could not commit version patch bump'
-          Get-Location | Write-Error
+          Write-Error 'Could not commit version patch bump from ' + Get-Location
           Exit 1
       }
 
       git push
       if ($LASTEXITCODE -ne 0)
       {
-          Write-Error 'Could not push version patch bump commit'
-          Get-Location | Write-Error
+          Write-Error 'Could not push version patch bump commit from ' + Get-Location
           Exit 1
       }
 
