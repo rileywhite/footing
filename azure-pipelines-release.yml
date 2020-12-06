@@ -1,9 +1,5 @@
 resources:
   repositories:
-  - repository: MainBranch
-    type: github
-    endpoint: rileywhite oauth connection
-    name: rileywhite/remeter-portal
   - repository: DevelopBranch
     type: github
     endpoint: rileywhite oauth connection
@@ -30,7 +26,7 @@ variables:
   buildConfiguration: Release
   timestamp: $(Get-Date -Format yyyyMMddTHHmmssfffffffZ)
 
-  mainBranchPath: 'main'
+  mainBranchPath: 'remeter-portal'
   developBranchPath: 'develop'
   srcPath: '$(mainBranchPath)/src'
   versionFilePath: '$(srcPath)/version'
@@ -64,7 +60,6 @@ jobs:
   steps:
   - checkout: self
     name: CheckoutMainBranchAndPersistCredentials
-    path: '$(mainBranchPath)'
 
   - script: |
       echo "##vso[task.setvariable variable=versionPrefix]$(cat $(versionFilePath))"
