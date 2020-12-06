@@ -24,15 +24,22 @@ variables:
   azureContainerRegistryName: 'crvemotueus2'
   azureContainerRegistryUrl: '$(azureContainerRegistryName).azurecr.io'
 
+  helmVersion: '3.4.1'
+  kubectlVersion: '1.19.4'
+
   buildConfiguration: Release
   timestamp: $(Get-Date -Format yyyyMMddTHHmmssfffffffZ)
 
-  srcPath: 'remeter-portal/src'
+  mainBranchPath: 'main'
+  developBranchPath: 'develop'
+  srcPath: '$(mainBranchPath)/src'
   versionFilePath: '$(srcPath)/version'
   dockerComposeFilePath: '$(srcPath)/docker-compose.yml'
   vemotuappChartPath: '$(srcPath)/vemotuapp'
   vemotuappChartFilePath: '$(vemotuappChartPath)/Chart.yaml'
   vemotuappValuesFilePath: '$(vemotuappChartPath)/values.yaml'
+  developSrcPath: '$(developBranchPath)/src'
+  developVersionFilePath: '$(developSrcPath)/version'
 
   vemotuTlsSecretName: 'vemotu-com-tls'
   remeterTlsSecretName: 'remeter-org-tls'
@@ -57,7 +64,7 @@ jobs:
   steps:
   - checkout: self
     name: CheckoutMainBranchAndPersistCredentials
-    persistCredentials: true
+    path: 'mainBranchPath'
 
   - script: |
       echo "##vso[task.setvariable variable=versionPrefix]$(cat $(versionFilePath))"
@@ -103,6 +110,7 @@ jobs:
       cd $(srcPath)
       git tag v$(SetOutputVariables.version)
       git push origin v$(SetOutputVariables.version)
+      cd $(Agent.BuildDirectory)
     condition: and(succeeded(), in(variables['Build.Reason'], 'Manual', 'IndividualCI', 'BatchedCI', 'Schedule'))
     name: GitTagVersionOnMainBranch
     workingDirectory: $(Build.SourcesDirectory)
@@ -130,12 +138,14 @@ jobs:
   - checkout: DevelopBranch
     name: CheckoutDevelopBranchAndPersistCredentials
     persistCredentials: true
+    path: '$(developBranchPath)'
 
   - powershell: |
-      $content =  Get-Content $(versionFilePath);
+      $content =  Get-Content $(developVersionFilePath);
       if ($LASTEXITCODE -ne 0)
       {
-          Write-Error 'Could not read version file $(versionFilePath)'
+          Write-Error 'Could not read version file $(developVersionFilePath)'
+          Get-Location | Write-Error
           Exit 1
       }
 
@@ -143,6 +153,7 @@ jobs:
       if (-Not $valid)
       {
           Write-Error 'Invalid version. Expected Major.Minor.Patch'
+          Get-Location | Write-Error
           Exit 1
       }
 
@@ -150,25 +161,46 @@ jobs:
       if ($LASTEXITCODE -ne 0)
       {
           Write-Error 'Could generate new patch version'
+          Get-Location | Write-Error
           Exit 1
       }
 
-      Set-Content $(versionFilePath) $newVersion
+      Set-Content $(developVersionFilePath) $newVersion
       if ($LASTEXITCODE -ne 0)
       {
           Write-Error 'Could write new patch version to version file'
+          Get-Location | Write-Error
+          Exit 1
+      }
+
+      cd $(developBranchPath)
+      if ($LASTEXITCODE -ne 0)
+      {
+          Write-Error 'Could not cd to $(developBranchPath)'
+          Get-Location | Write-Error
           Exit 1
       }
 
       git commit -m "Set new patch version $newVersion"
+      if ($LASTEXITCODE -ne 0)
+      {
+          Write-Error 'Could not commit version patch bump'
+          Get-Location | Write-Error
+          Exit 1
+      }
+
       git push
+      if ($LASTEXITCODE -ne 0)
+      {
+          Write-Error 'Could not push version patch bump commit'
+          Get-Location | Write-Error
+          Exit 1
+      }
+
+      cd $(Agent.BuildDirectory)
     condition: and(succeeded(), in(variables['Build.Reason'], 'Manual', 'IndividualCI', 'BatchedCI', 'Schedule'))
     name: GitIncrementPatchVersionOnDevelopBranch
     workingDirectory: $(Build.SourcesDirectory)
-
-  - checkout: self
-    name: CheckoutMainBranchAndPersistCredentialsAgain
-    persistCredentials: true
 
   - task: DockerCompose@0
     condition: and(succeeded(), in(variables['Build.Reason'], 'Manual', 'IndividualCI', 'BatchedCI', 'Schedule'))
@@ -187,16 +219,16 @@ jobs:
     name: HelmInstall
     condition: and(succeeded(), in(variables['Build.Reason'], 'Manual', 'IndividualCI', 'BatchedCI', 'Schedule'))
     inputs:
-      helmVersion: '3.4.1'
+      helmVersion: '$(helmVersion)'
       installKubectl: true
-      kubectlVersion: '1.19.4'
+      kubectlVersion: '$(kubectlVersion)'
 
   - task: HelmDeploy@0
     condition: and(succeeded(), in(variables['Build.Reason'], 'Manual', 'IndividualCI', 'BatchedCI', 'Schedule'))
     name: HelmPushToCR
     inputs:
       azureSubscriptionForACR: '$(azureSubscription)'
-      azureResourceGroupForACR: 'rg-vemotu-eus2-001'
+      azureResourceGroupForACR: '$(azureResourceGroup)'
       azureContainerRegistry: '$(azureContainerRegistryName).azurecr.io'
       command: 'save'
       chartNameForACR: 'vemotuapp:$(SetOutputVariables.version)'
