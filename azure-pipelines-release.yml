@@ -26,8 +26,8 @@ variables:
   buildConfiguration: Release
   timestamp: $(Get-Date -Format yyyyMMddTHHmmssfffffffZ)
 
-  mainBranchPath: 's/remeter-portal'
-  developBranchPath: 's/develop'
+  mainBranchPath: 'remeter-portal'
+  developBranchPath: 'develop'
   srcPath: '$(mainBranchPath)/src'
   versionFilePath: '$(srcPath)/version'
   dockerComposeFilePath: '$(srcPath)/docker-compose.yml'
