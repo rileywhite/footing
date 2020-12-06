@@ -238,31 +238,34 @@ jobs:
   continueOnError: true
   pool:
     vmImage: 'ubuntu-latest'
-  steps:
-  - task: HelmDeploy@0
-    name: HelmUpgrade
-    inputs:
-      connectionType: 'Azure Resource Manager'
-      azureSubscription: '$(azureSubscription)'
-      azureResourceGroup: '$(azureResourceGroup)'
-      kubernetesCluster: '$(prodKubernetesCluster)'
-      namespace: '$(prodDeployNamespace)'
-      command: 'upgrade'
-      releaseName: '$(prodReleaseName)'
-      chartType: 'FilePath'
-      chartPath: 'src/vemotuapp'
-      chartVersion: '$(SetOutputVariables.version)'
-      updateDependency: true
-      overrideValues: |
-          ingress.hosts[0].host=$(prodVemotuHost)
-          ingress.hosts[0].paths[0]=/
-          ingress.hosts[1].host=$(prodRemeterHost)
-          ingress.hosts[1].paths[0]=/
-          ingress.tls[0].hosts[0]=$(prodVemotuHost)
-          ingress.tls[0].secretName=$(vemotuTlsSecretName)
-          ingress.tls[1].hosts[0]=$(prodRemeterHost)
-          ingress.tls[1].secretName=$(remeterTlsSecretName)
-          ingress-nginx.controller.service.loadBalancerIP="$(prodLoadBalancerIP)"
+  strategy:
+    runOnce:
+      deploy:
+        steps:
+        - task: HelmDeploy@0
+          name: HelmUpgrade
+          inputs:
+            connectionType: 'Azure Resource Manager'
+            azureSubscription: '$(azureSubscription)'
+            azureResourceGroup: '$(azureResourceGroup)'
+            kubernetesCluster: '$(prodKubernetesCluster)'
+            namespace: '$(prodDeployNamespace)'
+            command: 'upgrade'
+            releaseName: '$(prodReleaseName)'
+            chartType: 'FilePath'
+            chartPath: 'src/vemotuapp'
+            chartVersion: '$(SetOutputVariables.version)'
+            updateDependency: true
+            overrideValues: |
+                ingress.hosts[0].host=$(prodVemotuHost)
+                ingress.hosts[0].paths[0]=/
+                ingress.hosts[1].host=$(prodRemeterHost)
+                ingress.hosts[1].paths[0]=/
+                ingress.tls[0].hosts[0]=$(prodVemotuHost)
+                ingress.tls[0].secretName=$(vemotuTlsSecretName)
+                ingress.tls[1].hosts[0]=$(prodRemeterHost)
+                ingress.tls[1].secretName=$(remeterTlsSecretName)
+                ingress-nginx.controller.service.loadBalancerIP="$(prodLoadBalancerIP)"
 
 
 - job: RemoveDraftRelease
