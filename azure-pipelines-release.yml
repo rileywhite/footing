@@ -84,13 +84,61 @@ jobs:
 
   - powershell: |
       $content = Get-Content $(vemotuappChartFilePath)
+      if ($LASTEXITCODE -ne 0)
+      {
+          Write-Error 'Could write read $(vemotuappChartFilePath)'
+          Get-Location | Write-Error
+          Exit 1
+      }
+
       $versionLine = $content | Select-String -Pattern '^version:' -CaseSensitive | Select-Object -ExpandProperty Line
+      if ($LASTEXITCODE -ne 0)
+      {
+          Write-Error 'Could not read version line matching expected pattern \'^version:\''
+          Get-Location | Write-Error
+          Exit 1
+      }
+
       $appVersionLine = $content | Select-String -Pattern '^appVersion:' -CaseSensitive | Select-Object -ExpandProperty Line
+      if ($LASTEXITCODE -ne 0)
+      {
+          Write-Error 'Could not read appVersion line matching expected pattern \'^appVersion:\''
+          Get-Location | Write-Error
+          Exit 1
+      }
+
       $content | ForEach-Object {$_ -replace $versionLine, "version: $(SetOutputVariables.version)"} | ForEach-Object {$_ -replace $appVersionLine, "appVersion: $(SetOutputVariables.version)"} | Set-Content $(vemotuappChartFilePath)
+      if ($LASTEXITCODE -ne 0)
+      {
+          Write-Error 'Could not set updated content in $(vemotuappChartFilePath)'
+          Get-Location | Write-Error
+          Exit 1
+      }
 
       $content = Get-Content $(vemotuappValuesFilePath)
+      if ($LASTEXITCODE -ne 0)
+      {
+          Write-Error 'Could write read $(vemotuappValuesFilePath)'
+          Get-Location | Write-Error
+          Exit 1
+      }
+
       $imageTagLine = $content | Select-String -Pattern '^  tag:' -CaseSensitive | Select-Object -ExpandProperty Line
+      if ($LASTEXITCODE -ne 0)
+      {
+          Write-Error 'Could not read tag line matching expected pattern \'^  tag::\''
+          Get-Location | Write-Error
+          Exit 1
+      }
+
       $content | ForEach-Object {$_ -replace $imageTagLine, "  tag: $(SetOutputVariables.version)"} | Set-Content $(vemotuappValuesFilePath)
+      if ($LASTEXITCODE -ne 0)
+      {
+          Write-Error 'Could not set updated content in $(vemotuappValuesFilePath)'
+          Get-Location | Write-Error
+          Exit 1
+      }
+
     name: UpdateChartYamlFiles
 
   - task: DockerCompose@0
