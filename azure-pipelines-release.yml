@@ -81,49 +81,49 @@ jobs:
       $content = Get-Content $(vemotuappChartFilePath) 2>&1
       if ($LASTEXITCODE -ne 0)
       {
-          Write-Error "Could not read $(vemotuappChartFilePath) from '$(Get-Location)' with error $content"
+          Write-Error "Exit code: $LASTEXITCODE. Could not read $(vemotuappChartFilePath) from '$(Get-Location)' with error $content"
           Exit 1
       }
 
       $versionLine = $content | Select-String -Pattern '^version:' -CaseSensitive | Select-Object -ExpandProperty Line 2>&1
       if ($LASTEXITCODE -ne 0)
       {
-          Write-Error "Could not read version line matching expected pattern '^version:' from '$(Get-Location)' with error $versionLine"
+          Write-Error "Exit code: $LASTEXITCODE. Could not read version line matching expected pattern '^version:' from '$(Get-Location)' with error $versionLine"
           Exit 1
       }
 
       $appVersionLine = $content | Select-String -Pattern '^appVersion:' -CaseSensitive | Select-Object -ExpandProperty Line 2>&1
       if ($LASTEXITCODE -ne 0)
       {
-          Write-Error "Could not read appVersion line matching expected pattern '^appVersion:' from '$(Get-Location)' with error $appVersionLine"
+          Write-Error "Exit code: $LASTEXITCODE. Could not read appVersion line matching expected pattern '^appVersion:' from '$(Get-Location)' with error $appVersionLine"
           Exit 1
       }
 
       $content | ForEach-Object {$_ -replace $versionLine, "version: $(SetOutputVariables.version)"} | ForEach-Object {$_ -replace $appVersionLine, "appVersion: $(SetOutputVariables.version)"} | Set-Content $(vemotuappChartFilePath) 2>&1
       if ($LASTEXITCODE -ne 0)
       {
-          Write-Error "Could not set updated content in '$(vemotuappChartFilePath)' from '$(Get-Location)' with error $content"
+          Write-Error "Exit code: $LASTEXITCODE. Could not set updated content in '$(vemotuappChartFilePath)' from '$(Get-Location)' with error $content"
           Exit 1
       }
 
       $content = Get-Content $(vemotuappValuesFilePath) 2>&1
       if ($LASTEXITCODE -ne 0)
       {
-          Write-Error "Could not read '$(vemotuappValuesFilePath)' from '$(Get-Location)' with error $content"
+          Write-Error "Exit code: $LASTEXITCODE. Could not read '$(vemotuappValuesFilePath)' from '$(Get-Location)' with error $content"
           Exit 1
       }
 
       $imageTagLine = $content | Select-String -Pattern '^  tag:' -CaseSensitive | Select-Object -ExpandProperty Line 2>&1
       if ($LASTEXITCODE -ne 0)
       {
-          Write-Error "Could not read tag line matching expected pattern '^  tag::' from '$(Get-Location)' with error $imageTagLine"
+          Write-Error "Exit code: $LASTEXITCODE. Could not read tag line matching expected pattern '^  tag::' from '$(Get-Location)' with error $imageTagLine"
           Exit 1
       }
 
       $content | ForEach-Object {$_ -replace $imageTagLine, "  tag: $(SetOutputVariables.version)"} | Set-Content $(vemotuappValuesFilePath) 2>&1
       if ($LASTEXITCODE -ne 0)
       {
-          Write-Error "Could not set updated content in '$(vemotuappValuesFilePath)' from '$(Get-Location)' with error $content"
+          Write-Error "Exit code: $LASTEXITCODE. Could not set updated content in '$(vemotuappValuesFilePath)' from '$(Get-Location)' with error $content"
           Exit 1
       }
 
@@ -180,49 +180,49 @@ jobs:
       $content =  Get-Content $(developVersionFilePath) 2>&1
       if ($LASTEXITCODE -ne 0)
       {
-          Write-Error "Could not read version file '$(developVersionFilePath)' from '$(Get-Location)' with error $content"
+          Write-Error "Exit code: $LASTEXITCODE. Could not read version file '$(developVersionFilePath)' from '$(Get-Location)' with error $content"
           Exit 1
       }
 
       $valid = $content -match '([0-9]+\.[0-9]+\.)([0-9]+)' 2>&1
       if (-Not $valid)
       {
-          Write-Error "Invalid version. Expected Major.Minor.Patch from '$(Get-Location)' with error $valid"
+          Write-Error "Exit code: $LASTEXITCODE. Invalid version. Expected Major.Minor.Patch from '$(Get-Location)' with error $valid"
           Exit 1
       }
 
       $newVersion = $Matches[1] + ([convert]::ToInt64($Matches[2], 10) + 1) 2>&1
       if ($LASTEXITCODE -ne 0)
       {
-          Write-Error "Could generate new patch version from '$(Get-Location)' with error $newVersion"
+          Write-Error "Exit code: $LASTEXITCODE. Could generate new patch version from '$(Get-Location)' with error $newVersion"
           Exit 1
       }
 
       $msg = Set-Content $(developVersionFilePath) $newVersion 2>&1
       if ($LASTEXITCODE -ne 0)
       {
-          Write-Error "Could not write new patch version to version file from '$(Get-Location)' with error $msg"
+          Write-Error "Exit code: $LASTEXITCODE. Could not write new patch version to version file from '$(Get-Location)' with error $msg"
           Exit 1
       }
 
       $msg cd $(developBranchPath) 2>&1
       if ($LASTEXITCODE -ne 0)
       {
-          Write-Error "Could not cd to '$(developBranchPath)' from '$(Get-Location)' with error $msg"
+          Write-Error "Exit code: $LASTEXITCODE. Could not cd to '$(developBranchPath)' from '$(Get-Location)' with error $msg"
           Exit 1
       }
 
       $msg = git commit -m "Set new patch version $newVersion" 2>&1
       if ($LASTEXITCODE -ne 0)
       {
-          Write-Error "Could not commit version patch bump from '$(Get-Location)' with error $msg"
+          Write-Error "Exit code: $LASTEXITCODE. Could not commit version patch bump from '$(Get-Location)' with error $msg"
           Exit 1
       }
 
       $msg = git push 2>&1
       if ($LASTEXITCODE -ne 0)
       {
-          Write-Error "Could not push version patch bump commit from '$(Get-Location)' with error $msg"
+          Write-Error "Exit code: $LASTEXITCODE. Could not push version patch bump commit from '$(Get-Location)' with error $msg"
           Exit 1
       }
 
