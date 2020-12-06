@@ -110,7 +110,7 @@ jobs:
     condition: and(succeeded(), in(variables['Build.Reason'], 'Manual', 'IndividualCI', 'BatchedCI', 'Schedule'))
     name: CreateDraftRelease
     inputs:
-      gitHubConnection: 'rileywhite'
+      gitHubConnection: '$(gitHubServiceConnection)'
       repositoryName: '$(Build.Repository.Name)'
       action: 'create'
       target: '$(Build.SourceVersion)'
