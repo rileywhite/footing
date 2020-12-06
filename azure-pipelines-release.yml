@@ -54,11 +54,6 @@ jobs:
   pool:
     vmImage: 'ubuntu-latest'
   steps:
-
-  - checkout: self
-    name: CheckoutMainBranchAndPersistCredentials
-    persistCredentials: true
-
   - script: |
       echo "##vso[task.setvariable variable=versionPrefix]$(cat $(versionFilePath))"
     name: ReadVersionFromFile
