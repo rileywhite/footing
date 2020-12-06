@@ -100,8 +100,9 @@ jobs:
       includeLatestTag: true
 
   - script: |
-       git tag v$(SetOutputVariables.version)
-       git push origin v$(SetOutputVariables.version)
+      cd $(srcPath)
+      git tag v$(SetOutputVariables.version)
+      git push origin v$(SetOutputVariables.version)
     condition: and(succeeded(), in(variables['Build.Reason'], 'Manual', 'IndividualCI', 'BatchedCI', 'Schedule'))
     name: GitTagVersionOnMainBranch
     workingDirectory: $(Build.SourcesDirectory)
