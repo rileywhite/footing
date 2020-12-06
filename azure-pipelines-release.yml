@@ -1,9 +1,14 @@
 resources:
   repositories:
-  - repository: ProjectRepo
+  - repository: MainBranch
     type: github
     endpoint: rileywhite oauth connection
     name: rileywhite/remeter-portal
+  - repository: DevelopBranch
+    type: github
+    endpoint: rileywhite oauth connection
+    name: rileywhite/remeter-portal
+    ref: develop
 
 
 trigger:
@@ -121,7 +126,7 @@ jobs:
     name: SetDraftReleaseCreated
     workingDirectory: $(Build.SourcesDirectory)
 
-  - checkout: ProjectRepo@develop
+  - checkout: DevelopBranch
     name: CheckoutDevelopBranchAndPersistCredentials
     persistCredentials: true
 
