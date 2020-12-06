@@ -91,7 +91,7 @@ jobs:
       }
       catch
       {
-        Write-Error "Raised error when executing code in location $(Get-Location)"
+        Write-Error "Raised error when executing code in location $(Get-Location) with error $(Error[0].Exception.Message)"
         throw
       }
     name: UpdateChartYamlFiles
@@ -153,7 +153,7 @@ jobs:
       }
       catch
       {
-          Write-Error "Raised error when executing code in location $(Get-Location)"
+          Write-Error "Raised error when executing code in location $(Get-Location) with error $(Error[0].Exception.Message)"
           throw
       }
 
