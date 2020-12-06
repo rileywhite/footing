@@ -229,30 +229,17 @@ jobs:
       notifyUsers: 'rileywhite@gmail.com'
       instructions: 'Approve?'
 
-- job: RemoveDraftRelease
-  dependsOn: GetApproval
-  condition: and(failed(), eq($(SetDraftReleaseCreated.success), 'true'), in(variables['Build.Reason'], 'Manual', 'IndividualCI', 'BatchedCI', 'Schedule'))
+
+- deployment: DeployToProd
+  dependsOn:
+    - DeployToStaging
+    - GetApproval
+  condition: eq(dependencies.GetApproval.result, 'Succeeded')
+  continueOnError: true
   pool:
     vmImage: 'ubuntu-latest'
-  steps:
-  - task: GitHubRelease@1
-    condition: and(failed(), eq($(SetDraftReleaseCreated.success), 'true'), in(variables['Build.Reason'], 'Manual', 'IndividualCI', 'BatchedCI', 'Schedule'))
-    name: DeleteFailedDraftRelease
-    inputs:
-      gitHubConnection: 'rileywhite'
-      repositoryName: '$(Build.Repository.Name)'
-      action: 'delete'
-      tag: 'v$(SetOutputVariables.version)'
-
-- job: DeployToProd
-  dependsOn: GetApproval
-  condition: and(succeeded(), in(variables['Build.Reason'], 'Manual', 'IndividualCI', 'BatchedCI', 'Schedule'))
-  pool:
-    vmImage: 'ubuntu-latest'
-
   steps:
   - task: HelmDeploy@0
-    condition: and(succeeded(), in(variables['Build.Reason'], 'Manual', 'IndividualCI', 'BatchedCI', 'Schedule'))
     name: HelmUpgrade
     inputs:
       connectionType: 'Azure Resource Manager'
@@ -277,8 +264,21 @@ jobs:
           ingress.tls[1].secretName=$(remeterTlsSecretName)
           ingress-nginx.controller.service.loadBalancerIP="$(prodLoadBalancerIP)"
 
+
+- job: RemoveDraftRelease
+  dependsOn:
+    - GetApproval
+    - DeployToProd
+  condition: |
+    and
+    (
+      eq(dependencies.GetApproval.result, 'Failed')
+      in(dependencies.DeployToProd.result, 'Skipped', 'Failed')
+    )
+  pool:
+    vmImage: 'ubuntu-latest'
+  steps:
   - task: GitHubRelease@1
-    condition: and(failed(), eq($(SetDraftReleaseCreated.success), 'true'), in(variables['Build.Reason'], 'Manual', 'IndividualCI', 'BatchedCI', 'Schedule'))
     name: DeleteFailedDraftRelease
     inputs:
       gitHubConnection: 'rileywhite'
@@ -286,8 +286,19 @@ jobs:
       action: 'delete'
       tag: 'v$(SetOutputVariables.version)'
 
+
+- job: UpdateToNonDraftRelease
+  dependsOn:
+    - GetApproval
+    - DeployToProd
+  condition: |
+    and
+    (
+      eq(dependencies.GetApproval.result, 'Succeeded')
+      in(dependencies.DeployToProd.result, 'Succeeded')
+    )
+  steps:
   - task: GitHubRelease@1
-    condition: and(succeeded(), in(variables['Build.Reason'], 'Manual', 'IndividualCI', 'BatchedCI', 'Schedule'))
     name: UpdateToNonDraftRelease
     inputs:
       gitHubConnection: 'rileywhite'
