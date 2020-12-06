@@ -1,9 +1,9 @@
-#resources:
-#  repositories:
-#  - repository: ProjectRepo
-#    type: github
-#    endpoint: 'rileywhite oauth connection'
-#    name: rileywhite/remeter
+resources:
+  repositories:
+  - repository: ProjectRepo
+    type: github
+    endpoint: rileywhite oauth connection
+    name: rileywhite/remeter
 
 
 trigger:
