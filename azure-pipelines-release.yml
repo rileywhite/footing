@@ -275,7 +275,7 @@ jobs:
   condition: |
     and
     (
-      eq(dependencies.GetApproval.result, 'Failed')
+      eq(dependencies.GetApproval.result, 'Failed'),
       in(dependencies.DeployToProd.result, 'Skipped', 'Failed')
     )
   pool:
