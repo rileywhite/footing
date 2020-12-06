@@ -26,8 +26,8 @@ variables:
   buildConfiguration: Release
   timestamp: $(Get-Date -Format yyyyMMddTHHmmssfffffffZ)
 
-  mainBranchPath: 'remeter-portal'
-  developBranchPath: 'develop'
+  mainBranchPath: 's/remeter-portal'
+  developBranchPath: 's/develop'
   srcPath: '$(mainBranchPath)/src'
   versionFilePath: '$(srcPath)/version'
   dockerComposeFilePath: '$(srcPath)/docker-compose.yml'
@@ -113,7 +113,7 @@ jobs:
       $content = Get-Content $(vemotuappValuesFilePath)
       if ($LASTEXITCODE -ne 0)
       {
-          Write-Error 'Could write read $(vemotuappValuesFilePath)'
+          Write-Error 'Could not read $(vemotuappValuesFilePath)'
           Get-Location | Write-Error
           Exit 1
       }
