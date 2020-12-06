@@ -81,7 +81,7 @@ jobs:
       $content = Get-Content $(vemotuappChartFilePath)
       if ($LASTEXITCODE -ne 0)
       {
-          Write-Error 'Could write read $(vemotuappChartFilePath)'
+          Write-Error 'Could not read $(vemotuappChartFilePath)'
           Get-Location | Write-Error
           Exit 1
       }
@@ -211,7 +211,7 @@ jobs:
       Set-Content $(developVersionFilePath) $newVersion
       if ($LASTEXITCODE -ne 0)
       {
-          Write-Error 'Could write new patch version to version file'
+          Write-Error 'Could not write new patch version to version file'
           Get-Location | Write-Error
           Exit 1
       }
