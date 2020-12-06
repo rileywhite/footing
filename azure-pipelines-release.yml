@@ -2,11 +2,11 @@ resources:
   repositories:
   - repository: MainBranch
     type: github
-    endpoint: $(gitHubServiceConnection)
+    endpoint: rileywhite oauth connection
     name: rileywhite/remeter-portal
   - repository: DevelopBranch
     type: github
-    endpoint: $(gitHubServiceConnection)
+    endpoint: rileywhite oauth connection
     name: rileywhite/remeter-portal
     ref: develop
 
