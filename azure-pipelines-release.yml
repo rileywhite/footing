@@ -2,7 +2,7 @@ resources:
   repositories:
   - repository: ProjectRepo
     type: github
-    endpoint: rileywhite
+    endpoint: 'rileywhite oauth connection'
     name: rileywhite/remeter
 
 
@@ -315,7 +315,7 @@ jobs:
   - task: GitHubRelease@1
     name: UpdateToNonDraftRelease
     inputs:
-      gitHubConnection: 'rileywhite'
+      gitHubConnection: 'rileywhite oauth connection'
       repositoryName: '$(Build.Repository.Name)'
       action: 'edit'
       target: '$(Build.SourceVersion)'
