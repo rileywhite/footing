@@ -297,7 +297,7 @@ jobs:
   condition: |
     and
     (
-      eq(dependencies.GetApproval.result, 'Succeeded')
+      eq(dependencies.GetApproval.result, 'Succeeded'),
       in(dependencies.DeployToProd.result, 'Succeeded')
     )
   steps:
