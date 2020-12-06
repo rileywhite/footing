@@ -1,3 +1,11 @@
+resources:
+  repositories:
+  - repository: ProjectRepo
+    type: github
+    endpoint: rileywhite
+    name: rileywhite/remeter
+
+
 trigger:
   batch: true
   branches:
@@ -5,6 +13,7 @@ trigger:
       - main
     exclude:
       - 'refs/pull/*'
+
 
 variables:
   azureContainerRegistryName: 'crvemotueus2'
@@ -33,6 +42,7 @@ variables:
   prodVemotuHost: prod.vemotu.com
   prodRemeterHost: prod.remeter.org
   prodLoadBalancerIP: 52.184.202.52
+
 
 jobs:
 - job: DeployToStaging
@@ -111,7 +121,7 @@ jobs:
     name: SetDraftReleaseCreated
     workingDirectory: $(Build.SourcesDirectory)
 
-  - checkout: self@develop
+  - checkout: ProjectRepo@develop
     name: CheckoutDevelopBranchAndPersistCredentials
     persistCredentials: true
 
@@ -238,6 +248,7 @@ jobs:
   continueOnError: true
   pool:
     vmImage: 'ubuntu-latest'
+  environment: 'prod'
   strategy:
     runOnce:
       deploy:
