@@ -27,9 +27,10 @@ variables:
   buildConfiguration: Release
   timestamp: $(Get-Date -Format yyyyMMddTHHmmssfffffffZ)
 
-  versionFilePath: 'src/version'
-  dockerComposeFilePath: 'src/docker-compose.yml'
-  vemotuappChartPath: 'src/vemotuapp'
+  srcPath: 'remeter-portal/src'
+  versionFilePath: '$(srcPath)/version'
+  dockerComposeFilePath: '$(srcPath)/docker-compose.yml'
+  vemotuappChartPath: '$(srcPath)/vemotuapp'
   vemotuappChartFilePath: '$(vemotuappChartPath)/Chart.yaml'
   vemotuappValuesFilePath: '$(vemotuappChartPath)/values.yaml'
 
@@ -54,6 +55,10 @@ jobs:
   pool:
     vmImage: 'ubuntu-latest'
   steps:
+  - checkout: self
+    name: CheckoutMainBranchAndPersistCredentials
+    persistCredentials: true
+
   - script: |
       echo "##vso[task.setvariable variable=versionPrefix]$(cat $(versionFilePath))"
     name: ReadVersionFromFile
@@ -87,7 +92,7 @@ jobs:
       containerregistrytype: 'Azure Container Registry'
       azureSubscription: '$(azureSubscription)'
       azureContainerRegistry: '{"loginServer":"$(azureContainerRegistryName).azurecr.io", "id" : "/subscriptions/$(azureSubscriptionUuid)/resourceGroups/$(azureResourceGroup)/providers/Microsoft.ContainerRegistry/registries/$(azureContainerRegistryName)"}'
-      dockerComposeFilePath: 'src/docker-compose.yml'
+      dockerComposeFilePath: '$(dockerComposeFilePath)'
       action: 'Build services'
       arguments: '--build-arg version=$(SetOutputVariables.fullVersion) --build-arg assembly_version=$(SetOutputVariables.assemblyVersion) --build-arg configuration=$(buildConfiguration)'
       dockerComposeFileArgs: |
@@ -171,7 +176,7 @@ jobs:
       containerregistrytype: 'Azure Container Registry'
       azureSubscription: '$(azureSubscription)'
       azureContainerRegistry: '{"loginServer":"$(azureContainerRegistryName).azurecr.io", "id" : "/subscriptions/$(azureSubscriptionUuid)/resourceGroups/$(azureResourceGroup)/providers/Microsoft.ContainerRegistry/registries/$(azureContainerRegistryName)"}'
-      dockerComposeFilePath: 'src/docker-compose.yml'
+      dockerComposeFilePath: '$(dockerComposeFilePath)'
       action: 'Push services'
       dockerComposeFileArgs: |
         DOCKER_IMAGE_VERSION_TAG=$(SetOutputVariables.version)
@@ -196,7 +201,7 @@ jobs:
       chartNameForACR: 'vemotuapp:$(SetOutputVariables.version)'
       chartPathForACR: '$(vemotuappChartPath)'
 
-  - script: 'helm dependency update src/vemotuapp'
+  - script: 'helm dependency update $(vemotuappChartPath)'
     condition: and(succeeded(), in(variables['Build.Reason'], 'Manual', 'IndividualCI', 'BatchedCI', 'Schedule'))
     name: HelmDependencyUpdate
 
@@ -212,7 +217,7 @@ jobs:
       command: 'upgrade'
       releaseName: '$(stagingReleaseName)'
       chartType: 'FilePath'
-      chartPath: 'src/vemotuapp'
+      chartPath: '$(vemotuappChartPath)'
       chartVersion: '$(SetOutputVariables.version)'
       updateDependency: true
       overrideValues: |
@@ -260,7 +265,7 @@ jobs:
       command: 'upgrade'
       releaseName: '$(prodReleaseName)'
       chartType: 'FilePath'
-      chartPath: 'src/vemotuapp'
+      chartPath: '$(vemotuappChartPath)'
       chartVersion: '$(SetOutputVariables.version)'
       updateDependency: true
       overrideValues: |
