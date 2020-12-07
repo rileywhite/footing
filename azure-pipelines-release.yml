@@ -270,7 +270,7 @@ jobs:
 
 - job: DeployToProd
   dependsOn:
-    - DeployToStaging
+    - DraftReleaseAndDeployToStaging
     - GetApproval
   condition: eq(dependencies.GetApproval.result, 'Succeeded')
   continueOnError: true
