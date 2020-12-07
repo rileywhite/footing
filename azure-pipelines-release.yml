@@ -26,7 +26,7 @@ variables:
   buildConfiguration: Release
   timestamp: $(Get-Date -Format yyyyMMddTHHmmssfffffffZ)
 
-  checkoutPath: 'remeter-portal'
+  checkoutPath: '.'
   srcPath: '$(checkoutPath)/src'
   versionFilePath: '$(srcPath)/version'
   dockerComposeFilePath: '$(srcPath)/docker-compose.yml'
@@ -69,7 +69,7 @@ jobs:
       }
       catch
       {
-          Write-Error "Raised error when executing code in location $(Get-Location) with error $($Error[0].Exception.Message)\n\nCurrent directory listing: $(Get-ChildItem)"
+          Write-Error "Raised error when executing code in location $(Get-Location) with error $($Error[0].Exception.Message)`n`nCurrent directory listing: $(Get-ChildItem)"
           throw
       }
 
