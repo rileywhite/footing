@@ -62,6 +62,7 @@ jobs:
   - powershell: |
       try
       {
+          Set-PSDebug -Trace 2
           $content =  Get-Content $(versionFilePath)
           $valid = $content -match '([0-9]+\.[0-9]+\.)([0-9]+)'
           $newVersion = $Matches[1] + ([convert]::ToInt64($Matches[2], 10) + 1)
@@ -128,6 +129,7 @@ jobs:
   - powershell: |
       try
       {
+          Set-PSDebug -Trace 2
           $content = Get-Content $(vemotuappChartFilePath)
           $versionLine = $content | Select-String -Pattern '^version:' -CaseSensitive | Select-Object -ExpandProperty Line
           $appVersionLine = $content | Select-String -Pattern '^appVersion:' -CaseSensitive | Select-Object -ExpandProperty Line
