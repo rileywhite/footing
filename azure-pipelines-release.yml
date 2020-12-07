@@ -27,7 +27,7 @@ variables:
   timestamp: $(Get-Date -Format yyyyMMddTHHmmssfffffffZ)
 
   mainBranchPath: 'remeter-portal'
-  developBranchPath: 'develop'
+  developBranchPath: '../develop'
   srcPath: '$(mainBranchPath)/src'
   versionFilePath: '$(srcPath)/version'
   dockerComposeFilePath: '$(srcPath)/docker-compose.yml'
@@ -128,15 +128,10 @@ jobs:
       target: '$(Build.SourceVersion)'
       tagSource: 'userSpecifiedTag'
       tag: 'v$(SetOutputVariables.version)'
+      title: 'v$(SetOutputVariables.version)'
       isDraft: true
       changeLogCompareToRelease: 'lastFullRelease'
       changeLogType: 'commitBased'
-
-  - script: |
-      echo "##vso[task.setvariable variable=success;isOutput=true]true"
-    condition: and(succeeded(), in(variables['Build.Reason'], 'Manual', 'IndividualCI', 'BatchedCI', 'Schedule'))
-    name: SetDraftReleaseCreated
-    workingDirectory: $(Build.SourcesDirectory)
 
   - checkout: DevelopBranch
     name: CheckoutDevelopBranchAndPersistCredentials
@@ -177,8 +172,6 @@ jobs:
           Write-Error "Exit code: $LASTEXITCODE. Could not push version patch bump commit from '$(Get-Location)' with error $msg"
           Exit 1
       }
-
-      cd $(Agent.BuildDirectory)
     condition: and(succeeded(), in(variables['Build.Reason'], 'Manual', 'IndividualCI', 'BatchedCI', 'Schedule'))
     name: GitIncrementPatchVersionOnDevelopBranch
     workingDirectory: $(Build.SourcesDirectory)
