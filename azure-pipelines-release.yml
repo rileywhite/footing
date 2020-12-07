@@ -128,7 +128,7 @@ jobs:
       target: '$(Build.SourceVersion)'
       tagSource: 'userSpecifiedTag'
       tag: 'v$(SetOutputVariables.version)'
-      releaseTitle: 'v$(SetOutputVariables.version)'
+      title: 'v$(SetOutputVariables.version)'
       isDraft: true
       changeLogCompareToRelease: 'lastFullRelease'
       changeLogType: 'commitBased'
@@ -136,7 +136,6 @@ jobs:
   - checkout: DevelopBranch
     name: CheckoutDevelopBranchAndPersistCredentials
     persistCredentials: true
-    path: '$(developBranchPath)'
 
   - powershell: |
       try
