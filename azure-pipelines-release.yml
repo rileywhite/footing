@@ -70,6 +70,7 @@ jobs:
       catch
       {
           Write-Error "Raised error when executing code in location $(Get-Location) with error $($Error[0].Exception.Message)"
+          Write-Error "Current directory listing: $(Get-ChildItem)"
           throw
       }
 
