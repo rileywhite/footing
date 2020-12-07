@@ -25,7 +25,7 @@ variables:
 
   buildConfiguration: Release
   timestamp: $(Get-Date -Format yyyyMMddTHHmmssfffffffZ)
-  gitAuthor: 'Riley White (CICD) <rileywhite@gmail.com>'
+  gitAuthor: 'Riley White <rileywhite@gmail.com>'
 
   checkoutPath: '.'
   srcPath: '$(checkoutPath)/src'
