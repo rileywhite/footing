@@ -73,13 +73,6 @@ jobs:
           throw
       }
 
-#      $msg = cd $(srcPath) 2>&1
-#      if ($LASTEXITCODE -ne 0)
-#      {
-#          Write-Error "Exit code: $LASTEXITCODE. Could not cd to '$(srcPath)' from '$(Get-Location)' with error $msg"
-#          Exit 1
-#      }
-
       $msg = git commit -m "Set new patch version $newVersion" 2>&1
       if ($LASTEXITCODE -ne 0)
       {
