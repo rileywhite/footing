@@ -66,18 +66,12 @@ jobs:
           $valid = $content -match '([0-9]+\.[0-9]+\.)([0-9]+)'
           $newVersion = $Matches[1] + ([convert]::ToInt64($Matches[2], 10) + 1)
           Set-Content $(versionFilePath) $newVersion
+          Set-Location $(srcPath)
       }
       catch
       {
           Write-Error "Raised error when executing code in location $(Get-Location) with error $($Error[0].Exception.Message)`n`nCurrent directory listing: $(Get-ChildItem)"
           throw
-      }
-
-      $msg = cd $(srcPath) 2>&1
-      if ($LASTEXITCODE -ne 0)
-      {
-          Write-Error "Exit code: $LASTEXITCODE. Could not cd to '$(srcPath)' from '$(Get-Location)' with error $msg"
-          Exit 1
       }
 
       $msg = git commit -m "Set new patch version $newVersion" 2>&1
