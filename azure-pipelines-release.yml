@@ -27,7 +27,7 @@ variables:
   timestamp: $(Get-Date -Format yyyyMMddTHHmmssfffffffZ)
 
   mainBranchPath: 'remeter-portal'
-  developBranchPath: '../develop'
+  developBranchPath: 'develop'
   srcPath: '$(mainBranchPath)/src'
   versionFilePath: '$(srcPath)/version'
   dockerComposeFilePath: '$(srcPath)/docker-compose.yml'
@@ -128,7 +128,7 @@ jobs:
       target: '$(Build.SourceVersion)'
       tagSource: 'userSpecifiedTag'
       tag: 'v$(SetOutputVariables.version)'
-      title: 'v$(SetOutputVariables.version)'
+      releaseTitle: 'v$(SetOutputVariables.version)'
       isDraft: true
       changeLogCompareToRelease: 'lastFullRelease'
       changeLogType: 'commitBased'
