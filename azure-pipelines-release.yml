@@ -26,16 +26,13 @@ variables:
   buildConfiguration: Release
   timestamp: $(Get-Date -Format yyyyMMddTHHmmssfffffffZ)
 
-  mainBranchPath: 'remeter-portal'
-  developBranchPath: 'develop'
-  srcPath: '$(mainBranchPath)/src'
+  checkoutPath: 'remeter-portal'
+  srcPath: '$(checkoutPath)/src'
   versionFilePath: '$(srcPath)/version'
   dockerComposeFilePath: '$(srcPath)/docker-compose.yml'
   vemotuappChartPath: '$(srcPath)/vemotuapp'
   vemotuappChartFilePath: '$(vemotuappChartPath)/Chart.yaml'
   vemotuappValuesFilePath: '$(vemotuappChartPath)/values.yaml'
-  developSrcPath: '$(developBranchPath)/src'
-  developVersionFilePath: '$(developSrcPath)/version'
 
   vemotuTlsSecretName: 'vemotu-com-tls'
   remeterTlsSecretName: 'remeter-org-tls'
@@ -54,7 +51,56 @@ variables:
 
 
 jobs:
-- job: DeployToStaging
+- job: BumpDevelopPatchVersion
+  pool:
+    vmImage: 'ubuntu-latest'
+  steps:
+  - checkout: DevelopBranch
+    name: CheckoutDevelopBranchAndPersistCredentials
+    persistCredentials: true
+
+  - powershell: |
+      try
+      {
+          $content =  Get-Content $(versionFilePath)
+          $valid = $content -match '([0-9]+\.[0-9]+\.)([0-9]+)'
+          $newVersion = $Matches[1] + ([convert]::ToInt64($Matches[2], 10) + 1)
+          Set-Content $(versionFilePath) $newVersion
+      }
+      catch
+      {
+          Write-Error "Raised error when executing code in location $(Get-Location) with error $($Error[0].Exception.Message)"
+          throw
+      }
+
+      $msg = cd $(srcPath) 2>&1
+      if ($LASTEXITCODE -ne 0)
+      {
+          Write-Error "Exit code: $LASTEXITCODE. Could not cd to '$(srcPath)' from '$(Get-Location)' with error $msg"
+          Exit 1
+      }
+
+      $msg = git commit -m "Set new patch version $newVersion" 2>&1
+      if ($LASTEXITCODE -ne 0)
+      {
+          Write-Error "Exit code: $LASTEXITCODE. Could not commit version patch bump from '$(Get-Location)' with error $msg"
+          Exit 1
+      }
+
+      $msg = git push 2>&1
+      if ($LASTEXITCODE -ne 0)
+      {
+          Write-Error "Exit code: $LASTEXITCODE. Could not push version patch bump commit from '$(Get-Location)' with error $msg"
+          Exit 1
+      }
+    condition: and(succeeded(), in(variables['Build.Reason'], 'Manual', 'IndividualCI', 'BatchedCI', 'Schedule'))
+    name: GitIncrementPatchVersionOnDevelopBranch
+    workingDirectory: $(Build.SourcesDirectory)
+
+
+- job: BuildAndPushToContainerRegistry
+  dependsOn:
+  - BumpDevelopPatchVersion
   pool:
     vmImage: 'ubuntu-latest'
   steps:
@@ -77,6 +123,13 @@ jobs:
       echo "##vso[task.setvariable variable=assemblyVersion;isOutput=true]$VERSIONPREFIX.$(Build.BuildId)"
       echo "##vso[task.setvariable variable=loadBalancerIP;isOutput=true]$(stagingLoadBalancerIP)"
     name: SetOutputVariables
+
+  - script: |
+      cd $(srcPath)
+      git tag v$(SetOutputVariables.version)
+      git push origin v$(SetOutputVariables.version)
+    condition: and(succeeded(), in(variables['Build.Reason'], 'Manual', 'IndividualCI', 'BatchedCI', 'Schedule'))
+    name: GitTagVersion
 
   - powershell: |
       try
@@ -108,72 +161,6 @@ jobs:
       dockerComposeFileArgs: |
         DOCKER_IMAGE_VERSION_TAG=$(SetOutputVariables.version)
       includeLatestTag: true
-
-  - script: |
-      cd $(srcPath)
-      git tag v$(SetOutputVariables.version)
-      git push origin v$(SetOutputVariables.version)
-      cd $(Agent.BuildDirectory)
-    condition: and(succeeded(), in(variables['Build.Reason'], 'Manual', 'IndividualCI', 'BatchedCI', 'Schedule'))
-    name: GitTagVersionOnMainBranch
-    workingDirectory: $(Build.SourcesDirectory)
-
-  - task: GitHubRelease@1
-    condition: and(succeeded(), in(variables['Build.Reason'], 'Manual', 'IndividualCI', 'BatchedCI', 'Schedule'))
-    name: CreateDraftRelease
-    inputs:
-      gitHubConnection: '$(gitHubServiceConnection)'
-      repositoryName: '$(Build.Repository.Name)'
-      action: 'create'
-      target: '$(Build.SourceVersion)'
-      tagSource: 'userSpecifiedTag'
-      tag: 'v$(SetOutputVariables.version)'
-      title: 'v$(SetOutputVariables.version)'
-      isDraft: true
-      changeLogCompareToRelease: 'lastFullRelease'
-      changeLogType: 'commitBased'
-
-  - checkout: DevelopBranch
-    name: CheckoutDevelopBranchAndPersistCredentials
-    persistCredentials: true
-
-  - powershell: |
-      try
-      {
-          $content =  Get-Content $(developVersionFilePath)
-          $valid = $content -match '([0-9]+\.[0-9]+\.)([0-9]+)'
-          $newVersion = $Matches[1] + ([convert]::ToInt64($Matches[2], 10) + 1)
-          Set-Content $(developVersionFilePath) $newVersion
-      }
-      catch
-      {
-          Write-Error "Raised error when executing code in location $(Get-Location) with error $($Error[0].Exception.Message)"
-          throw
-      }
-
-      $msg = cd $(developBranchPath) 2>&1
-      if ($LASTEXITCODE -ne 0)
-      {
-          Write-Error "Exit code: $LASTEXITCODE. Could not cd to '$(developBranchPath)' from '$(Get-Location)' with error $msg"
-          Exit 1
-      }
-
-      $msg = git commit -m "Set new patch version $newVersion" 2>&1
-      if ($LASTEXITCODE -ne 0)
-      {
-          Write-Error "Exit code: $LASTEXITCODE. Could not commit version patch bump from '$(Get-Location)' with error $msg"
-          Exit 1
-      }
-
-      $msg = git push 2>&1
-      if ($LASTEXITCODE -ne 0)
-      {
-          Write-Error "Exit code: $LASTEXITCODE. Could not push version patch bump commit from '$(Get-Location)' with error $msg"
-          Exit 1
-      }
-    condition: and(succeeded(), in(variables['Build.Reason'], 'Manual', 'IndividualCI', 'BatchedCI', 'Schedule'))
-    name: GitIncrementPatchVersionOnDevelopBranch
-    workingDirectory: $(Build.SourcesDirectory)
 
   - task: DockerCompose@0
     condition: and(succeeded(), in(variables['Build.Reason'], 'Manual', 'IndividualCI', 'BatchedCI', 'Schedule'))
@@ -207,6 +194,36 @@ jobs:
       chartNameForACR: 'vemotuapp:$(SetOutputVariables.version)'
       chartPathForACR: '$(vemotuappChartPath)'
 
+
+- job: DraftReleaseAndDeployToStaging
+  dependsOn:
+  - BuildAndPushToContainerRegistry
+  pool:
+    vmImage: 'ubuntu-latest'
+  steps:
+  - task: GitHubRelease@1
+    condition: and(succeeded(), in(variables['Build.Reason'], 'Manual', 'IndividualCI', 'BatchedCI', 'Schedule'))
+    name: CreateDraftRelease
+    inputs:
+      gitHubConnection: '$(gitHubServiceConnection)'
+      repositoryName: '$(Build.Repository.Name)'
+      action: 'create'
+      target: '$(Build.SourceVersion)'
+      tagSource: 'userSpecifiedTag'
+      tag: 'v$(SetOutputVariables.version)'
+      title: 'v$(SetOutputVariables.version)'
+      isDraft: true
+      changeLogCompareToRelease: 'lastFullRelease'
+      changeLogType: 'commitBased'
+
+  - task: HelmInstaller@0
+    name: HelmInstall
+    condition: and(succeeded(), in(variables['Build.Reason'], 'Manual', 'IndividualCI', 'BatchedCI', 'Schedule'))
+    inputs:
+      helmVersion: '$(helmVersion)'
+      installKubectl: true
+      kubectlVersion: '$(kubectlVersion)'
+
   - script: 'helm dependency update $(vemotuappChartPath)'
     condition: and(succeeded(), in(variables['Build.Reason'], 'Manual', 'IndividualCI', 'BatchedCI', 'Schedule'))
     name: HelmDependencyUpdate
@@ -239,7 +256,7 @@ jobs:
 
 
 - job: GetApproval
-  dependsOn: DeployToStaging
+  dependsOn: DraftReleaseAndDeployToStaging
   continueOnError: true
   pool: server
   steps:
