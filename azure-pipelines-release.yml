@@ -25,6 +25,7 @@ variables:
 
   buildConfiguration: Release
   timestamp: $(Get-Date -Format yyyyMMddTHHmmssfffffffZ)
+  gitAuthor: 'Riley White (CICD) <rileywhite@gmail.com>'
 
   checkoutPath: '.'
   srcPath: '$(checkoutPath)/src'
@@ -75,7 +76,7 @@ jobs:
           throw
       }
 
-      $msg = git commit -m "Set new patch version $newVersion" --author="Vemotu CICD <vemotu-cicd@vemotu.com>" 2>&1
+      $msg = git commit -m "Set new patch version $newVersion" --author="$(gitAuthor)" 2>&1
       if ($LASTEXITCODE -ne 0)
       {
           Write-Error "Exit code: $LASTEXITCODE. Could not commit version patch bump from '$(Get-Location)' with error $msg"
