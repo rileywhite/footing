@@ -203,12 +203,13 @@ jobs:
   continueOnError: true
   pool: server
   steps:
-  - task: ManualValidation@0
+  - task: ManualIntervention@8
     condition: and(succeeded(), in(variables['Build.Reason'], 'Manual', 'IndividualCI', 'BatchedCI', 'Schedule'))
     name: ApproveForRelease
     inputs:
       notifyUsers: 'briollen@gmail.com'
       instructions: 'Approve?'
+      timeoutInMinutes: 10080
 
 
 - job: DeployToProd
