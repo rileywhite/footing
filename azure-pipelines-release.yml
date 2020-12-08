@@ -140,7 +140,7 @@ jobs:
   dependsOn:
   - BuildAndPushToContainerRegistry
   variables:
-  - deployVersion: $[ dependencies.BuildAndPushToContainerRegistry.outputs['SetOutputVariables.version'] ]
+    deployVersion: $[ dependencies.BuildAndPushToContainerRegistry.outputs['SetOutputVariables.version'] ]
   pool:
     vmImage: 'ubuntu-latest'
   steps:
@@ -218,7 +218,7 @@ jobs:
   condition: eq(dependencies.GetApproval.result, 'Succeeded')
   continueOnError: true
   variables:
-  - deployVersion: $[ dependencies.BuildAndPushToContainerRegistry.outputs['SetOutputVariables.version'] ]
+    deployVersion: $[ dependencies.BuildAndPushToContainerRegistry.outputs['SetOutputVariables.version'] ]
   pool:
     vmImage: 'ubuntu-latest'
   steps:
@@ -260,7 +260,7 @@ jobs:
       in(dependencies.DeployToProd.result, 'Skipped', 'Failed')
     )
   variables:
-  - deployVersion: $[ dependencies.BuildAndPushToContainerRegistry.outputs['SetOutputVariables.version'] ]
+    deployVersion: $[ dependencies.BuildAndPushToContainerRegistry.outputs['SetOutputVariables.version'] ]
   pool:
     vmImage: 'ubuntu-latest'
   steps:
@@ -285,7 +285,7 @@ jobs:
       in(dependencies.DeployToProd.result, 'Succeeded')
     )
   variables:
-  - deployVersion: $[ dependencies.BuildAndPushToContainerRegistry.outputs['SetOutputVariables.version'] ]
+    deployVersion: $[ dependencies.BuildAndPushToContainerRegistry.outputs['SetOutputVariables.version'] ]
   steps:
   - task: GitHubRelease@1
     name: UpdateToNonDraftRelease
