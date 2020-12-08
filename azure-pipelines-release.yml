@@ -207,7 +207,7 @@ jobs:
     condition: and(succeeded(), in(variables['Build.Reason'], 'Manual', 'IndividualCI', 'BatchedCI', 'Schedule'))
     name: ApproveForRelease
     inputs:
-      emailRecipients: 'rileywhite@gmail.com'
+      emailRecipients: 'briollen@gmail.com'
       instructions: 'Approve?'
 
 
