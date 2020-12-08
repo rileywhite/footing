@@ -78,10 +78,10 @@ jobs:
           Exit 1
       }
 
-      $msg = git pull origin develop
+      $msg = git checkout develop
       if ($LASTEXITCODE -ne 0)
       {
-          Write-Error "Exit code: $LASTEXITCODE. Could not set sync local repo with HEAD of develop with error $msg"
+          Write-Error "Exit code: $LASTEXITCODE. Could not check out develop branch with error $msg"
           Exit 1
       }
 
