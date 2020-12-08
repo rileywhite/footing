@@ -1,12 +1,3 @@
-resources:
-  repositories:
-  - repository: DevelopBranch
-    type: github
-    endpoint: rileywhite oauth connection
-    name: rileywhite/remeter-portal
-    ref: develop
-
-
 trigger:
   batch: true
   branches:
@@ -54,6 +45,10 @@ jobs:
   pool:
     vmImage: 'ubuntu-latest'
   steps:
+  - checkout: self
+    name: CheckoutMainBranchAndPersistCredentials
+    persistCredentials: true
+
   - script: |
       echo "##vso[task.setvariable variable=versionPrefix]$(cat $(versionFilePath))"
     name: ReadVersionFromFile
