@@ -62,7 +62,6 @@ jobs:
       echo "##vso[task.setvariable variable=version;isOutput=true]$VERSIONPREFIX"
       echo "##vso[task.setvariable variable=fullVersion;isOutput=true]$VERSIONPREFIX+build.$(Build.BuildId)-timestamp.$TIMESTAMP"
       echo "##vso[task.setvariable variable=assemblyVersion;isOutput=true]$VERSIONPREFIX.$(Build.BuildId)"
-      echo "##vso[task.setvariable variable=loadBalancerIP;isOutput=true]$(stagingLoadBalancerIP)"
     name: SetOutputVariables
 
   - script: |
@@ -140,6 +139,8 @@ jobs:
 - job: DraftReleaseAndDeployToStaging
   dependsOn:
   - BuildAndPushToContainerRegistry
+  variables:
+  - version: $[dependencies.BuildAndPushToContainerRegistry.outputs['SetOutputVariables.version']]
   pool:
     vmImage: 'ubuntu-latest'
   steps:
@@ -152,8 +153,8 @@ jobs:
       action: 'create'
       target: '$(Build.SourceVersion)'
       tagSource: 'userSpecifiedTag'
-      tag: 'v$(SetOutputVariables.version)'
-      title: 'v$(SetOutputVariables.version)'
+      tag: 'v$(version)'
+      title: 'v$(version)'
       isDraft: true
       changeLogCompareToRelease: 'lastFullRelease'
       changeLogType: 'commitBased'
@@ -183,7 +184,7 @@ jobs:
       releaseName: '$(stagingReleaseName)'
       chartType: 'FilePath'
       chartPath: '$(vemotuappChartPath)'
-      chartVersion: '$(SetOutputVariables.version)'
+      chartVersion: '$(version)'
       updateDependency: true
       overrideValues: |
           ingress.hosts[0].host=$(stagingVemotuHost)
@@ -206,7 +207,7 @@ jobs:
     condition: and(succeeded(), in(variables['Build.Reason'], 'Manual', 'IndividualCI', 'BatchedCI', 'Schedule'))
     name: ApproveForRelease
     inputs:
-      notifyUsers: 'rileywhite@gmail.com'
+      emailRecipients: 'rileywhite@gmail.com'
       instructions: 'Approve?'
 
 
@@ -216,6 +217,8 @@ jobs:
     - GetApproval
   condition: eq(dependencies.GetApproval.result, 'Succeeded')
   continueOnError: true
+  variables:
+  - version: $[dependencies.BuildAndPushToContainerRegistry.outputs['SetOutputVariables.version']]
   pool:
     vmImage: 'ubuntu-latest'
   steps:
@@ -231,7 +234,7 @@ jobs:
       releaseName: '$(prodReleaseName)'
       chartType: 'FilePath'
       chartPath: '$(vemotuappChartPath)'
-      chartVersion: '$(SetOutputVariables.version)'
+      chartVersion: '$(version)'
       updateDependency: true
       overrideValues: |
           ingress.hosts[0].host=$(prodVemotuHost)
@@ -247,6 +250,7 @@ jobs:
 
 - job: RemoveDraftRelease
   dependsOn:
+    - BuildAndPushToContainerRegistry
     - GetApproval
     - DeployToProd
   condition: |
@@ -255,6 +259,8 @@ jobs:
       eq(dependencies.GetApproval.result, 'Failed'),
       in(dependencies.DeployToProd.result, 'Skipped', 'Failed')
     )
+  variables:
+  - version: $[dependencies.BuildAndPushToContainerRegistry.outputs['SetOutputVariables.version']]
   pool:
     vmImage: 'ubuntu-latest'
   steps:
@@ -264,11 +270,12 @@ jobs:
       gitHubConnection: '$(gitHubServiceConnection)'
       repositoryName: '$(Build.Repository.Name)'
       action: 'delete'
-      tag: 'v$(SetOutputVariables.version)'
+      tag: 'v$(version)'
 
 
 - job: UpdateToNonDraftRelease
   dependsOn:
+    - BuildAndPushToContainerRegistry
     - GetApproval
     - DeployToProd
   condition: |
@@ -277,6 +284,8 @@ jobs:
       eq(dependencies.GetApproval.result, 'Succeeded'),
       in(dependencies.DeployToProd.result, 'Succeeded')
     )
+  variables:
+  - version: $[dependencies.BuildAndPushToContainerRegistry.outputs['SetOutputVariables.version']]
   steps:
   - task: GitHubRelease@1
     name: UpdateToNonDraftRelease
@@ -285,7 +294,7 @@ jobs:
       repositoryName: '$(Build.Repository.Name)'
       action: 'edit'
       target: '$(Build.SourceVersion)'
-      tag: 'v$(SetOutputVariables.version)'
+      tag: 'v$(version)'
       assetUploadMode: 'replace'
       changeLogCompareToRelease: 'lastFullRelease'
       changeLogType: 'commitBased'
