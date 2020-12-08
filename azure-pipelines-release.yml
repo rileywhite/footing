@@ -201,16 +201,15 @@ jobs:
 - job: GetApproval
   dependsOn: DraftReleaseAndDeployToStaging
   continueOnError: true
-  pool:
-    vmImage: 'ubuntu-latest'
+  pool: server
   steps:
-  - task: ManualIntervention@8
+  - task: ManualValidation@0
     condition: and(succeeded(), in(variables['Build.Reason'], 'Manual', 'IndividualCI', 'BatchedCI', 'Schedule'))
     name: ApproveForRelease
+    timeoutInMinutes: 10080
     inputs:
       notifyUsers: 'briollen@gmail.com'
       instructions: 'Approve?'
-      timeoutInMinutes: 10080
 
 
 - job: DeployToProd
