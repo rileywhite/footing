@@ -49,7 +49,7 @@ variables:
   prodRemeterHost: prod.remeter.org
   prodLoadBalancerIP: 52.184.202.52
 
-
+jobs:
 - job: BuildAndPushToContainerRegistry
   pool:
     vmImage: 'ubuntu-latest'
