@@ -140,7 +140,7 @@ jobs:
   dependsOn:
   - BuildAndPushToContainerRegistry
   variables:
-  - version: $[ dependencies.BuildAndPushToContainerRegistry.outputs['SetOutputVariables.version'] ]
+  - deployVersion: $[ dependencies.BuildAndPushToContainerRegistry.outputs['SetOutputVariables.version'] ]
   pool:
     vmImage: 'ubuntu-latest'
   steps:
@@ -153,8 +153,8 @@ jobs:
       action: 'create'
       target: '$(Build.SourceVersion)'
       tagSource: 'userSpecifiedTag'
-      tag: 'v$(version)'
-      title: 'v$(version)'
+      tag: 'v$(deployVersion)'
+      title: 'v$(deployVersion)'
       isDraft: true
       changeLogCompareToRelease: 'lastFullRelease'
       changeLogType: 'commitBased'
@@ -184,7 +184,7 @@ jobs:
       releaseName: '$(stagingReleaseName)'
       chartType: 'FilePath'
       chartPath: '$(vemotuappChartPath)'
-      chartVersion: '$(version)'
+      chartVersion: '$(deployVersion)'
       updateDependency: true
       overrideValues: |
           ingress.hosts[0].host=$(stagingVemotuHost)
@@ -218,7 +218,7 @@ jobs:
   condition: eq(dependencies.GetApproval.result, 'Succeeded')
   continueOnError: true
   variables:
-  - version: $[dependencies.BuildAndPushToContainerRegistry.outputs['SetOutputVariables.version']]
+  - deployVersion: $[ dependencies.BuildAndPushToContainerRegistry.outputs['SetOutputVariables.version'] ]
   pool:
     vmImage: 'ubuntu-latest'
   steps:
@@ -234,7 +234,7 @@ jobs:
       releaseName: '$(prodReleaseName)'
       chartType: 'FilePath'
       chartPath: '$(vemotuappChartPath)'
-      chartVersion: '$(version)'
+      chartVersion: '$(deployVersion)'
       updateDependency: true
       overrideValues: |
           ingress.hosts[0].host=$(prodVemotuHost)
@@ -260,7 +260,7 @@ jobs:
       in(dependencies.DeployToProd.result, 'Skipped', 'Failed')
     )
   variables:
-  - version: $[dependencies.BuildAndPushToContainerRegistry.outputs['SetOutputVariables.version']]
+  - deployVersion: $[ dependencies.BuildAndPushToContainerRegistry.outputs['SetOutputVariables.version'] ]
   pool:
     vmImage: 'ubuntu-latest'
   steps:
@@ -270,7 +270,7 @@ jobs:
       gitHubConnection: '$(gitHubServiceConnection)'
       repositoryName: '$(Build.Repository.Name)'
       action: 'delete'
-      tag: 'v$(version)'
+      tag: 'v$(deployVersion)'
 
 
 - job: UpdateToNonDraftRelease
@@ -285,7 +285,7 @@ jobs:
       in(dependencies.DeployToProd.result, 'Succeeded')
     )
   variables:
-  - version: $[dependencies.BuildAndPushToContainerRegistry.outputs['SetOutputVariables.version']]
+  - deployVersion: $[ dependencies.BuildAndPushToContainerRegistry.outputs['SetOutputVariables.version'] ]
   steps:
   - task: GitHubRelease@1
     name: UpdateToNonDraftRelease
@@ -294,7 +294,7 @@ jobs:
       repositoryName: '$(Build.Repository.Name)'
       action: 'edit'
       target: '$(Build.SourceVersion)'
-      tag: 'v$(version)'
+      tag: 'v$(deployVersion)'
       assetUploadMode: 'replace'
       changeLogCompareToRelease: 'lastFullRelease'
       changeLogType: 'commitBased'
