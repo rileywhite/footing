@@ -140,7 +140,7 @@ jobs:
   dependsOn:
   - BuildAndPushToContainerRegistry
   variables:
-  - version: '$[dependencies.BuildAndPushToContainerRegistry.outputs['SetOutputVariables.version']]'
+  - version: $[ dependencies.BuildAndPushToContainerRegistry.outputs['SetOutputVariables.version'] ]
   pool:
     vmImage: 'ubuntu-latest'
   steps:
