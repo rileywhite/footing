@@ -26,9 +26,6 @@ variables:
   buildConfiguration: Release
   timestamp: $(Get-Date -Format yyyyMMddTHHmmssfffffffZ)
 
-  gitUserName: 'Vemotu CICD'
-  gitUserEmail: 'vemotu-cicd@vemotu.com'
-
   checkoutPath: '.'
   srcPath: '$(checkoutPath)/src'
   versionFilePath: '$(srcPath)/version'
@@ -53,81 +50,10 @@ variables:
   prodLoadBalancerIP: 52.184.202.52
 
 
-jobs:
-- job: BumpDevelopPatchVersion
-  pool:
-    vmImage: 'ubuntu-latest'
-  steps:
-  - checkout: DevelopBranch
-    name: CheckoutDevelopBranchAndPersistCredentials
-    persistCredentials: true
-    clean: true
-
-  - powershell: |
-      $msg = git config --global user.name "$(gitUserName)"
-      if ($LASTEXITCODE -ne 0)
-      {
-          Write-Error "Exit code: $LASTEXITCODE. Could not set git user.name to '$(gitUserName)' with error $msg"
-          Exit 1
-      }
-
-      $msg = git config --global user.email "$(gitUserEmail)"
-      if ($LASTEXITCODE -ne 0)
-      {
-          Write-Error "Exit code: $LASTEXITCODE. Could not set git user.email to '$(gitUserEmail)' with error $msg"
-          Exit 1
-      }
-
-      $msg = git checkout develop
-      if ($LASTEXITCODE -ne 0)
-      {
-          Write-Error "Exit code: $LASTEXITCODE. Could not check out develop branch with error $msg"
-          Exit 1
-      }
-
-      try
-      {
-          Set-PSDebug -Trace 2
-          $content =  Get-Content $(versionFilePath)
-          $valid = $content -match '([0-9]+\.[0-9]+\.)([0-9]+)'
-          $newVersion = $Matches[1] + ([convert]::ToInt64($Matches[2], 10) + 1)
-          Set-Content $(versionFilePath) $newVersion
-          Set-Location $(srcPath)
-      }
-      catch
-      {
-          Write-Error "Raised error when executing code in location $(Get-Location) with error $($Error[0].Exception.Message)`n`nCurrent directory listing: $(Get-ChildItem)"
-          throw
-      }
-
-      $msg = git commit -m "Set new patch version $newVersion" 2>&1
-      if ($LASTEXITCODE -ne 0)
-      {
-          Write-Error "Exit code: $LASTEXITCODE. Could not commit version patch bump from '$(Get-Location)' with error $msg"
-          Exit 1
-      }
-
-      $msg = git push 2>&1
-      if ($LASTEXITCODE -ne 0)
-      {
-          Write-Error "Exit code: $LASTEXITCODE. Could not push version patch bump commit from '$(Get-Location)' with error $msg"
-          Exit 1
-      }
-    condition: and(succeeded(), in(variables['Build.Reason'], 'Manual', 'IndividualCI', 'BatchedCI', 'Schedule'))
-    name: GitIncrementPatchVersionOnDevelopBranch
-    workingDirectory: $(Build.SourcesDirectory)
-
-
 - job: BuildAndPushToContainerRegistry
-  dependsOn:
-  - BumpDevelopPatchVersion
   pool:
     vmImage: 'ubuntu-latest'
   steps:
-  - checkout: self
-    name: CheckoutMainBranchAndPersistCredentials
-    persistCredentials: true
-
   - script: |
       echo "##vso[task.setvariable variable=versionPrefix]$(cat $(versionFilePath))"
     name: ReadVersionFromFile
