@@ -61,6 +61,7 @@ jobs:
   - checkout: DevelopBranch
     name: CheckoutDevelopBranchAndPersistCredentials
     persistCredentials: true
+    clean: true
 
   - powershell: |
       $msg = git config --global user.name "$(gitUserName)"
