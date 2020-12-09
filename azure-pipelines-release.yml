@@ -259,7 +259,7 @@ jobs:
   condition: |
     and
     (
-      neq(dependencies.GetApproval.result, 'Succeeded'),
+      ne(dependencies.GetApproval.result, 'Succeeded'),
       in(dependencies.DeployToProd.result, 'Skipped', 'Failed')
     )
   variables:
