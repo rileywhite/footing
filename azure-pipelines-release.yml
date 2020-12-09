@@ -204,7 +204,8 @@ jobs:
   pool: server
   timeoutInMinutes: 6
   steps:
-  # Completely removing this task until it is updated to work as intended (mabye V1?)
+  # Completely removing the ManualValidation task until it is updated to work as intended (mabye V1?). Adding a placeholder to keep the job dependencies intact.
+  - script: 'echo "placeholder job step"'
   #- task: ManualValidation@0
   #  condition: and(succeeded(), in(variables['Build.Reason'], 'Manual', 'IndividualCI', 'BatchedCI', 'Schedule'))
   #  name: ApproveForRelease
