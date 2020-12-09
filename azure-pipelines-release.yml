@@ -26,9 +26,9 @@ variables:
   vemotuappValuesFilePath: '$(vemotuappChartPath)/values.yaml'
 
   vemotuTlsSecretName: 'vemotu-com-tls'
-  vemotuWwwTlsSecretName: 'vemotu-com-tls'
+  vemotuWwwTlsSecretName: 'www-vemotu-com-tls'
   remeterTlsSecretName: 'remeter-org-tls'
-  remeterWwwTlsSecretName: 'remeter-org-tls'
+  remeterWwwTlsSecretName: 'www-remeter-org-tls'
 
   stagingDeployNamespace: vemotu-staging
   stagingReleaseName: vemotuapp-staging
@@ -39,9 +39,9 @@ variables:
   prodDeployNamespace: vemotu-prod
   prodReleaseName: vemotuapp-prod
   prodVemotuHost: vemotu.com
-  prodWwwVemotuHost: vemotu.com
+  prodWwwVemotuHost: www.vemotu.com
   prodRemeterHost: remeter.org
-  prodWwwRemeterHost: remeter.org
+  prodWwwRemeterHost: www.remeter.org
   prodLoadBalancerIP: 52.184.202.52
 
 jobs:
