@@ -36,8 +36,8 @@ variables:
 
   prodDeployNamespace: vemotu-prod
   prodReleaseName: vemotuapp-prod
-  prodVemotuHost: prod.vemotu.com
-  prodRemeterHost: prod.remeter.org
+  prodVemotuHost: vemotu.com
+  prodRemeterHost: remeter.org
   prodLoadBalancerIP: 52.184.202.52
 
 jobs:
@@ -239,9 +239,12 @@ jobs:
       installKubectl: true
       kubectlVersion: '$(kubectlVersion)'
 
-  - script: 'helm dependency update $(vemotuappChartPath)'
+  - script: |
+      helm chart pull $(azureContainerRegistryName).azurecr.io/charts/$(projectName):$(deployVersion)
+      helm chart export $(registryServerName)/helm/vemotuapp:$(deployVersion) --destination install
+      helm dependency update install
     condition: and(succeeded(), in(variables['Build.Reason'], 'Manual', 'IndividualCI', 'BatchedCI', 'Schedule'))
-    name: HelmDependencyUpdate
+    name: HelmGetChartAndUpdateDependencies
 
   - task: HelmDeploy@0
     name: HelmUpgrade
@@ -254,7 +257,7 @@ jobs:
       command: 'upgrade'
       releaseName: '$(prodReleaseName)'
       chartType: 'FilePath'
-      chartPath: '$(vemotuappChartPath)'
+      chartPath: 'install'
       chartVersion: '$(deployVersion)'
       updateDependency: true
       overrideValues: |
