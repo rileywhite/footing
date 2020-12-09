@@ -26,7 +26,9 @@ variables:
   vemotuappValuesFilePath: '$(vemotuappChartPath)/values.yaml'
 
   vemotuTlsSecretName: 'vemotu-com-tls'
+  vemotuWwwTlsSecretName: 'vemotu-com-tls'
   remeterTlsSecretName: 'remeter-org-tls'
+  remeterWwwTlsSecretName: 'remeter-org-tls'
 
   stagingDeployNamespace: vemotu-staging
   stagingReleaseName: vemotuapp-staging
@@ -37,7 +39,9 @@ variables:
   prodDeployNamespace: vemotu-prod
   prodReleaseName: vemotuapp-prod
   prodVemotuHost: vemotu.com
+  prodWwwVemotuHost: vemotu.com
   prodRemeterHost: remeter.org
+  prodWwwRemeterHost: remeter.org
   prodLoadBalancerIP: 52.184.202.52
 
 jobs:
@@ -264,12 +268,20 @@ jobs:
       overrideValues: |
           ingress.hosts[0].host=$(prodVemotuHost)
           ingress.hosts[0].paths[0]=/
-          ingress.hosts[1].host=$(prodRemeterHost)
+          ingress.hosts[1].host=$(prodWwwVemotuHost)
           ingress.hosts[1].paths[0]=/
+          ingress.hosts[2].host=$(prodRemeterHost)
+          ingress.hosts[2].paths[0]=/
+          ingress.hosts[3].host=$(prodWwwRemeterHost)
+          ingress.hosts[3].paths[0]=/
           ingress.tls[0].hosts[0]=$(prodVemotuHost)
           ingress.tls[0].secretName=$(vemotuTlsSecretName)
-          ingress.tls[1].hosts[0]=$(prodRemeterHost)
-          ingress.tls[1].secretName=$(remeterTlsSecretName)
+          ingress.tls[1].hosts[0]=$(prodWwwVemotuHost)
+          ingress.tls[1].secretName=$(vemotuWwwTlsSecretName)
+          ingress.tls[2].hosts[0]=$(prodRemeterHost)
+          ingress.tls[2].secretName=$(remeterTlsSecretName)
+          ingress.tls[3].hosts[0]=$(prodWwwRemeterHost)
+          ingress.tls[3].secretName=$(remeterWwwTlsSecretName)
           ingress-nginx.controller.service.loadBalancerIP="$(prodLoadBalancerIP)"
 
 
