@@ -211,7 +211,12 @@ jobs:
       notifyUsers: |
         briollen@gmail.com
       instructions: 'Approve?'
-      timeoutInMinutes: 1
+      # timeout short with resume after because this task is currently in pre-release and doesn't actually have an approve button
+      # at some point it can be configured for real
+      # until then, you have five minutes to cancel a prod deploy if stagint looks to be very broken
+      # (once this can be configured correctly, be sure to extend the job's timeoutInMinutes in tandem with the below two lines)
+      timeoutInMinutes: 5
+      onTimeout: 'resume'
 
 
 - job: DeployToProd
