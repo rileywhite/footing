@@ -242,8 +242,8 @@ jobs:
   - bash: |
       export HELM_EXPERIMENTAL_OCI=1
       helm chart pull $(azureContainerRegistryName).azurecr.io/helm/vemotuapp:$(deployVersion)
-      helm chart export $(registryServerName)/helm/vemotuapp:$(deployVersion) --destination install
-      helm dependency update install
+      helm chart export $(registryServerName)/helm/vemotuapp:$(deployVersion) --destination $(vemotuappChartPath)
+      helm dependency update $(vemotuappChartPath)
     condition: and(succeeded(), in(variables['Build.Reason'], 'Manual', 'IndividualCI', 'BatchedCI', 'Schedule'))
     name: HelmGetChartAndUpdateDependencies
 
@@ -258,7 +258,7 @@ jobs:
       command: 'upgrade'
       releaseName: '$(prodReleaseName)'
       chartType: 'FilePath'
-      chartPath: 'install'
+      chartPath: '$(vemotuappChartPath)'
       chartVersion: '$(deployVersion)'
       updateDependency: true
       overrideValues: |
