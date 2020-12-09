@@ -241,7 +241,7 @@ jobs:
 
   - bash: |
       export HELM_EXPERIMENTAL_OCI=1
-      helm chart pull $(azureContainerRegistryName).azurecr.io/charts/$(projectName):$(deployVersion)
+      helm chart pull $(azureContainerRegistryName).azurecr.io/helm/vemotuapp:$(deployVersion)
       helm chart export $(registryServerName)/helm/vemotuapp:$(deployVersion) --destination install
       helm dependency update install
     condition: and(succeeded(), in(variables['Build.Reason'], 'Manual', 'IndividualCI', 'BatchedCI', 'Schedule'))
