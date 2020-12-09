@@ -204,19 +204,20 @@ jobs:
   pool: server
   timeoutInMinutes: 6
   steps:
-  - task: ManualValidation@0
-    condition: and(succeeded(), in(variables['Build.Reason'], 'Manual', 'IndividualCI', 'BatchedCI', 'Schedule'))
-    name: ApproveForRelease
-    inputs:
-      notifyUsers: |
-        briollen@gmail.com
-      instructions: 'Approve?'
-      # timeout short with resume after because this task is currently in pre-release and doesn't actually have an approve button
-      # at some point it can be configured for real
-      # until then, you have five minutes to cancel a prod deploy if stagint looks to be very broken
-      # (once this can be configured correctly, be sure to extend the job's timeoutInMinutes in tandem with the below two lines)
-      timeoutInMinutes: 5
-      onTimeout: 'resume'
+  # Completely removing this task until it is updated to work as intended (mabye V1?)
+  #- task: ManualValidation@0
+  #  condition: and(succeeded(), in(variables['Build.Reason'], 'Manual', 'IndividualCI', 'BatchedCI', 'Schedule'))
+  #  name: ApproveForRelease
+  #  inputs:
+  #    notifyUsers: |
+  #      briollen@gmail.com
+  #    instructions: 'Approve?'
+  #    # timeout short with resume after because this task is currently in pre-release and doesn't actually have an approve button
+  #    # at some point it can be configured for real
+  #    # until then, you have five minutes to cancel a prod deploy if stagint looks to be very broken
+  #    # (once this can be configured correctly, be sure to extend the job's timeoutInMinutes in tandem with the below two lines)
+  #    timeoutInMinutes: 5
+  #    onTimeout: 'resume'
 
 
 - job: DeployToProd
@@ -290,7 +291,7 @@ jobs:
     and
     (
       eq(dependencies.GetApproval.result, 'Succeeded'),
-      in(dependencies.DeployToProd.result, 'Succeeded')
+      eq(dependencies.DeployToProd.result, 'Succeeded')
     )
   variables:
     deployVersion: $[ dependencies.BuildAndPushToContainerRegistry.outputs['SetOutputVariables.version'] ]
