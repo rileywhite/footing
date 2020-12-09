@@ -202,14 +202,16 @@ jobs:
   dependsOn: DraftReleaseAndDeployToStaging
   continueOnError: true
   pool: server
+  timeoutInMinutes: 6
   steps:
   - task: ManualValidation@0
     condition: and(succeeded(), in(variables['Build.Reason'], 'Manual', 'IndividualCI', 'BatchedCI', 'Schedule'))
     name: ApproveForRelease
-    timeoutInMinutes: 10080
     inputs:
-      notifyUsers: 'briollen@gmail.com'
+      notifyUsers: |
+        briollen@gmail.com
       instructions: 'Approve?'
+      timeoutInMinutes: 1
 
 
 - job: DeployToProd
@@ -257,7 +259,7 @@ jobs:
   condition: |
     and
     (
-      eq(dependencies.GetApproval.result, 'Failed'),
+      neq(dependencies.GetApproval.result, 'Succeeded'),
       in(dependencies.DeployToProd.result, 'Skipped', 'Failed')
     )
   variables:
