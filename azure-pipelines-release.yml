@@ -239,7 +239,8 @@ jobs:
       installKubectl: true
       kubectlVersion: '$(kubectlVersion)'
 
-  - script: |
+  - bash: |
+      export HELM_EXPERIMENTAL_OCI=1
       helm chart pull $(azureContainerRegistryName).azurecr.io/charts/$(projectName):$(deployVersion)
       helm chart export $(registryServerName)/helm/vemotuapp:$(deployVersion) --destination install
       helm dependency update install
