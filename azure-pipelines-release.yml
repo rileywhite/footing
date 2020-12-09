@@ -231,6 +231,18 @@ jobs:
   pool:
     vmImage: 'ubuntu-latest'
   steps:
+  - task: HelmInstaller@0
+    name: HelmInstall
+    condition: and(succeeded(), in(variables['Build.Reason'], 'Manual', 'IndividualCI', 'BatchedCI', 'Schedule'))
+    inputs:
+      helmVersion: '$(helmVersion)'
+      installKubectl: true
+      kubectlVersion: '$(kubectlVersion)'
+
+  - script: 'helm dependency update $(vemotuappChartPath)'
+    condition: and(succeeded(), in(variables['Build.Reason'], 'Manual', 'IndividualCI', 'BatchedCI', 'Schedule'))
+    name: HelmDependencyUpdate
+
   - task: HelmDeploy@0
     name: HelmUpgrade
     inputs:
@@ -263,10 +275,10 @@ jobs:
     - GetApproval
     - DeployToProd
   condition: |
-    and
+    or
     (
       ne(dependencies.GetApproval.result, 'Succeeded'),
-      in(dependencies.DeployToProd.result, 'Skipped', 'Failed')
+      ne(dependencies.DeployToProd.result, 'Succeeded')
     )
   variables:
     deployVersion: $[ dependencies.BuildAndPushToContainerRegistry.outputs['SetOutputVariables.version'] ]
