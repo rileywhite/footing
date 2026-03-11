@@ -28,17 +28,17 @@
                     @((MarkupString)FormPrompt)
                 </dt>
                 <dd>
-                    $<input size="10" placeholder="xxx.xx" @bind="Model.Amount" />
-                    <input size="20" placeholder="how often?" list="periods" @bind="Model.Period">
-                    <datalist id="periods">
+                    $<InputNumber size="10" placeholder="xxx.xx" @bind-Value="Model.Amount" />
+                    <InputSelect @bind-Value="Model.Period">
+                        <option value="">how often?</option>
                         @foreach (Period period in Enum.GetValues(typeof(Period)))
                         {
                             <option value="@period">@GetPeriodDescription(period)</option>
                         }
-                    </datalist>
+                    </InputSelect>
                 </dd>
                 <dt>@FormAmountDescriptionConnectorWord</dt>
-                <dd><input size="30" placeholder="@Label Description" @bind="Model.Name" /></dd>
+                <dd><InputText size="30" placeholder="@($"{Label} Description")" @bind-Value="Model.Name" /></dd>
             </dl>
 
             <button type="submit" class="btn btn-primary">Add</button>

@@ -53,7 +53,7 @@ public class MoneyFlowCardTests : BunitContext
     public void RendersFormWithPeriodOptions()
     {
         var cut = RenderCard();
-        cut.Markup.Should().Contain("datalist");
+        cut.Find("select").Should().NotBeNull();
         foreach (Period period in Enum.GetValues(typeof(Period)))
             cut.Markup.Should().Contain(period.ToString());
     }
