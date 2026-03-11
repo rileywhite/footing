@@ -24,6 +24,22 @@ public class MoneyFlowCardTests : BunitContext
             .Add(c => c.FormAmountDescriptionConnectorWord, connectorWord));
     }
 
+    private IRenderedComponent<MoneyFlowCard> RenderCardWithCallback(
+        MoneyFlows moneyFlows,
+        string name = "testCard",
+        string label = "Test Label",
+        string formPrompt = "Enter amount",
+        string connectorWord = "for")
+    {
+        return Render<MoneyFlowCard>(p => p
+            .Add(c => c.MoneyFlows, moneyFlows)
+            .Add(c => c.MoneyFlowsChanged, flows => { })
+            .Add(c => c.Name, name)
+            .Add(c => c.Label, label)
+            .Add(c => c.FormPrompt, formPrompt)
+            .Add(c => c.FormAmountDescriptionConnectorWord, connectorWord));
+    }
+
     [Fact]
     public void RendersLabel() =>
         RenderCard(label: "Income").Markup.Should().Contain("Income");
@@ -95,7 +111,7 @@ public class MoneyFlowCardTests : BunitContext
     public void AddButton_SubmitsValidForm_AddsMoneyFlow()
     {
         var flows = new MoneyFlows { Direction = MoneyFlowDirection.Income };
-        var cut = RenderCard(moneyFlows: flows);
+        var cut = RenderCardWithCallback(flows);
 
         cut.Find("input[placeholder='xxx.xx']").Change("1000");
         cut.Find("select").Change("Weekly");
@@ -104,5 +120,24 @@ public class MoneyFlowCardTests : BunitContext
 
         flows.Should().HaveCount(1);
         flows[0].Name.Should().Be("Test Salary");
+        flows[0].Period.Should().Be(Period.Weekly);
+    }
+
+    [Fact]
+    public void AddButton_WithMonthlyPeriod_AddsMoneyFlow()
+    {
+        var flows = new MoneyFlows { Direction = MoneyFlowDirection.Outgo };
+        var cut = RenderCardWithCallback(flows);
+
+        cut.Find("input[placeholder='xxx.xx']").Change("50.25");
+        cut.Find("select").Change("Monthly");
+        cut.Find("input[placeholder='Test Label Description']").Change("Rent");
+
+        cut.Find("button[type='submit']").Click();
+
+        flows.Should().HaveCount(1);
+        flows[0].Name.Should().Be("Rent");
+        ((decimal)flows[0].Amount).Should().Be(50.25m);
+        flows[0].Period.Should().Be(Period.Monthly);
     }
 }
