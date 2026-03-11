@@ -1,6 +1,6 @@
 @page "/footing-me"
 @using Footing.Client.Components
-@rendermode InteractiveWebAssembly
+@rendermode @(new InteractiveWebAssemblyRenderMode(prerender: false))
 
 <PageTitle>Footing - Manage My Money</PageTitle>
 
