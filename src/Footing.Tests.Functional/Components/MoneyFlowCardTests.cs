@@ -90,4 +90,19 @@ public class MoneyFlowCardTests : BunitContext
     [Fact]
     public void EmptyFlows_RendersEmptyTable() =>
         RenderCard().FindAll("table tr").Count.Should().Be(0);
+
+    [Fact]
+    public void AddButton_SubmitsValidForm_AddsMoneyFlow()
+    {
+        var flows = new MoneyFlows { Direction = MoneyFlowDirection.Income };
+        var cut = RenderCard(moneyFlows: flows);
+
+        cut.Find("input[placeholder='xxx.xx']").Change("1000");
+        cut.Find("input[placeholder='how often?']").Change("Weekly");
+        cut.Find("input[placeholder='Test Label Description']").Change("Test Salary");
+        cut.Find("button[type='submit']").Click();
+
+        flows.Should().HaveCount(1);
+        flows[0].Name.Should().Be("Test Salary");
+    }
 }
