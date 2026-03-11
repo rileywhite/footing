@@ -98,7 +98,7 @@ public class MoneyFlowCardTests : BunitContext
         var cut = RenderCard(moneyFlows: flows);
 
         cut.Find("input[placeholder='xxx.xx']").Change("1000");
-        cut.Find("input[placeholder='how often?']").Change("Weekly");
+        cut.Find("select").Change("Weekly");
         cut.Find("input[placeholder='Test Label Description']").Change("Test Salary");
         cut.Find("button[type='submit']").Click();
 
