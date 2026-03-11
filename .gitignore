@@ -1,4 +1,7 @@
 .runtime/
 .claude/
 .logs/
+.beads/
 __pycache__/
+*.secrets.local
+src/README.md
