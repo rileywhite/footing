@@ -5,6 +5,9 @@ using Footing.Components;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Add Aspire service defaults (OpenTelemetry, health checks, resilience).
+builder.AddServiceDefaults();
+
 // Add services to the container.
 builder.Services.AddBlazoredLocalStorage();
 builder.Services.AddScoped<IFootingJSInterop, FootingJSInteropProvider>();
@@ -29,6 +32,8 @@ app.UseStatusCodePagesWithReExecute("/not-found", createScopeForStatusCodePages:
 app.UseHttpsRedirection();
 
 app.UseAntiforgery();
+
+app.MapDefaultEndpoints();
 
 app.MapStaticAssets();
 app.MapRazorComponents<App>()
