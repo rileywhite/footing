@@ -18,11 +18,10 @@ variables:
   azureContainerRegistryUrl: '$(azureContainerRegistryName).azurecr.io'
   dockerComposeFile: 'src/docker-compose.yml'
   timestamp: $(Get-Date -Format yyyyMMddTHHmmssfffffffZ)
-  vemotuappChartPath: 'src/vemotuapp'
-  vemotuappChartFilePath: '$(vemotuappChartPath)/Chart.yaml'
-  vemotuappValuesFilePath: '$(vemotuappChartPath)/values.yaml'
-  vemotuTlsSecretName: 'vemotu-com-tls'
-  remeterTlsSecretName: 'remeter-org-tls'
+  footingappChartPath: 'src/footingapp'
+  footingappChartFilePath: '$(footingappChartPath)/Chart.yaml'
+  footingappValuesFilePath: '$(footingappChartPath)/values.yaml'
+  footingTlsSecretName: 'footing-app-tls'
 
 steps:
 - script: |
@@ -50,10 +49,9 @@ steps:
   condition: eq(variables['Build.SourceBranch'], 'refs/heads/develop')
 
 - script: |
-    echo "##vso[task.setvariable variable=deployNamespace;isOutput=true]vemotu-$ENVNAME"
-    echo "##vso[task.setvariable variable=releaseName;isOutput=true]vemotuapp-$ENVNAME"
-    echo "##vso[task.setvariable variable=vemotuHost;isOutput=true]$ENVNAME.vemotu.com"
-    echo "##vso[task.setvariable variable=remeterHost;isOutput=true]$ENVNAME.remeter.org"
+    echo "##vso[task.setvariable variable=deployNamespace;isOutput=true]footing-$ENVNAME"
+    echo "##vso[task.setvariable variable=releaseName;isOutput=true]footingapp-$ENVNAME"
+    echo "##vso[task.setvariable variable=footingHost;isOutput=true]$ENVNAME.footing.app"
     echo "##vso[task.setvariable variable=configuration;isOutput=true]$CONFIGURATIONDECISION"
     echo "##vso[task.setvariable variable=version;isOutput=true]$VERSIONPREFIX-$ALPHAORBETA.$(Build.BuildId)"
     echo "##vso[task.setvariable variable=fullVersion;isOutput=true]$VERSIONPREFIX-$ALPHAORBETA.$(Build.BuildId)+$TIMESTAMP"
@@ -62,14 +60,14 @@ steps:
   name: SetOutputVariables
 
 - powershell: |
-    $content = Get-Content $(vemotuappChartFilePath)
+    $content = Get-Content $(footingappChartFilePath)
     $versionLine = $content | Select-String -Pattern '^version:' -CaseSensitive | Select-Object -ExpandProperty Line
     $appVersionLine = $content | Select-String -Pattern '^appVersion:' -CaseSensitive | Select-Object -ExpandProperty Line
-    $content | ForEach-Object {$_ -replace $versionLine, "version: $(SetOutputVariables.version)"} | ForEach-Object {$_ -replace $appVersionLine, "appVersion: $(SetOutputVariables.version)"} | Set-Content $(vemotuappChartFilePath)
+    $content | ForEach-Object {$_ -replace $versionLine, "version: $(SetOutputVariables.version)"} | ForEach-Object {$_ -replace $appVersionLine, "appVersion: $(SetOutputVariables.version)"} | Set-Content $(footingappChartFilePath)
 
-    $content = Get-Content $(vemotuappValuesFilePath)
+    $content = Get-Content $(footingappValuesFilePath)
     $imageTagLine = $content | Select-String -Pattern '^  tag:' -CaseSensitive | Select-Object -ExpandProperty Line
-    $content | ForEach-Object {$_ -replace $imageTagLine, "  tag: $(SetOutputVariables.version)"} | Set-Content $(vemotuappValuesFilePath)
+    $content | ForEach-Object {$_ -replace $imageTagLine, "  tag: $(SetOutputVariables.version)"} | Set-Content $(footingappValuesFilePath)
   name: UpdateChartYamlFiles
 
 - task: DockerCompose@0
@@ -114,10 +112,10 @@ steps:
     azureResourceGroupForACR: 'rg-vemotu-eus2-001'
     azureContainerRegistry: 'crvemotueus2.azurecr.io'
     command: 'save'
-    chartNameForACR: 'vemotuapp:$(SetOutputVariables.version)'
-    chartPathForACR: '$(vemotuappChartPath)'
+    chartNameForACR: 'footingapp:$(SetOutputVariables.version)'
+    chartPathForACR: '$(footingappChartPath)'
 
-- script: 'helm dependency update src/vemotuapp'
+- script: 'helm dependency update src/footingapp'
   condition: and(succeeded(), in(variables['Build.Reason'], 'Manual', 'IndividualCI', 'BatchedCI', 'Schedule'))
   name: HelmDependencyUpdate
 
@@ -133,16 +131,12 @@ steps:
     command: 'upgrade'
     releaseName: '$(SetOutputVariables.releaseName)'
     chartType: 'FilePath'
-    chartPath: 'src/vemotuapp'
+    chartPath: 'src/footingapp'
     chartVersion: '$(SetOutputVariables.version)'
     updateDependency: true
     overrideValues: |
-        ingress.hosts[0].host=$(SetOutputVariables.vemotuHost)
+        ingress.hosts[0].host=$(SetOutputVariables.footingHost)
         ingress.hosts[0].paths[0]=/
-        ingress.hosts[1].host=$(SetOutputVariables.remeterHost)
-        ingress.hosts[1].paths[0]=/
-        ingress.tls[0].hosts[0]=$(SetOutputVariables.vemotuHost)
-        ingress.tls[0].secretName=$(vemotuTlsSecretName)
-        ingress.tls[1].hosts[0]=$(SetOutputVariables.remeterHost)
-        ingress.tls[1].secretName=$(remeterTlsSecretName)
+        ingress.tls[0].hosts[0]=$(SetOutputVariables.footingHost)
+        ingress.tls[0].secretName=$(footingTlsSecretName)
         ingress-nginx.controller.service.loadBalancerIP="$(SetOutputVariables.loadBalancerIP)"

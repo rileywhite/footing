@@ -21,27 +21,22 @@ variables:
   srcPath: '$(checkoutPath)/src'
   versionFilePath: '$(srcPath)/version'
   dockerComposeFilePath: '$(srcPath)/docker-compose.yml'
-  vemotuappChartPath: '$(srcPath)/vemotuapp'
-  vemotuappChartFilePath: '$(vemotuappChartPath)/Chart.yaml'
-  vemotuappValuesFilePath: '$(vemotuappChartPath)/values.yaml'
+  footingappChartPath: '$(srcPath)/footingapp'
+  footingappChartFilePath: '$(footingappChartPath)/Chart.yaml'
+  footingappValuesFilePath: '$(footingappChartPath)/values.yaml'
 
-  vemotuTlsSecretName: 'vemotu-com-tls'
-  vemotuWwwTlsSecretName: 'www-vemotu-com-tls'
-  remeterTlsSecretName: 'remeter-org-tls'
-  remeterWwwTlsSecretName: 'www-remeter-org-tls'
+  footingTlsSecretName: 'footing-app-tls'
+  footingWwwTlsSecretName: 'www-footing-app-tls'
 
-  stagingDeployNamespace: vemotu-staging
-  stagingReleaseName: vemotuapp-staging
-  stagingVemotuHost: staging.vemotu.com
-  stagingRemeterHost: staging.remeter.org
+  stagingDeployNamespace: footing-staging
+  stagingReleaseName: footingapp-staging
+  stagingFootingHost: staging.footing.app
   stagingLoadBalancerIP: 52.138.105.11
 
-  prodDeployNamespace: vemotu-prod
-  prodReleaseName: vemotuapp-prod
-  prodVemotuHost: vemotu.com
-  prodWwwVemotuHost: www.vemotu.com
-  prodRemeterHost: remeter.org
-  prodWwwRemeterHost: www.remeter.org
+  prodDeployNamespace: footing-prod
+  prodReleaseName: footingapp-prod
+  prodFootingHost: footing.app
+  prodWwwFootingHost: www.footing.app
   prodLoadBalancerIP: 52.184.202.52
 
 jobs:
@@ -79,13 +74,13 @@ jobs:
       try
       {
           Set-PSDebug -Trace 2
-          $content = Get-Content $(vemotuappChartFilePath)
+          $content = Get-Content $(footingappChartFilePath)
           $versionLine = $content | Select-String -Pattern '^version:' -CaseSensitive | Select-Object -ExpandProperty Line
           $appVersionLine = $content | Select-String -Pattern '^appVersion:' -CaseSensitive | Select-Object -ExpandProperty Line
-          $content | ForEach-Object {$_ -replace $versionLine, "version: $(SetOutputVariables.version)"} | ForEach-Object {$_ -replace $appVersionLine, "appVersion: $(SetOutputVariables.version)"} | Set-Content $(vemotuappChartFilePath)
-          $content = Get-Content $(vemotuappValuesFilePath)
+          $content | ForEach-Object {$_ -replace $versionLine, "version: $(SetOutputVariables.version)"} | ForEach-Object {$_ -replace $appVersionLine, "appVersion: $(SetOutputVariables.version)"} | Set-Content $(footingappChartFilePath)
+          $content = Get-Content $(footingappValuesFilePath)
           $imageTagLine = $content | Select-String -Pattern '^  tag:' -CaseSensitive | Select-Object -ExpandProperty Line
-          $content | ForEach-Object {$_ -replace $imageTagLine, "  tag: $(SetOutputVariables.version)"} | Set-Content $(vemotuappValuesFilePath)
+          $content | ForEach-Object {$_ -replace $imageTagLine, "  tag: $(SetOutputVariables.version)"} | Set-Content $(footingappValuesFilePath)
       }
       catch
       {
@@ -136,8 +131,8 @@ jobs:
       azureResourceGroupForACR: '$(azureResourceGroup)'
       azureContainerRegistry: '$(azureContainerRegistryName).azurecr.io'
       command: 'save'
-      chartNameForACR: 'vemotuapp:$(SetOutputVariables.version)'
-      chartPathForACR: '$(vemotuappChartPath)'
+      chartNameForACR: 'footingapp:$(SetOutputVariables.version)'
+      chartPathForACR: '$(footingappChartPath)'
 
 
 - job: DraftReleaseAndDeployToStaging
@@ -171,7 +166,7 @@ jobs:
       installKubectl: true
       kubectlVersion: '$(kubectlVersion)'
 
-  - script: 'helm dependency update $(vemotuappChartPath)'
+  - script: 'helm dependency update $(footingappChartPath)'
     condition: and(succeeded(), in(variables['Build.Reason'], 'Manual', 'IndividualCI', 'BatchedCI', 'Schedule'))
     name: HelmDependencyUpdate
 
@@ -187,18 +182,14 @@ jobs:
       command: 'upgrade'
       releaseName: '$(stagingReleaseName)'
       chartType: 'FilePath'
-      chartPath: '$(vemotuappChartPath)'
+      chartPath: '$(footingappChartPath)'
       chartVersion: '$(deployVersion)'
       updateDependency: true
       overrideValues: |
-          ingress.hosts[0].host=$(stagingVemotuHost)
+          ingress.hosts[0].host=$(stagingFootingHost)
           ingress.hosts[0].paths[0]=/
-          ingress.hosts[1].host=$(stagingRemeterHost)
-          ingress.hosts[1].paths[0]=/
-          ingress.tls[0].hosts[0]=$(stagingVemotuHost)
-          ingress.tls[0].secretName=$(vemotuTlsSecretName)
-          ingress.tls[1].hosts[0]=$(stagingRemeterHost)
-          ingress.tls[1].secretName=$(remeterTlsSecretName)
+          ingress.tls[0].hosts[0]=$(stagingFootingHost)
+          ingress.tls[0].secretName=$(footingTlsSecretName)
           ingress-nginx.controller.service.loadBalancerIP="$(stagingLoadBalancerIP)"
 
 
@@ -208,20 +199,6 @@ jobs:
   pool: server
   timeoutInMinutes: 6
   steps: []
-  # Completely removing the ManualValidation task until it is updated to work as intended (mabye V1?)
-  #- task: ManualValidation@0
-  #  condition: and(succeeded(), in(variables['Build.Reason'], 'Manual', 'IndividualCI', 'BatchedCI', 'Schedule'))
-  #  name: ApproveForRelease
-  #  inputs:
-  #    notifyUsers: |
-  #      briollen@gmail.com
-  #    instructions: 'Approve?'
-  #    # timeout short with resume after because this task is currently in pre-release and doesn't actually have an approve button
-  #    # at some point it can be configured for real
-  #    # until then, you have five minutes to cancel a prod deploy if stagint looks to be very broken
-  #    # (once this can be configured correctly, be sure to extend the job's timeoutInMinutes in tandem with the below two lines)
-  #    timeoutInMinutes: 5
-  #    onTimeout: 'resume'
 
 
 - job: DeployToProd
@@ -245,9 +222,9 @@ jobs:
 
   - bash: |
       export HELM_EXPERIMENTAL_OCI=1
-      helm chart pull $(azureContainerRegistryName).azurecr.io/helm/vemotuapp:$(deployVersion)
-      helm chart export $(registryServerName)/helm/vemotuapp:$(deployVersion) --destination $(vemotuappChartPath)
-      helm dependency update $(vemotuappChartPath)
+      helm chart pull $(azureContainerRegistryName).azurecr.io/helm/footingapp:$(deployVersion)
+      helm chart export $(registryServerName)/helm/footingapp:$(deployVersion) --destination $(footingappChartPath)
+      helm dependency update $(footingappChartPath)
     condition: and(succeeded(), in(variables['Build.Reason'], 'Manual', 'IndividualCI', 'BatchedCI', 'Schedule'))
     name: HelmGetChartAndUpdateDependencies
 
@@ -262,26 +239,18 @@ jobs:
       command: 'upgrade'
       releaseName: '$(prodReleaseName)'
       chartType: 'FilePath'
-      chartPath: '$(vemotuappChartPath)'
+      chartPath: '$(footingappChartPath)'
       chartVersion: '$(deployVersion)'
       updateDependency: true
       overrideValues: |
-          ingress.hosts[0].host=$(prodVemotuHost)
+          ingress.hosts[0].host=$(prodFootingHost)
           ingress.hosts[0].paths[0]=/
-          ingress.hosts[1].host=$(prodWwwVemotuHost)
+          ingress.hosts[1].host=$(prodWwwFootingHost)
           ingress.hosts[1].paths[0]=/
-          ingress.hosts[2].host=$(prodRemeterHost)
-          ingress.hosts[2].paths[0]=/
-          ingress.hosts[3].host=$(prodWwwRemeterHost)
-          ingress.hosts[3].paths[0]=/
-          ingress.tls[0].hosts[0]=$(prodVemotuHost)
-          ingress.tls[0].secretName=$(vemotuTlsSecretName)
-          ingress.tls[1].hosts[0]=$(prodWwwVemotuHost)
-          ingress.tls[1].secretName=$(vemotuWwwTlsSecretName)
-          ingress.tls[2].hosts[0]=$(prodRemeterHost)
-          ingress.tls[2].secretName=$(remeterTlsSecretName)
-          ingress.tls[3].hosts[0]=$(prodWwwRemeterHost)
-          ingress.tls[3].secretName=$(remeterWwwTlsSecretName)
+          ingress.tls[0].hosts[0]=$(prodFootingHost)
+          ingress.tls[0].secretName=$(footingTlsSecretName)
+          ingress.tls[1].hosts[0]=$(prodWwwFootingHost)
+          ingress.tls[1].secretName=$(footingWwwTlsSecretName)
           ingress-nginx.controller.service.loadBalancerIP="$(prodLoadBalancerIP)"
 
 
