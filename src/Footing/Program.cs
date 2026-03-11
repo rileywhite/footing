@@ -1,3 +1,4 @@
+using Blazored.LocalStorage;
 using Footing.Client.Pages;
 using Footing.Client.Services;
 using Footing.Components;
@@ -5,6 +6,7 @@ using Footing.Components;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
+builder.Services.AddBlazoredLocalStorage();
 builder.Services.AddScoped<IFootingJSInterop, FootingJSInteropProvider>();
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents()
