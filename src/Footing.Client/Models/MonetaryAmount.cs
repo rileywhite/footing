@@ -1,3 +1,5 @@
+using System.Text.Json.Serialization;
+
 namespace Footing.Models;
 
 public struct MonetaryAmount
@@ -12,12 +14,16 @@ public struct MonetaryAmount
 
     public override int GetHashCode() => Amount.GetHashCode();
 
+    [JsonIgnore]
     public MonetaryAmount RoundedAmount => Math.Round(Amount, 2);
 
+    [JsonIgnore]
     public MonetaryAmount RoundedAbsoluteAmount => Math.Abs(RoundedAmount);
 
+    [JsonIgnore]
     public bool IsNegative => RoundedAmount < 0.00m;
 
+    [JsonIgnore]
     public string AmountDynamicHighlightCssClass => IsNegative ? AmountHighlightNegativeCssClass : AmountHighlightPositiveCssClass;
 
     public static string AmountSensitiveCssClass => "monetary-amount-sensitive";
