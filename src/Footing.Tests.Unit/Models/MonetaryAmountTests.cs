@@ -1,3 +1,4 @@
+using System.Text.Json;
 using FluentAssertions;
 using Footing.Models;
 using Xunit;
@@ -108,5 +109,30 @@ public class MonetaryAmountTests
         MonetaryAmount a = 42.50m;
         MonetaryAmount b = 42.50m;
         a.GetHashCode().Should().Be(b.GetHashCode());
+    }
+
+    [Fact]
+    public void JsonSerialize_MonetaryAmount_DoesNotThrowCycleException()
+    {
+        MonetaryAmount amount = 42.567m;
+
+        var json = JsonSerializer.Serialize(amount);
+
+        json.Should().Contain("42.567");
+        var deserialized = JsonSerializer.Deserialize<MonetaryAmount>(json);
+        deserialized.Amount.Should().Be(42.567m);
+    }
+
+    [Fact]
+    public void JsonSerialize_FootingAnalysisWithMonetaryAmounts_DoesNotThrowCycleException()
+    {
+        var analysis = new FootingAnalysis();
+        analysis.Inflows.Add(new MoneyFlow { Name = "Salary", Amount = 1000m });
+
+        var json = JsonSerializer.Serialize(analysis);
+
+        json.Should().NotBeNullOrEmpty();
+        var deserialized = JsonSerializer.Deserialize<FootingAnalysis>(json);
+        deserialized.Should().NotBeNull();
     }
 }
