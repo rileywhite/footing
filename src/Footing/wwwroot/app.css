@@ -196,6 +196,10 @@ a, .btn-link {
     color: var(--ft-primary);
 }
 
+a:hover, .btn-link:hover {
+    color: var(--ft-primary-hover);
+}
+
 .btn-primary {
     color: #fff;
     background-color: var(--ft-primary);
@@ -205,6 +209,22 @@ a, .btn-link {
 .btn-primary:hover {
     background-color: var(--ft-primary-hover);
     border-color: var(--ft-primary-border);
+}
+
+.btn-primary:active, .btn-primary:focus-visible {
+    background-color: var(--ft-primary-hover);
+    border-color: var(--ft-primary-border);
+}
+
+.btn-outline-primary {
+    color: var(--ft-primary);
+    border-color: var(--ft-primary);
+}
+
+.btn-outline-primary:hover {
+    color: #fff;
+    background-color: var(--ft-primary);
+    border-color: var(--ft-primary);
 }
 
 .btn-accordian-header:focus {
@@ -257,6 +277,327 @@ h1:focus {
 
 .monetary-amount-sensitive .monetary-amount-highlight-negative {
     color: var(--ft-amount-negative);
+}
+
+/* ============================================================
+   Cards — Design Token Integration
+   ============================================================ */
+
+.card {
+    background-color: var(--ft-bg-surface);
+    border-color: var(--ft-bg-topbar-border);
+}
+
+.card-header {
+    background-color: var(--ft-bg-topbar);
+    border-bottom-color: var(--ft-bg-topbar-border);
+}
+
+.card-header .btn-link,
+.card-header .btn-link:hover,
+.card-header .btn-link:focus {
+    color: var(--ft-text);
+    text-decoration: none;
+}
+
+.card-header .btn-link:hover {
+    color: var(--ft-primary);
+}
+
+/* ============================================================
+   Tables — Design Token Integration
+   ============================================================ */
+
+.table {
+    color: var(--ft-text);
+    border-color: var(--ft-bg-topbar-border);
+}
+
+.table > :not(caption) > * > * {
+    background-color: transparent;
+    color: var(--ft-text);
+    border-bottom-color: var(--ft-bg-topbar-border);
+}
+
+/* ============================================================
+   Forms — Design Token Integration
+   ============================================================ */
+
+.form-control, .form-select {
+    color: var(--ft-text);
+    background-color: var(--ft-bg-surface);
+    border-color: var(--ft-bg-topbar-border);
+}
+
+.form-control::placeholder {
+    color: var(--ft-text-muted);
+}
+
+.form-control:focus, .form-select:focus {
+    color: var(--ft-text);
+    background-color: var(--ft-bg-surface);
+    border-color: var(--ft-focus-ring);
+}
+
+/* ============================================================
+   Accordion — Enhanced Styling
+   ============================================================ */
+
+#moneyFlows .card {
+    border-radius: 0;
+    border-bottom: 0;
+    transition: box-shadow 0.15s ease;
+}
+
+#moneyFlows .card:first-child {
+    border-top-left-radius: 0.5rem;
+    border-top-right-radius: 0.5rem;
+}
+
+#moneyFlows .card:last-child {
+    border-bottom-left-radius: 0.5rem;
+    border-bottom-right-radius: 0.5rem;
+    border-bottom: 1px solid var(--ft-bg-topbar-border);
+}
+
+#moneyFlows .card-header h5 {
+    margin: 0;
+}
+
+#moneyFlows .card-header .btn-link {
+    font-weight: 600;
+    font-size: 0.95rem;
+    padding: 0.25rem 0;
+    width: 100%;
+    text-align: left;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+#moneyFlows .card-body {
+    padding: 1.25rem;
+}
+
+/* ============================================================
+   Money Flow Form — Improved Layout
+   ============================================================ */
+
+#moneyFlows dl {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 0.5rem 1rem;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+#moneyFlows dt {
+    font-weight: 500;
+    color: var(--ft-text-muted);
+    font-size: 0.9rem;
+}
+
+#moneyFlows dd {
+    margin-bottom: 0;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+#moneyFlows dd input[type="number"],
+#moneyFlows dd input[type="text"] {
+    padding: 0.375rem 0.75rem;
+    border: 1px solid var(--ft-bg-topbar-border);
+    border-radius: 0.375rem;
+    background-color: var(--ft-bg-surface);
+    color: var(--ft-text);
+    font-size: 0.9rem;
+}
+
+#moneyFlows dd select {
+    padding: 0.375rem 0.75rem;
+    border: 1px solid var(--ft-bg-topbar-border);
+    border-radius: 0.375rem;
+    background-color: var(--ft-bg-surface);
+    color: var(--ft-text);
+    font-size: 0.9rem;
+}
+
+/* ============================================================
+   Delete Button in Money Flow Table
+   ============================================================ */
+
+#moneyFlows .table .bi-x {
+    cursor: pointer;
+    opacity: 0.5;
+    transition: opacity 0.15s, color 0.15s;
+    color: var(--ft-text-muted);
+}
+
+#moneyFlows .table .bi-x:hover {
+    opacity: 1;
+    color: var(--ft-amount-negative);
+}
+
+/* ============================================================
+   Landing Page — Hero & Cards
+   ============================================================ */
+
+.ft-hero {
+    text-align: center;
+    padding: 3rem 1rem 2rem;
+}
+
+.ft-hero h1 {
+    font-size: 2.25rem;
+    font-weight: 700;
+    color: var(--ft-text);
+    margin-bottom: 0.75rem;
+}
+
+.ft-hero .ft-tagline {
+    font-size: 1.15rem;
+    color: var(--ft-text-muted);
+    max-width: 32rem;
+    margin: 0 auto 2rem;
+    line-height: 1.6;
+}
+
+.ft-cards {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+    max-width: 48rem;
+    margin: 0 auto;
+}
+
+@media (min-width: 641px) {
+    .ft-cards {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+
+.ft-card {
+    background-color: var(--ft-bg-surface);
+    border: 1px solid var(--ft-bg-topbar-border);
+    border-radius: 0.75rem;
+    padding: 1.75rem;
+    transition: box-shadow 0.2s, border-color 0.2s;
+}
+
+.ft-card:hover {
+    border-color: var(--ft-primary);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+[data-theme="dark"] .ft-card:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.ft-card h3 {
+    font-size: 1.2rem;
+    font-weight: 600;
+    margin-bottom: 0.75rem;
+    color: var(--ft-text);
+}
+
+.ft-card p {
+    color: var(--ft-text-muted);
+    font-size: 0.95rem;
+    line-height: 1.6;
+    margin-bottom: 1rem;
+}
+
+.ft-card p:last-of-type {
+    margin-bottom: 1.25rem;
+}
+
+.ft-card .btn {
+    font-size: 0.9rem;
+    padding: 0.5rem 1.25rem;
+    border-radius: 0.375rem;
+}
+
+/* ============================================================
+   Control Your Money Page — Improved Layout
+   ============================================================ */
+
+.ft-prose {
+    max-width: 36rem;
+}
+
+.ft-prose h2 {
+    font-size: 1.75rem;
+    font-weight: 700;
+    margin-bottom: 1.5rem;
+    color: var(--ft-text);
+}
+
+.ft-prose p {
+    font-size: 1.05rem;
+    line-height: 1.8;
+    color: var(--ft-text-muted);
+    margin-bottom: 1rem;
+}
+
+.ft-prose p em {
+    color: var(--ft-text);
+    font-style: italic;
+}
+
+.ft-prose .btn {
+    margin-top: 0.5rem;
+}
+
+/* ============================================================
+   Footing Me Page — Header
+   ============================================================ */
+
+.ft-page-header {
+    margin-bottom: 1.5rem;
+}
+
+.ft-page-header h1 {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: var(--ft-text);
+    margin-bottom: 0.25rem;
+}
+
+.ft-page-header p {
+    color: var(--ft-text-muted);
+    font-size: 0.95rem;
+    margin: 0;
+}
+
+/* ============================================================
+   Net Total Card — Highlighted
+   ============================================================ */
+
+.ft-net-total .card-header {
+    background-color: var(--ft-primary);
+    border-color: var(--ft-primary);
+}
+
+.ft-net-total .card-header .btn-link,
+.ft-net-total .card-header .btn-link:hover {
+    color: #fff;
+}
+
+/* ============================================================
+   Export Button Area
+   ============================================================ */
+
+.ft-export {
+    padding: 1rem 0;
+    text-align: center;
+}
+
+.ft-export .btn {
+    padding: 0.6rem 2rem;
+    font-size: 0.95rem;
+    border-radius: 0.5rem;
 }
 
 /* ============================================================

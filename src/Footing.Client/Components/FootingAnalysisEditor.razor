@@ -38,7 +38,7 @@
                    Label="Event Budget"
                    FormPrompt="@EventBudgetsFormPrompt"
                    FormAmountDescriptionConnectorWord="for" />
-    <div class="card @MonetaryAmount.AmountSensitiveCssClass">
+    <div class="card ft-net-total @MonetaryAmount.AmountSensitiveCssClass">
         <div id="totalHeading" class="card-header">
             <h5>
                 <button class="button btn btn-link btn-accordian-header" type="button" data-bs-toggle="collapse" data-bs-target="#totalDetails" aria-expanded="true" aria-controls="totalDetails">
@@ -67,10 +67,8 @@
             </div>
         </div>
     </div>
-    <div class="card">
-        <div class="card-body">
-            <input type="button" class="btn btn-primary" @onclick="ExportToExcel" value="Download Excel Spreadsheet" />
-        </div>
+    <div class="ft-export">
+        <button class="btn btn-primary" @onclick="ExportToExcel">Download Excel Spreadsheet</button>
     </div>
 </div>
 

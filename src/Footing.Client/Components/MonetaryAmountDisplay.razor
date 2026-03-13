@@ -1,10 +1,10 @@
 @if (this.Amount.IsNegative)
 {
-    <span class="monetary-amount-highlight">-$@this.Amount.RoundedAbsoluteAmount</span>
+    <span class="monetary-amount-highlight monetary-amount-highlight-negative">-$@this.Amount.RoundedAbsoluteAmount</span>
 }
 else
 {
-    <span class="monetary-amount-highlight">$@this.Amount.RoundedAbsoluteAmount</span>
+    <span class="monetary-amount-highlight monetary-amount-highlight-positive">$@this.Amount.RoundedAbsoluteAmount</span>
 }
 
 @code {

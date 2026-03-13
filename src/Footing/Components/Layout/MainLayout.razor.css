@@ -19,16 +19,26 @@ main {
     height: 3.5rem;
     display: flex;
     align-items: center;
+    gap: 0.5rem;
 }
+
+    .top-row ::deep .ft-topbar-link {
+        font-size: 0.85rem;
+        color: var(--ft-text-muted);
+        text-decoration: none;
+        padding: 0.25rem 0.75rem;
+        border-radius: 0.25rem;
+        transition: color 0.15s, background-color 0.15s;
+    }
+
+    .top-row ::deep .ft-topbar-link:hover {
+        color: var(--ft-primary);
+        background-color: var(--ft-sidebar-hover-bg);
+    }
 
     .top-row ::deep a, .top-row ::deep .btn-link {
         white-space: nowrap;
-        margin-left: 1.5rem;
         text-decoration: none;
-    }
-
-    .top-row ::deep a:hover, .top-row ::deep .btn-link:hover {
-        text-decoration: underline;
     }
 
     .top-row ::deep a:first-child {
@@ -41,8 +51,9 @@ main {
         justify-content: space-between;
     }
 
-    .top-row ::deep a, .top-row ::deep .btn-link {
-        margin-left: 0;
+    .top-row ::deep .ft-topbar-link {
+        font-size: 0.8rem;
+        padding: 0.25rem 0.5rem;
     }
 }
 
