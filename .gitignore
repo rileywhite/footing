@@ -8,7 +8,3 @@ src/README.md
 
 # Gas Town (added by gt)
 state.json
-
-# Dolt database files (added by bd init)
-.dolt/
-*.db
