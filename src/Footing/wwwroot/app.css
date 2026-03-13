@@ -61,8 +61,68 @@
     --ft-checkbox-border: #929292;
 }
 
+/* Dark mode: explicit data-theme attribute takes priority */
+[data-theme="dark"] {
+    /* --- Brand --- */
+    --ft-primary: #3a9e90;
+    --ft-primary-hover: #4db3a5;
+    --ft-primary-border: #2d7a6f;
+    --ft-accent: #d4a84e;
+    --ft-accent-hover: #e0b95f;
+
+    /* --- Monetary --- */
+    --ft-amount-positive: #3a9e90;
+    --ft-amount-negative: #e06050;
+
+    /* --- Text --- */
+    --ft-text: #e0ddd8;
+    --ft-text-muted: #9a9a9a;
+
+    /* --- Backgrounds --- */
+    --ft-bg: #1a1a2e;
+    --ft-bg-surface: #252538;
+    --ft-bg-topbar: #222236;
+    --ft-bg-topbar-border: #333348;
+
+    /* --- Sidebar --- */
+    --ft-sidebar-bg: #111822;
+    --ft-sidebar-bg-end: #0d1218;
+    --ft-sidebar-text: #9ab0be;
+    --ft-sidebar-text-active: #ffffff;
+    --ft-sidebar-active-bg: rgba(255, 255, 255, 0.12);
+    --ft-sidebar-hover-bg: rgba(255, 255, 255, 0.06);
+    --ft-sidebar-toprow-bg: rgba(0, 0, 0, 0.35);
+    --ft-sidebar-border: rgba(255, 255, 255, 0.06);
+    --ft-sidebar-toggler-icon: rgba(255, 255, 255, 0.5);
+    --ft-sidebar-toggler-checked-bg: rgba(255, 255, 255, 0.25);
+
+    /* --- Focus --- */
+    --ft-focus-ring: #5ca8f5;
+
+    /* --- Validation --- */
+    --ft-valid: #3cc060;
+    --ft-invalid: #e06050;
+
+    /* --- Error UI --- */
+    --ft-error-bg: #a02020;
+    --ft-error-text: #ffffff;
+    --ft-error-ui-bg: #2a2820;
+
+    /* --- Reconnect modal --- */
+    --ft-modal-bg: #252538;
+    --ft-modal-shadow: rgba(0, 0, 0, 0.5);
+    --ft-modal-backdrop: rgba(0, 0, 0, 0.6);
+    --ft-modal-btn-bg: #3a9e90;
+    --ft-modal-btn-hover: #4db3a5;
+    --ft-modal-spinner: #3a9e90;
+
+    /* --- Checkbox --- */
+    --ft-checkbox-border: #6a6a6a;
+}
+
+/* Fallback: apply dark mode when no explicit theme is set and OS prefers dark */
 @media (prefers-color-scheme: dark) {
-    :root {
+    :root:not([data-theme]) {
         /* --- Brand --- */
         --ft-primary: #3a9e90;
         --ft-primary-hover: #4db3a5;
@@ -197,4 +257,65 @@ h1:focus {
 
 .monetary-amount-sensitive .monetary-amount-highlight-negative {
     color: var(--ft-amount-negative);
+}
+
+/* ============================================================
+   Theme Toggle
+   ============================================================ */
+
+.theme-toggle {
+    background: none;
+    border: 1px solid var(--ft-bg-topbar-border);
+    border-radius: 6px;
+    cursor: pointer;
+    padding: 0.25rem 0.5rem;
+    font-size: 1.15rem;
+    line-height: 1;
+    color: var(--ft-text);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.2s;
+}
+
+.theme-toggle:hover {
+    background-color: var(--ft-sidebar-hover-bg);
+}
+
+.theme-toggle .icon-sun,
+.theme-toggle .icon-moon {
+    display: none;
+}
+
+/* Show sun icon in dark mode (click to switch to light) */
+[data-theme="dark"] .theme-toggle .icon-sun {
+    display: inline;
+}
+
+[data-theme="dark"] .theme-toggle .icon-moon {
+    display: none;
+}
+
+/* Show moon icon in light mode (click to switch to dark) */
+[data-theme="light"] .theme-toggle .icon-moon {
+    display: inline;
+}
+
+[data-theme="light"] .theme-toggle .icon-sun {
+    display: none;
+}
+
+/* When no explicit theme, default to showing moon (assume light) */
+:root:not([data-theme]) .theme-toggle .icon-moon {
+    display: inline;
+}
+
+@media (prefers-color-scheme: dark) {
+    :root:not([data-theme]) .theme-toggle .icon-sun {
+        display: inline;
+    }
+
+    :root:not([data-theme]) .theme-toggle .icon-moon {
+        display: none;
+    }
 }

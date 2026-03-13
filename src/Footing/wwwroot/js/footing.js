@@ -8,6 +8,17 @@ window.Footing = {
         });
     },
 
+    toggleTheme: function () {
+        var html = document.documentElement;
+        var current = html.getAttribute('data-theme');
+        if (!current) {
+            current = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+        }
+        var next = current === 'dark' ? 'light' : 'dark';
+        html.setAttribute('data-theme', next);
+        localStorage.setItem('ft-theme', next);
+    },
+
     saveAsFile: function (filename, mimeType, bytesBase64) {
         var data = window.atob(bytesBase64);
         var bytes = new Uint8Array(data.length);
