@@ -1,5 +1,9 @@
 .runtime/
-.claude/
+.claude/*
+!.claude/review-profile.json
+!.claude/commands/
+.claude/commands/*
+!.claude/commands/review.md
 .logs/
 .beads/
 __pycache__/
