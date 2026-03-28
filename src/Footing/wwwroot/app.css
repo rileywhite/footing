@@ -5,29 +5,29 @@
 
 :root {
     /* --- Brand --- */
-    --ft-primary: #2d7a6f;
-    --ft-primary-hover: #246660;
-    --ft-primary-border: #1f5a54;
-    --ft-accent: #c9973e;
-    --ft-accent-hover: #b8882f;
+    --ft-primary: #5a7a6a;
+    --ft-primary-hover: #4d6b5c;
+    --ft-primary-border: #436051;
+    --ft-accent: #b89e78;
+    --ft-accent-hover: #a88e68;
 
     /* --- Monetary --- */
-    --ft-amount-positive: #2d7a6f;
+    --ft-amount-positive: #5a7a6a;
     --ft-amount-negative: #c0392b;
 
     /* --- Text --- */
-    --ft-text: #1a1a2e;
-    --ft-text-muted: #5a5a6e;
+    --ft-text: #2c3530;
+    --ft-text-muted: #6e7d72;
 
     /* --- Backgrounds --- */
-    --ft-bg: #faf8f5;
+    --ft-bg: #f6f2ec;
     --ft-bg-surface: #ffffff;
-    --ft-bg-topbar: #f2efe9;
-    --ft-bg-topbar-border: #ddd8d0;
+    --ft-bg-topbar: #ede8e0;
+    --ft-bg-topbar-border: #dfd8cc;
 
     /* --- Sidebar --- */
-    --ft-sidebar-bg: #1a2e3a;
-    --ft-sidebar-bg-end: #162530;
+    --ft-sidebar-bg: #1e2e28;
+    --ft-sidebar-bg-end: #182420;
     --ft-sidebar-text: #c8d4da;
     --ft-sidebar-text-active: #ffffff;
     --ft-sidebar-active-bg: rgba(255, 255, 255, 0.15);
@@ -53,9 +53,9 @@
     --ft-modal-bg: #ffffff;
     --ft-modal-shadow: rgba(0, 0, 0, 0.3);
     --ft-modal-backdrop: rgba(0, 0, 0, 0.4);
-    --ft-modal-btn-bg: #2d7a6f;
-    --ft-modal-btn-hover: #246660;
-    --ft-modal-spinner: #2d7a6f;
+    --ft-modal-btn-bg: #5a7a6a;
+    --ft-modal-btn-hover: #4d6b5c;
+    --ft-modal-spinner: #5a7a6a;
 
     /* --- Checkbox --- */
     --ft-checkbox-border: #929292;
