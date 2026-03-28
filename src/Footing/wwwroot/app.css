@@ -10,6 +10,7 @@
     --ft-primary-border: #436051;
     --ft-accent: #b89e78;
     --ft-accent-hover: #a88e68;
+    --ft-accent-text: #3a2e1e;
 
     /* --- Monetary --- */
     --ft-amount-positive: #5a7a6a;
@@ -69,6 +70,7 @@
     --ft-primary-border: #6b9680;
     --ft-accent: #d4b88a;
     --ft-accent-hover: #e0c89a;
+    --ft-accent-text: #2e2418;
 
     /* --- Monetary --- */
     --ft-amount-positive: #7da893;
@@ -129,6 +131,7 @@
         --ft-primary-border: #6b9680;
         --ft-accent: #d4b88a;
         --ft-accent-hover: #e0c89a;
+        --ft-accent-text: #2e2418;
 
         /* --- Monetary --- */
         --ft-amount-positive: #7da893;
@@ -228,7 +231,7 @@ a:hover, .btn-link:hover {
 }
 
 .btn-accent {
-    color: #fff;
+    color: var(--ft-accent-text);
     background-color: var(--ft-accent);
     border-color: var(--ft-accent-hover);
 }
@@ -249,7 +252,7 @@ a:hover, .btn-link:hover {
 }
 
 .btn-outline-accent:hover {
-    color: #fff;
+    color: var(--ft-accent-text);
     background-color: var(--ft-accent);
     border-color: var(--ft-accent);
 }
