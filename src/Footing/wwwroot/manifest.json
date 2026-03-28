@@ -1,0 +1,22 @@
+{
+  "name": "Footing by Riverbed",
+  "short_name": "Footing",
+  "description": "Privacy-first personal finance tracker",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f6f2ec",
+  "theme_color": "#5a7a6a",
+  "icons": [
+    {
+      "src": "apple-touch-icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "favicon.png",
+      "sizes": "32x32",
+      "type": "image/png"
+    }
+  ]
+}
