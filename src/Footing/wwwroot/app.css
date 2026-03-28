@@ -64,30 +64,30 @@
 /* Dark mode: explicit data-theme attribute takes priority */
 [data-theme="dark"] {
     /* --- Brand --- */
-    --ft-primary: #3a9e90;
-    --ft-primary-hover: #4db3a5;
-    --ft-primary-border: #2d7a6f;
-    --ft-accent: #d4a84e;
-    --ft-accent-hover: #e0b95f;
+    --ft-primary: #7da893;
+    --ft-primary-hover: #8fb8a2;
+    --ft-primary-border: #6b9680;
+    --ft-accent: #d4b88a;
+    --ft-accent-hover: #e0c89a;
 
     /* --- Monetary --- */
-    --ft-amount-positive: #3a9e90;
+    --ft-amount-positive: #7da893;
     --ft-amount-negative: #e06050;
 
     /* --- Text --- */
-    --ft-text: #e0ddd8;
-    --ft-text-muted: #9a9a9a;
+    --ft-text: #e2ded6;
+    --ft-text-muted: #9a9690;
 
     /* --- Backgrounds --- */
-    --ft-bg: #1a1a2e;
-    --ft-bg-surface: #252538;
-    --ft-bg-topbar: #222236;
-    --ft-bg-topbar-border: #333348;
+    --ft-bg: #1c2420;
+    --ft-bg-surface: #252e2a;
+    --ft-bg-topbar: #222b26;
+    --ft-bg-topbar-border: #333d37;
 
     /* --- Sidebar --- */
-    --ft-sidebar-bg: #111822;
-    --ft-sidebar-bg-end: #0d1218;
-    --ft-sidebar-text: #9ab0be;
+    --ft-sidebar-bg: #161e1a;
+    --ft-sidebar-bg-end: #111916;
+    --ft-sidebar-text: #a8b8aa;
     --ft-sidebar-text-active: #ffffff;
     --ft-sidebar-active-bg: rgba(255, 255, 255, 0.12);
     --ft-sidebar-hover-bg: rgba(255, 255, 255, 0.06);
@@ -106,48 +106,48 @@
     /* --- Error UI --- */
     --ft-error-bg: #a02020;
     --ft-error-text: #ffffff;
-    --ft-error-ui-bg: #2a2820;
+    --ft-error-ui-bg: #2a2520;
 
     /* --- Reconnect modal --- */
-    --ft-modal-bg: #252538;
+    --ft-modal-bg: #252e2a;
     --ft-modal-shadow: rgba(0, 0, 0, 0.5);
     --ft-modal-backdrop: rgba(0, 0, 0, 0.6);
-    --ft-modal-btn-bg: #3a9e90;
-    --ft-modal-btn-hover: #4db3a5;
-    --ft-modal-spinner: #3a9e90;
+    --ft-modal-btn-bg: #7da893;
+    --ft-modal-btn-hover: #8fb8a2;
+    --ft-modal-spinner: #7da893;
 
     /* --- Checkbox --- */
-    --ft-checkbox-border: #6a6a6a;
+    --ft-checkbox-border: #6a6a66;
 }
 
 /* Fallback: apply dark mode when no explicit theme is set and OS prefers dark */
 @media (prefers-color-scheme: dark) {
     :root:not([data-theme]) {
         /* --- Brand --- */
-        --ft-primary: #3a9e90;
-        --ft-primary-hover: #4db3a5;
-        --ft-primary-border: #2d7a6f;
-        --ft-accent: #d4a84e;
-        --ft-accent-hover: #e0b95f;
+        --ft-primary: #7da893;
+        --ft-primary-hover: #8fb8a2;
+        --ft-primary-border: #6b9680;
+        --ft-accent: #d4b88a;
+        --ft-accent-hover: #e0c89a;
 
         /* --- Monetary --- */
-        --ft-amount-positive: #3a9e90;
+        --ft-amount-positive: #7da893;
         --ft-amount-negative: #e06050;
 
         /* --- Text --- */
-        --ft-text: #e0ddd8;
-        --ft-text-muted: #9a9a9a;
+        --ft-text: #e2ded6;
+        --ft-text-muted: #9a9690;
 
         /* --- Backgrounds --- */
-        --ft-bg: #1a1a2e;
-        --ft-bg-surface: #252538;
-        --ft-bg-topbar: #222236;
-        --ft-bg-topbar-border: #333348;
+        --ft-bg: #1c2420;
+        --ft-bg-surface: #252e2a;
+        --ft-bg-topbar: #222b26;
+        --ft-bg-topbar-border: #333d37;
 
         /* --- Sidebar --- */
-        --ft-sidebar-bg: #111822;
-        --ft-sidebar-bg-end: #0d1218;
-        --ft-sidebar-text: #9ab0be;
+        --ft-sidebar-bg: #161e1a;
+        --ft-sidebar-bg-end: #111916;
+        --ft-sidebar-text: #a8b8aa;
         --ft-sidebar-text-active: #ffffff;
         --ft-sidebar-active-bg: rgba(255, 255, 255, 0.12);
         --ft-sidebar-hover-bg: rgba(255, 255, 255, 0.06);
@@ -166,18 +166,18 @@
         /* --- Error UI --- */
         --ft-error-bg: #a02020;
         --ft-error-text: #ffffff;
-        --ft-error-ui-bg: #2a2820;
+        --ft-error-ui-bg: #2a2520;
 
         /* --- Reconnect modal --- */
-        --ft-modal-bg: #252538;
+        --ft-modal-bg: #252e2a;
         --ft-modal-shadow: rgba(0, 0, 0, 0.5);
         --ft-modal-backdrop: rgba(0, 0, 0, 0.6);
-        --ft-modal-btn-bg: #3a9e90;
-        --ft-modal-btn-hover: #4db3a5;
-        --ft-modal-spinner: #3a9e90;
+        --ft-modal-btn-bg: #7da893;
+        --ft-modal-btn-hover: #8fb8a2;
+        --ft-modal-spinner: #7da893;
 
         /* --- Checkbox --- */
-        --ft-checkbox-border: #6a6a6a;
+        --ft-checkbox-border: #6a6a66;
     }
 }
 
