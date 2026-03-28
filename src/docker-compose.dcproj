@@ -6,7 +6,7 @@
     <ProjectGuid>{DC8CB009-BA60-4D83-A120-BFE663F53050}</ProjectGuid>
     <DockerLaunchBrowser>True</DockerLaunchBrowser>
     <DockerServiceUrl>{Scheme}://localhost:{ServicePort}</DockerServiceUrl>
-    <DockerServiceName>remeter.portal.server</DockerServiceName>
+    <DockerServiceName>footing</DockerServiceName>
   </PropertyGroup>
   <ItemGroup>
     <None Include="docker-compose.override.yml">
