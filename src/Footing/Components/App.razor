@@ -28,6 +28,23 @@
             }
         })();
     </script>
+    <script>
+        // Mutation observer catches enhanced navigation resetting data-theme.
+        // Blazor's DOM patching may strip the attribute before enhancedload fires,
+        // so this provides immediate re-application with no visible flash.
+        (function () {
+            var _applying = false;
+            new MutationObserver(function () {
+                if (_applying) return;
+                var saved = localStorage.getItem('ft-theme');
+                if (saved && document.documentElement.getAttribute('data-theme') !== saved) {
+                    _applying = true;
+                    document.documentElement.setAttribute('data-theme', saved);
+                    _applying = false;
+                }
+            }).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+        })();
+    </script>
 </head>
 
 <body>
@@ -36,6 +53,11 @@
     <script src="@Assets["lib/bootstrap/dist/js/bootstrap.bundle.min.js"]"></script>
     <script src="@Assets["js/footing.js"]"></script>
     <script src="@Assets["_framework/blazor.web.js"]"></script>
+    <script>
+        Blazor.addEventListener('enhancedload', function () {
+            Footing.applyTheme();
+        });
+    </script>
 </body>
 
 </html>

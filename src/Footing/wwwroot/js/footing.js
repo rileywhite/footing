@@ -1,4 +1,11 @@
 window.Footing = {
+    applyTheme: function () {
+        var saved = localStorage.getItem('ft-theme');
+        if (saved === 'dark' || saved === 'light') {
+            document.documentElement.setAttribute('data-theme', saved);
+        }
+    },
+
     initializePopovers: function () {
         var isTouchDevice = ("ontouchstart" in window) || window.DocumentTouch && document instanceof DocumentTouch;
         document.querySelectorAll('[data-bs-toggle="popover"]').forEach(function (el) {
