@@ -186,7 +186,7 @@
    ============================================================ */
 
 html, body {
-    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-family: 'Rubik', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
     height: 100%;
     color: var(--ft-text);
     background-color: var(--ft-bg);
