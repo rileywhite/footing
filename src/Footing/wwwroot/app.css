@@ -227,6 +227,33 @@ a:hover, .btn-link:hover {
     border-color: var(--ft-primary);
 }
 
+.btn-accent {
+    color: #fff;
+    background-color: var(--ft-accent);
+    border-color: var(--ft-accent-hover);
+}
+
+.btn-accent:hover {
+    background-color: var(--ft-accent-hover);
+    border-color: var(--ft-accent-hover);
+}
+
+.btn-accent:active, .btn-accent:focus-visible {
+    background-color: var(--ft-accent-hover);
+    border-color: var(--ft-accent-hover);
+}
+
+.btn-outline-accent {
+    color: var(--ft-accent);
+    border-color: var(--ft-accent);
+}
+
+.btn-outline-accent:hover {
+    color: #fff;
+    background-color: var(--ft-accent);
+    border-color: var(--ft-accent);
+}
+
 .btn-accordian-header:focus {
     outline: none;
     box-shadow: none;
@@ -499,7 +526,7 @@ h1:focus {
     font-size: 1.2rem;
     font-weight: 600;
     margin-bottom: 0.75rem;
-    color: var(--ft-text);
+    color: var(--ft-primary);
 }
 
 .ft-card p {
@@ -542,7 +569,7 @@ h1:focus {
 }
 
 .ft-prose p em {
-    color: var(--ft-text);
+    color: var(--ft-accent);
     font-style: italic;
 }
 
@@ -598,6 +625,18 @@ h1:focus {
     padding: 0.6rem 2rem;
     font-size: 0.95rem;
     border-radius: 0.5rem;
+}
+
+/* ============================================================
+   Accent Highlights — Inline Help & Secondary Links
+   ============================================================ */
+
+.text-info {
+    color: var(--ft-accent) !important;
+}
+
+a.text-info:hover {
+    color: var(--ft-accent-hover) !important;
 }
 
 /* ============================================================
