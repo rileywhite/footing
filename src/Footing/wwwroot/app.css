@@ -60,6 +60,39 @@
 
     /* --- Checkbox --- */
     --ft-checkbox-border: #929292;
+
+    /* --- Typography Scale --- */
+    --ft-text-xs: 0.75rem;
+    --ft-text-sm: 0.875rem;
+    --ft-text-base: 1rem;
+    --ft-text-lg: 1.125rem;
+    --ft-text-xl: 1.25rem;
+    --ft-text-2xl: 1.5rem;
+    --ft-text-3xl: 2rem;
+
+    /* --- Font Weights (Rubik) --- */
+    --ft-weight-body: 400;
+    --ft-weight-label: 500;
+    --ft-weight-heading: 600;
+    --ft-weight-title: 700;
+
+    /* --- Spacing --- */
+    --ft-space-xs: 0.25rem;
+    --ft-space-sm: 0.5rem;
+    --ft-space-md: 1rem;
+    --ft-space-lg: 1.5rem;
+    --ft-space-xl: 2rem;
+    --ft-space-2xl: 3rem;
+    --ft-space-3xl: 4rem;
+
+    /* --- Border Radius --- */
+    --ft-radius-sm: 0.25rem;
+    --ft-radius-md: 0.5rem;
+    --ft-radius-lg: 0.75rem;
+
+    /* --- Shadows --- */
+    --ft-shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.08);
+    --ft-shadow-md: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
 /* Dark mode: explicit data-theme attribute takes priority */
@@ -120,6 +153,10 @@
 
     /* --- Checkbox --- */
     --ft-checkbox-border: #6a6a66;
+
+    /* --- Shadows (darker for dark backgrounds) --- */
+    --ft-shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.2);
+    --ft-shadow-md: 0 4px 12px rgba(0, 0, 0, 0.3);
 }
 
 /* Fallback: apply dark mode when no explicit theme is set and OS prefers dark */
@@ -181,6 +218,10 @@
 
         /* --- Checkbox --- */
         --ft-checkbox-border: #6a6a66;
+
+        /* --- Shadows (darker for dark backgrounds) --- */
+        --ft-shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.2);
+        --ft-shadow-md: 0 4px 12px rgba(0, 0, 0, 0.3);
     }
 }
 
@@ -190,6 +231,8 @@
 
 html, body {
     font-family: 'Rubik', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    font-weight: var(--ft-weight-body);
+    font-size: var(--ft-text-base);
     height: 100%;
     color: var(--ft-text);
     background-color: var(--ft-bg);
@@ -268,7 +311,7 @@ a:hover, .btn-link:hover {
 }
 
 .content {
-    padding-top: 1.1rem;
+    padding-top: var(--ft-space-md);
 }
 
 h1:focus {
@@ -380,13 +423,13 @@ h1:focus {
 }
 
 #moneyFlows .card:first-child {
-    border-top-left-radius: 0.5rem;
-    border-top-right-radius: 0.5rem;
+    border-top-left-radius: var(--ft-radius-md);
+    border-top-right-radius: var(--ft-radius-md);
 }
 
 #moneyFlows .card:last-child {
-    border-bottom-left-radius: 0.5rem;
-    border-bottom-right-radius: 0.5rem;
+    border-bottom-left-radius: var(--ft-radius-md);
+    border-bottom-right-radius: var(--ft-radius-md);
     border-bottom: 1px solid var(--ft-bg-topbar-border);
 }
 
@@ -395,18 +438,18 @@ h1:focus {
 }
 
 #moneyFlows .card-header .btn-link {
-    font-weight: 600;
-    font-size: 0.95rem;
-    padding: 0.25rem 0;
+    font-weight: var(--ft-weight-heading);
+    font-size: var(--ft-text-sm);
+    padding: var(--ft-space-xs) 0;
     width: 100%;
     text-align: left;
     display: flex;
     align-items: center;
-    gap: 0.5rem;
+    gap: var(--ft-space-sm);
 }
 
 #moneyFlows .card-body {
-    padding: 1.25rem;
+    padding: var(--ft-space-md) var(--ft-space-lg);
 }
 
 /* ============================================================
@@ -416,42 +459,42 @@ h1:focus {
 #moneyFlows dl {
     display: grid;
     grid-template-columns: auto 1fr;
-    gap: 0.5rem 1rem;
+    gap: var(--ft-space-sm) var(--ft-space-md);
     align-items: center;
-    margin-bottom: 1rem;
+    margin-bottom: var(--ft-space-md);
 }
 
 #moneyFlows dt {
-    font-weight: 500;
+    font-weight: var(--ft-weight-label);
     color: var(--ft-text-muted);
-    font-size: 0.9rem;
+    font-size: var(--ft-text-sm);
 }
 
 #moneyFlows dd {
     margin-bottom: 0;
     display: flex;
     align-items: center;
-    gap: 0.5rem;
+    gap: var(--ft-space-sm);
     flex-wrap: wrap;
 }
 
 #moneyFlows dd input[type="number"],
 #moneyFlows dd input[type="text"] {
-    padding: 0.375rem 0.75rem;
+    padding: var(--ft-space-xs) var(--ft-space-sm);
     border: 1px solid var(--ft-bg-topbar-border);
-    border-radius: 0.375rem;
+    border-radius: var(--ft-radius-sm);
     background-color: var(--ft-bg-surface);
     color: var(--ft-text);
-    font-size: 0.9rem;
+    font-size: var(--ft-text-sm);
 }
 
 #moneyFlows dd select {
-    padding: 0.375rem 0.75rem;
+    padding: var(--ft-space-xs) var(--ft-space-sm);
     border: 1px solid var(--ft-bg-topbar-border);
-    border-radius: 0.375rem;
+    border-radius: var(--ft-radius-sm);
     background-color: var(--ft-bg-surface);
     color: var(--ft-text);
-    font-size: 0.9rem;
+    font-size: var(--ft-text-sm);
 }
 
 /* ============================================================
@@ -476,28 +519,28 @@ h1:focus {
 
 .ft-hero {
     text-align: center;
-    padding: 3rem 1rem 2rem;
+    padding: var(--ft-space-2xl) var(--ft-space-md) var(--ft-space-xl);
 }
 
 .ft-hero h1 {
-    font-size: 2.25rem;
-    font-weight: 700;
+    font-size: var(--ft-text-3xl);
+    font-weight: var(--ft-weight-title);
     color: var(--ft-text);
-    margin-bottom: 0.75rem;
+    margin-bottom: var(--ft-space-sm);
 }
 
 .ft-hero .ft-tagline {
-    font-size: 1.15rem;
+    font-size: var(--ft-text-lg);
     color: var(--ft-text-muted);
     max-width: 32rem;
-    margin: 0 auto 2rem;
+    margin: 0 auto var(--ft-space-xl);
     line-height: 1.6;
 }
 
 .ft-cards {
     display: grid;
     grid-template-columns: 1fr;
-    gap: 1.5rem;
+    gap: var(--ft-space-lg);
     max-width: 48rem;
     margin: 0 auto;
 }
@@ -511,42 +554,38 @@ h1:focus {
 .ft-card {
     background-color: var(--ft-bg-surface);
     border: 1px solid var(--ft-bg-topbar-border);
-    border-radius: 0.75rem;
-    padding: 1.75rem;
+    border-radius: var(--ft-radius-lg);
+    padding: var(--ft-space-lg) var(--ft-space-lg);
     transition: box-shadow 0.2s, border-color 0.2s;
 }
 
 .ft-card:hover {
     border-color: var(--ft-primary);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-}
-
-[data-theme="dark"] .ft-card:hover {
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    box-shadow: var(--ft-shadow-md);
 }
 
 .ft-card h3 {
-    font-size: 1.2rem;
-    font-weight: 600;
-    margin-bottom: 0.75rem;
+    font-size: var(--ft-text-xl);
+    font-weight: var(--ft-weight-heading);
+    margin-bottom: var(--ft-space-sm);
     color: var(--ft-primary);
 }
 
 .ft-card p {
     color: var(--ft-text-muted);
-    font-size: 0.95rem;
+    font-size: var(--ft-text-sm);
     line-height: 1.6;
-    margin-bottom: 1rem;
+    margin-bottom: var(--ft-space-md);
 }
 
 .ft-card p:last-of-type {
-    margin-bottom: 1.25rem;
+    margin-bottom: var(--ft-space-lg);
 }
 
 .ft-card .btn {
-    font-size: 0.9rem;
-    padding: 0.5rem 1.25rem;
-    border-radius: 0.375rem;
+    font-size: var(--ft-text-sm);
+    padding: var(--ft-space-sm) var(--ft-space-lg);
+    border-radius: var(--ft-radius-sm);
 }
 
 /* ============================================================
@@ -558,17 +597,17 @@ h1:focus {
 }
 
 .ft-prose h2 {
-    font-size: 1.75rem;
-    font-weight: 700;
-    margin-bottom: 1.5rem;
+    font-size: var(--ft-text-2xl);
+    font-weight: var(--ft-weight-title);
+    margin-bottom: var(--ft-space-lg);
     color: var(--ft-text);
 }
 
 .ft-prose p {
-    font-size: 1.05rem;
+    font-size: var(--ft-text-base);
     line-height: 1.8;
     color: var(--ft-text-muted);
-    margin-bottom: 1rem;
+    margin-bottom: var(--ft-space-md);
 }
 
 .ft-prose p em {
@@ -577,7 +616,7 @@ h1:focus {
 }
 
 .ft-prose .btn {
-    margin-top: 0.5rem;
+    margin-top: var(--ft-space-sm);
 }
 
 /* ============================================================
@@ -585,19 +624,19 @@ h1:focus {
    ============================================================ */
 
 .ft-page-header {
-    margin-bottom: 1.5rem;
+    margin-bottom: var(--ft-space-lg);
 }
 
 .ft-page-header h1 {
-    font-size: 1.75rem;
-    font-weight: 700;
+    font-size: var(--ft-text-2xl);
+    font-weight: var(--ft-weight-title);
     color: var(--ft-text);
-    margin-bottom: 0.25rem;
+    margin-bottom: var(--ft-space-xs);
 }
 
 .ft-page-header p {
     color: var(--ft-text-muted);
-    font-size: 0.95rem;
+    font-size: var(--ft-text-sm);
     margin: 0;
 }
 
@@ -620,14 +659,14 @@ h1:focus {
    ============================================================ */
 
 .ft-export {
-    padding: 1rem 0;
+    padding: var(--ft-space-md) 0;
     text-align: center;
 }
 
 .ft-export .btn {
-    padding: 0.6rem 2rem;
-    font-size: 0.95rem;
-    border-radius: 0.5rem;
+    padding: var(--ft-space-sm) var(--ft-space-xl);
+    font-size: var(--ft-text-sm);
+    border-radius: var(--ft-radius-md);
 }
 
 /* ============================================================
@@ -649,10 +688,10 @@ a.text-info:hover {
 .theme-toggle {
     background: none;
     border: 1px solid var(--ft-bg-topbar-border);
-    border-radius: 6px;
+    border-radius: var(--ft-radius-sm);
     cursor: pointer;
-    padding: 0.25rem 0.5rem;
-    font-size: 1.15rem;
+    padding: var(--ft-space-xs) var(--ft-space-sm);
+    font-size: var(--ft-text-lg);
     line-height: 1;
     color: var(--ft-text);
     display: flex;
