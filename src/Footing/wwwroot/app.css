@@ -723,6 +723,80 @@ h1:focus {
    Accent Highlights — Inline Help & Secondary Links
    ============================================================ */
 
+/* ============================================================
+   Conversational Progressive Flow (First-Time Users)
+   ============================================================ */
+
+.ft-conversational {
+    max-width: 42rem;
+}
+
+.ft-privacy-inline {
+    font-size: var(--ft-text-sm);
+    color: var(--ft-text-muted);
+    margin-bottom: var(--ft-space-lg);
+    padding: var(--ft-space-sm) var(--ft-space-md);
+    border-left: 3px solid var(--ft-bg-topbar-border);
+}
+
+.ft-section-card {
+    margin-bottom: var(--ft-space-xs);
+    border-radius: var(--ft-radius-md) !important;
+    border-bottom: 1px solid var(--ft-bg-topbar-border) !important;
+}
+
+.ft-conversational > .ft-section-card + div {
+    background-color: var(--ft-bg-surface);
+    border: 1px solid var(--ft-bg-topbar-border);
+    border-top: 0;
+    border-radius: 0 0 var(--ft-radius-md) var(--ft-radius-md);
+    margin-bottom: var(--ft-space-lg);
+}
+
+.ft-conversational > .ft-section-card + div > .card-body {
+    padding: var(--ft-space-md) var(--ft-space-lg);
+}
+
+.ft-guiding-sentence {
+    font-size: var(--ft-text-lg);
+    font-weight: var(--ft-weight-label);
+    color: var(--ft-text);
+    margin-bottom: var(--ft-space-md);
+    line-height: 1.5;
+}
+
+.ft-entries-compact {
+    margin-top: var(--ft-space-md);
+    font-size: var(--ft-text-sm);
+}
+
+.ft-entries-compact td {
+    padding: var(--ft-space-xs) var(--ft-space-sm);
+}
+
+.ft-skip-link {
+    margin-top: var(--ft-space-sm);
+    text-align: right;
+}
+
+.ft-skip-link a {
+    font-size: var(--ft-text-sm);
+    color: var(--ft-text-muted);
+    text-decoration: none;
+}
+
+.ft-skip-link a:hover {
+    color: var(--ft-primary);
+    text-decoration: underline;
+}
+
+/* Net total in conversational mode */
+.ft-conversational .ft-net-total {
+    margin-top: var(--ft-space-md);
+    border-radius: var(--ft-radius-md) !important;
+    border-bottom: 1px solid var(--ft-bg-topbar-border) !important;
+}
+
 .text-info {
     color: var(--ft-accent) !important;
 }

@@ -1,51 +1,122 @@
 @using Footing.Client.ViewModels
 
-<div class="card">
-    <div id="@(Name)Heading" class="card-header">
-        <h5 class="mb-0">
-            <button class="button btn btn-link btn-accordian-header" type="button" data-bs-toggle="collapse" data-bs-target="#@(Name)Details" aria-expanded="true" aria-controls="@(Name)Details">
-                @Label <MonetaryAmountDisplay Amount="this.MoneyFlows.WeeklyTotalMoneyFlow" /> / Week
-            </button>
-        </h5>
+@if (IsVisible)
+{
+    <div class="card @(GuidingSentence != null ? "ft-section-card" : "")">
+        <div id="@(Name)Heading" class="card-header">
+            <h5 class="mb-0">
+                @if (GuidingSentence != null)
+                {
+                    <button class="button btn btn-link btn-accordian-header" type="button" @onclick="ToggleOpen">
+                        @Label <MonetaryAmountDisplay Amount="this.MoneyFlows.WeeklyTotalMoneyFlow" /> / Week
+                    </button>
+                }
+                else
+                {
+                    <button class="button btn btn-link btn-accordian-header" type="button" data-bs-toggle="collapse" data-bs-target="#@(Name)Details" aria-expanded="true" aria-controls="@(Name)Details">
+                        @Label <MonetaryAmountDisplay Amount="this.MoneyFlows.WeeklyTotalMoneyFlow" /> / Week
+                    </button>
+                }
+            </h5>
+        </div>
     </div>
-</div>
-<div id="@(Name)Details" class="collapse" aria-labelledby="@(Name)Heading" data-bs-parent="#moneyFlows">
-    <div class="card-body">
-        <table class="table">
-            @foreach (var moneyFlow in this.MoneyFlows)
-            {
-                <tr>
-                    <td>@moneyFlow.Name</td>
-                    <td><MonetaryAmountDisplay Amount="@moneyFlow.Amount" /> @moneyFlow.Period</td>
-                    <td><span class="bi bi-x" role="button" @onclick="@(e => this.RemoveMoneyFlow(moneyFlow.Id))"></span></td>
-                </tr>
-            }
-        </table>
-        <EditForm Model="@Model" OnValidSubmit="AddMoneyFlow">
-            <DataAnnotationsValidator />
-            <dl>
-                <dt>
-                    @((MarkupString)FormPrompt)
-                </dt>
-                <dd>
-                    $<InputNumber size="10" placeholder="xxx.xx" @bind-Value="Model.Amount" />
-                    <InputSelect @bind-Value="Model.Period">
-                        <option value="">how often?</option>
-                        @foreach (Period period in Enum.GetValues(typeof(Period)))
-                        {
-                            <option value="@period">@GetPeriodDescription(period)</option>
-                        }
-                    </InputSelect>
-                </dd>
-                <dt>@FormAmountDescriptionConnectorWord</dt>
-                <dd><InputText size="30" placeholder="@($"{Label} Description")" @bind-Value="Model.Name" /></dd>
-            </dl>
+    @if (GuidingSentence != null)
+    {
+        @if (_isOpen)
+        {
+            <div id="@(Name)Details" aria-labelledby="@(Name)Heading">
+                <div class="card-body">
+                    <p class="ft-guiding-sentence">@GuidingSentence</p>
 
-            <button type="submit" class="btn btn-primary">Add</button>
-            <ValidationSummary />
-        </EditForm>
-    </div>
-</div>
+                    <EditForm Model="@Model" OnValidSubmit="AddMoneyFlow">
+                        <DataAnnotationsValidator />
+                        <dl>
+                            <dt>
+                                @((MarkupString)FormPrompt)
+                            </dt>
+                            <dd>
+                                $<InputNumber size="10" placeholder="xxx.xx" @bind-Value="Model.Amount" />
+                                <InputSelect @bind-Value="Model.Period">
+                                    <option value="">how often?</option>
+                                    @foreach (Period period in Enum.GetValues(typeof(Period)))
+                                    {
+                                        <option value="@period">@GetPeriodDescription(period)</option>
+                                    }
+                                </InputSelect>
+                            </dd>
+                            <dt>@FormAmountDescriptionConnectorWord</dt>
+                            <dd><InputText size="30" placeholder="@($"{Label} Description")" @bind-Value="Model.Name" /></dd>
+                        </dl>
+
+                        <button type="submit" class="btn btn-primary">Add</button>
+                        <ValidationSummary />
+                    </EditForm>
+
+                    @if (this.MoneyFlows.Count > 0)
+                    {
+                        <table class="table ft-entries-compact">
+                            @foreach (var moneyFlow in this.MoneyFlows)
+                            {
+                                <tr>
+                                    <td>@moneyFlow.Name</td>
+                                    <td><MonetaryAmountDisplay Amount="@moneyFlow.Amount" /> @moneyFlow.Period</td>
+                                    <td><span class="bi bi-x" role="button" @onclick="@(e => this.RemoveMoneyFlow(moneyFlow.Id))"></span></td>
+                                </tr>
+                            }
+                        </table>
+                    }
+
+                    @if (OnFirstEntryAdded.HasDelegate)
+                    {
+                        <div class="ft-skip-link">
+                            <a href="" @onclick="SkipSection" @onclick:preventDefault>Skip, move on</a>
+                        </div>
+                    }
+                </div>
+            </div>
+        }
+    }
+    else
+    {
+        <div id="@(Name)Details" class="collapse" aria-labelledby="@(Name)Heading" data-bs-parent="#moneyFlows">
+            <div class="card-body">
+                <table class="table">
+                    @foreach (var moneyFlow in this.MoneyFlows)
+                    {
+                        <tr>
+                            <td>@moneyFlow.Name</td>
+                            <td><MonetaryAmountDisplay Amount="@moneyFlow.Amount" /> @moneyFlow.Period</td>
+                            <td><span class="bi bi-x" role="button" @onclick="@(e => this.RemoveMoneyFlow(moneyFlow.Id))"></span></td>
+                        </tr>
+                    }
+                </table>
+                <EditForm Model="@Model" OnValidSubmit="AddMoneyFlow">
+                    <DataAnnotationsValidator />
+                    <dl>
+                        <dt>
+                            @((MarkupString)FormPrompt)
+                        </dt>
+                        <dd>
+                            $<InputNumber size="10" placeholder="xxx.xx" @bind-Value="Model.Amount" />
+                            <InputSelect @bind-Value="Model.Period">
+                                <option value="">how often?</option>
+                                @foreach (Period period in Enum.GetValues(typeof(Period)))
+                                {
+                                    <option value="@period">@GetPeriodDescription(period)</option>
+                                }
+                            </InputSelect>
+                        </dd>
+                        <dt>@FormAmountDescriptionConnectorWord</dt>
+                        <dd><InputText size="30" placeholder="@($"{Label} Description")" @bind-Value="Model.Name" /></dd>
+                    </dl>
+
+                    <button type="submit" class="btn btn-primary">Add</button>
+                    <ValidationSummary />
+                </EditForm>
+            </div>
+        </div>
+    }
+}
 
 @code{
     [Parameter]
@@ -66,7 +137,37 @@
     [Parameter]
     public string FormAmountDescriptionConnectorWord { get; set; } = null!;
 
+    [Parameter]
+    public string? GuidingSentence { get; set; }
+
+    [Parameter]
+    public bool IsOpen { get; set; }
+
+    [Parameter]
+    public bool IsVisible { get; set; } = true;
+
+    [Parameter]
+    public EventCallback OnFirstEntryAdded { get; set; }
+
+    private bool _isOpen;
+    private bool _hasNotifiedFirstEntry;
+    private bool _initialized;
+
     private NewMoneyFlowModel Model { get; set; } = new NewMoneyFlowModel();
+
+    protected override void OnParametersSet()
+    {
+        if (GuidingSentence != null && !_initialized)
+        {
+            _isOpen = IsOpen;
+            if (IsOpen) _initialized = true;
+        }
+    }
+
+    private void ToggleOpen()
+    {
+        _isOpen = !_isOpen;
+    }
 
     private async Task AddMoneyFlow()
     {
@@ -79,6 +180,12 @@
             });
         this.Model = new NewMoneyFlowModel();
         await this.MoneyFlowsChanged.InvokeAsync(this.MoneyFlows);
+
+        if (!_hasNotifiedFirstEntry && OnFirstEntryAdded.HasDelegate)
+        {
+            _hasNotifiedFirstEntry = true;
+            await OnFirstEntryAdded.InvokeAsync();
+        }
     }
 
     private async Task RemoveMoneyFlow(Guid id)
@@ -86,6 +193,15 @@
         var moneyFlow = this.MoneyFlows.First(mf => mf.Id == id);
         this.MoneyFlows.Remove(moneyFlow);
         await this.MoneyFlowsChanged.InvokeAsync(this.MoneyFlows);
+    }
+
+    private async Task SkipSection()
+    {
+        if (OnFirstEntryAdded.HasDelegate)
+        {
+            _hasNotifiedFirstEntry = true;
+            await OnFirstEntryAdded.InvokeAsync();
+        }
     }
 
     private string GetPeriodDescription(Period period) => period switch
