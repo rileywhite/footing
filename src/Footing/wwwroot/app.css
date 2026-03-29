@@ -589,6 +589,30 @@ h1:focus {
 }
 
 /* ============================================================
+   Landing Page Footer
+   ============================================================ */
+
+.ft-landing-footer {
+    display: flex;
+    justify-content: center;
+    gap: 1.5rem;
+    padding: 2rem 0;
+    margin-top: 2rem;
+    border-top: 1px solid var(--ft-bg-topbar-border);
+}
+
+.ft-landing-footer a {
+    font-size: 0.85rem;
+    color: var(--ft-text-muted);
+    text-decoration: none;
+    transition: color 0.15s;
+}
+
+.ft-landing-footer a:hover {
+    color: var(--ft-primary);
+}
+
+/* ============================================================
    Control Your Money Page — Improved Layout
    ============================================================ */
 

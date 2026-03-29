@@ -36,18 +36,6 @@ public class HomePageTests
     }
 
     [SkippableFact]
-    public async Task HomePage_HasControlYourMoneyLink()
-    {
-        SkipIfUnavailable();
-        var page = await _fixture.Browser.NewPageAsync();
-        await page.GotoAsync(_fixture.BaseUrl);
-        var links = page.Locator("a[href='control-your-money']");
-        await links.First.WaitForAsync();
-        (await links.CountAsync()).Should().BeGreaterThan(0);
-        await page.CloseAsync();
-    }
-
-    [SkippableFact]
     public async Task HomePage_NavigatesToFindMyFooting()
     {
         SkipIfUnavailable();

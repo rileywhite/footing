@@ -1,29 +1,12 @@
-<div class="top-row ps-3 navbar navbar-dark">
-    <div class="container-fluid">
-        <a class="navbar-brand" href="">Footing</a>
+<nav class="site-nav">
+    <a class="site-wordmark" href="">Footing</a>
+    <div class="site-nav-actions">
+        <NavLink class="site-nav-link" href="find-my-footing">
+            Find My Footing
+        </NavLink>
+        <button class="theme-toggle" onclick="Footing.toggleTheme()" title="Toggle dark mode" aria-label="Toggle dark mode">
+            <span class="icon-sun" aria-hidden="true">&#x2600;&#xFE0F;</span>
+            <span class="icon-moon" aria-hidden="true">&#x1F319;</span>
+        </button>
     </div>
-</div>
-
-<input type="checkbox" title="Navigation menu" class="navbar-toggler" />
-
-<div class="nav-scrollable" onclick="document.querySelector('.navbar-toggler').click()">
-    <nav class="nav flex-column">
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
-                <span class="bi bi-house-door-fill-nav-menu" aria-hidden="true"></span> Home
-            </NavLink>
-        </div>
-
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="find-my-footing">
-                <span class="bi bi-currency-dollar-nav-menu" aria-hidden="true"></span> Find My Footing
-            </NavLink>
-        </div>
-
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="control-your-money">
-                <span class="bi bi-arrow-left-right-nav-menu" aria-hidden="true"></span> Control Your Money
-            </NavLink>
-        </div>
-    </nav>
-</div>
+</nav>
