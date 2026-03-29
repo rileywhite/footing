@@ -14,4 +14,11 @@ public class FootingAnalysis
         HouseholdBudgets.WeeklyTotalMoneyFlow -
         PersonalBudgets.WeeklyTotalMoneyFlow -
         EventBudgets.WeeklyTotalMoneyFlow;
+
+    public bool HasAnyEntries =>
+        Inflows.Count > 0 ||
+        RecurringBills.Count > 0 ||
+        HouseholdBudgets.Count > 0 ||
+        PersonalBudgets.Count > 0 ||
+        EventBudgets.Count > 0;
 }

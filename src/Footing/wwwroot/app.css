@@ -797,6 +797,52 @@ h1:focus {
     border-bottom: 1px solid var(--ft-bg-topbar-border) !important;
 }
 
+/* ============================================================
+   Compact Summary View (Returning Users)
+   ============================================================ */
+
+.ft-compact-summary {
+    max-width: 42rem;
+}
+
+.ft-compact-summary .ft-section-card {
+    margin-bottom: 0;
+    border-radius: 0 !important;
+    border-bottom: 0 !important;
+}
+
+.ft-compact-summary .ft-section-card:first-of-type {
+    border-top-left-radius: var(--ft-radius-md) !important;
+    border-top-right-radius: var(--ft-radius-md) !important;
+}
+
+.ft-compact-summary .ft-section-card:last-of-type {
+    border-bottom-left-radius: var(--ft-radius-md) !important;
+    border-bottom-right-radius: var(--ft-radius-md) !important;
+    border-bottom: 1px solid var(--ft-bg-topbar-border) !important;
+}
+
+/* When the section body is shown, the card after it needs bottom border removed */
+.ft-compact-summary .ft-section-card + div {
+    border-bottom: 0 !important;
+    border-radius: 0 !important;
+    margin-bottom: 0 !important;
+}
+
+.ft-compact-header {
+    font-size: var(--ft-text-base) !important;
+    padding: var(--ft-space-sm) 0 !important;
+    justify-content: space-between !important;
+}
+
+.ft-chevron {
+    font-size: 0.6rem;
+    opacity: 0.6;
+    margin-left: auto;
+    padding-left: var(--ft-space-sm);
+    transition: transform 0.2s;
+}
+
 .text-info {
     color: var(--ft-accent) !important;
 }

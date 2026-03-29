@@ -107,40 +107,55 @@
 }
 else
 {
-    <p>
-        <em>
-            Nothing you put in here will be sent to our servers. It will be saved to your local computer; however, you may
-            <a href="" @onclick=ClearLocalStorage @onclick:preventDefault>clear</a>
-            it at any time.
-        </em>
-    </p>
+    <div id="moneyFlows" class="ft-compact-summary">
+        <p class="ft-privacy-inline">
+            <em>
+                Nothing you put in here will be sent to our servers. It will be saved to your local computer; however, you may
+                <a href="" @onclick=ClearLocalStorage @onclick:preventDefault>clear</a>
+                it at any time.
+            </em>
+        </p>
 
-    <div id="moneyFlows" class="accordion">
         <MoneyFlowCard @bind-MoneyFlows=this.FootingAnalysis.Inflows
                        Name="income"
                        Label="Income"
                        FormPrompt="@IncomesFormPrompt"
-                       FormAmountDescriptionConnectorWord="from" />
+                       FormAmountDescriptionConnectorWord="from"
+                       GuidingSentence=""
+                       CompactMode="true"
+                       IsOpen="false" />
         <MoneyFlowCard @bind-MoneyFlows=this.FootingAnalysis.RecurringBills
                        Name="recurringBills"
                        Label="Recurring Bill"
                        FormPrompt="@RecurringBillsFormPrompt"
-                       FormAmountDescriptionConnectorWord="for" />
+                       FormAmountDescriptionConnectorWord="for"
+                       GuidingSentence=""
+                       CompactMode="true"
+                       IsOpen="false" />
         <MoneyFlowCard @bind-MoneyFlows=this.FootingAnalysis.HouseholdBudgets
                        Name="householdBudgets"
                        Label="Household Budget"
                        FormPrompt="@HouseholdBudgetsFormPrompt"
-                       FormAmountDescriptionConnectorWord="for" />
+                       FormAmountDescriptionConnectorWord="for"
+                       GuidingSentence=""
+                       CompactMode="true"
+                       IsOpen="false" />
         <MoneyFlowCard @bind-MoneyFlows=this.FootingAnalysis.PersonalBudgets
                        Name="personalBudgets"
                        Label="Personal Budget"
                        FormPrompt="@PersonalBudgetsFormPrompt"
-                       FormAmountDescriptionConnectorWord="for" />
+                       FormAmountDescriptionConnectorWord="for"
+                       GuidingSentence=""
+                       CompactMode="true"
+                       IsOpen="false" />
         <MoneyFlowCard @bind-MoneyFlows=this.FootingAnalysis.EventBudgets
                        Name="eventBudgets"
                        Label="Event Budget"
                        FormPrompt="@EventBudgetsFormPrompt"
-                       FormAmountDescriptionConnectorWord="for" />
+                       FormAmountDescriptionConnectorWord="for"
+                       GuidingSentence=""
+                       CompactMode="true"
+                       IsOpen="false" />
         <div class="ft-export">
             <button class="btn btn-accent" @onclick="ExportToExcel">Download Excel Spreadsheet</button>
         </div>
@@ -267,7 +282,7 @@ budget of";
     {
         var stored = this.LocalStore.GetItem<FootingAnalysis>(FootingAnalysisStorageKey);
         this.FootingAnalysis = stored ?? new FootingAnalysis();
-        this.IsFirstTimeUser = stored is null;
+        this.IsFirstTimeUser = stored?.HasAnyEntries != true;
 
         if (IsFirstTimeUser)
         {

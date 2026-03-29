@@ -7,8 +7,9 @@
             <h5 class="mb-0">
                 @if (GuidingSentence != null)
                 {
-                    <button class="button btn btn-link btn-accordian-header" type="button" @onclick="ToggleOpen">
+                    <button class="button btn btn-link btn-accordian-header @(CompactMode ? "ft-compact-header" : "")" type="button" @onclick="ToggleOpen" aria-expanded="@_isOpen.ToString().ToLower()">
                         @Label <MonetaryAmountDisplay Amount="this.MoneyFlows.WeeklyTotalMoneyFlow" /> / Week
+                        <span class="ft-chevron" aria-hidden="true">@(_isOpen ? "▼" : "▶")</span>
                     </button>
                 }
                 else
@@ -24,9 +25,12 @@
     {
         @if (_isOpen)
         {
-            <div id="@(Name)Details" aria-labelledby="@(Name)Heading">
+            <div id="@(Name)Details" class="ft-section--open" aria-labelledby="@(Name)Heading">
                 <div class="card-body">
-                    <p class="ft-guiding-sentence">@GuidingSentence</p>
+                    @if (!string.IsNullOrEmpty(GuidingSentence))
+                    {
+                        <p class="ft-guiding-sentence">@GuidingSentence</p>
+                    }
 
                     <EditForm Model="@Model" OnValidSubmit="AddMoneyFlow">
                         <DataAnnotationsValidator />
@@ -149,6 +153,9 @@
     [Parameter]
     public EventCallback OnFirstEntryAdded { get; set; }
 
+    [Parameter]
+    public bool CompactMode { get; set; }
+
     private bool _isOpen;
     private bool _hasNotifiedFirstEntry;
     private bool _initialized;
@@ -160,7 +167,7 @@
         if (GuidingSentence != null && !_initialized)
         {
             _isOpen = IsOpen;
-            if (IsOpen) _initialized = true;
+            if (IsOpen || CompactMode) _initialized = true;
         }
     }
 
