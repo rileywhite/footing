@@ -17,19 +17,6 @@ public class FootingJSInteropProviderTests
     }
 
     [Fact]
-    public async Task InitializePopovers_CallsFootingJsFunction()
-    {
-        _mockJsRuntime.Setup(x => x.InvokeAsync<Microsoft.JSInterop.Infrastructure.IJSVoidResult>(
-                "Footing.initializePopovers", It.IsAny<object[]>()))
-            .ReturnsAsync(default(Microsoft.JSInterop.Infrastructure.IJSVoidResult)!);
-
-        await _provider.InitializePopovers();
-
-        _mockJsRuntime.Verify(x => x.InvokeAsync<Microsoft.JSInterop.Infrastructure.IJSVoidResult>(
-            "Footing.initializePopovers", It.IsAny<object[]>()), Times.Once);
-    }
-
-    [Fact]
     public async Task Confirm_ReturnsTrue_WhenUserAccepts()
     {
         _mockJsRuntime.Setup(x => x.InvokeAsync<bool>("confirm",

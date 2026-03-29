@@ -7,13 +7,14 @@
 @if (IsFirstTimeUser)
 {
     <div id="moneyFlows" class="ft-conversational">
-        <p class="ft-privacy-inline">
+        <div class="ft-privacy-banner">
+            <span class="ft-privacy-banner__icon" aria-hidden="true">&#x1F512;</span>
             <em>
                 Nothing you put in here will be sent to our servers. It will be saved to your local computer; however, you may
                 <a href="" @onclick=ClearLocalStorage @onclick:preventDefault>clear</a>
                 it at any time.
             </em>
-        </p>
+        </div>
 
         <MoneyFlowCard @bind-MoneyFlows=this.FootingAnalysis.Inflows
                        Name="income"
@@ -66,55 +67,53 @@
                        OnFirstEntryAdded="@(() => RevealNextSection(4))" />
 
         <div class="ft-export">
-            <button class="btn btn-accent" @onclick="ExportToExcel">Download Excel Spreadsheet</button>
+            <input type="button" class="btn btn-accent ft-export-btn" value="Download Excel Spreadsheet" @onclick="ExportToExcel" />
         </div>
     </div>
 
-    @if (IsSectionVisible(1))
-    {
-        <div class="ft-sticky-total @(NetTotalWeeklyAmount.IsNegative ? "ft-sticky-total--negative" : "ft-sticky-total--positive") @(stickyExpanded ? "ft-sticky-total--expanded" : "")"
-             @onclick="ToggleStickyExpand">
-            <div id="totalHeading" class="ft-sticky-total__summary @MonetaryAmount.AmountSensitiveCssClass">
-                <span class="ft-sticky-total__label">Net Total</span>
-                <span class="ft-sticky-total__amount">
-                    <MonetaryAmountDisplay Amount=@NetTotalWeeklyAmount /> / Week
-                </span>
-                <span class="ft-sticky-total__chevron" aria-hidden="true">@(stickyExpanded ? "\u25BC" : "\u25B2")</span>
-            </div>
-            @if (stickyExpanded)
-            {
-                <div class="ft-sticky-total__detail">
-                    @if (this.NetTotalWeeklyAmount.IsNegative)
-                    {
-                        <h5>Time to roll up your sleeves</h5>
-                        <p>
-                            It's a good time to take a hard look at your expenses. It's no fun, but with hard work, you can pull yourself back into the
-                            net positive territory!
-                        </p>
-                    }
-                    else
-                    {
-                        <h5>You're looking good so far</h5>
-                        <p>
-                            This could always change as you notice new expenses that you aren't yet tracking and as unexpected expenses
-                            appear. It's a good idea to stash your extra money somewhere where it will earn interest.
-                        </p>
-                    }
-                </div>
-            }
+    <div class="ft-sticky-total @(NetTotalWeeklyAmount.IsNegative ? "ft-sticky-total--negative" : "ft-sticky-total--positive") @(stickyExpanded ? "ft-sticky-total--expanded" : "")"
+         @onclick="ToggleStickyExpand">
+        <div id="totalHeading" class="ft-sticky-total__summary @MonetaryAmount.AmountSensitiveCssClass">
+            <span class="ft-sticky-total__label">Net Total</span>
+            <span class="ft-sticky-total__amount">
+                <MonetaryAmountDisplay Amount=@NetTotalWeeklyAmount /> / Week
+            </span>
+            <span class="ft-sticky-total__chevron" aria-hidden="true">@(stickyExpanded ? "\u25BC" : "\u25B2")</span>
         </div>
-    }
+        @if (stickyExpanded)
+        {
+            <div class="ft-sticky-total__detail">
+                @if (this.NetTotalWeeklyAmount.IsNegative)
+                {
+                    <h5>Time to roll up your sleeves</h5>
+                    <p>
+                        It's a good time to take a hard look at your expenses. It's no fun, but with hard work, you can pull yourself back into the
+                        net positive territory!
+                    </p>
+                }
+                else
+                {
+                    <h5>You're looking good so far</h5>
+                    <p>
+                        This could always change as you notice new expenses that you aren't yet tracking and as unexpected expenses
+                        appear. It's a good idea to stash your extra money somewhere where it will earn interest.
+                    </p>
+                }
+            </div>
+        }
+    </div>
 }
 else
 {
     <div id="moneyFlows" class="ft-compact-summary">
-        <p class="ft-privacy-inline">
+        <div class="ft-privacy-banner">
+            <span class="ft-privacy-banner__icon" aria-hidden="true">&#x1F512;</span>
             <em>
                 Nothing you put in here will be sent to our servers. It will be saved to your local computer; however, you may
                 <a href="" @onclick=ClearLocalStorage @onclick:preventDefault>clear</a>
                 it at any time.
             </em>
-        </p>
+        </div>
 
         <MoneyFlowCard @bind-MoneyFlows=this.FootingAnalysis.Inflows
                        Name="income"
@@ -157,7 +156,7 @@ else
                        CompactMode="true"
                        IsOpen="false" />
         <div class="ft-export">
-            <button class="btn btn-accent" @onclick="ExportToExcel">Download Excel Spreadsheet</button>
+            <input type="button" class="btn btn-accent ft-export-btn" value="Download Excel Spreadsheet" @onclick="ExportToExcel" />
         </div>
     </div>
 
@@ -236,35 +235,35 @@ else
 
     private string IncomesFormPrompt { get; } =
     @"I receive a
-<span data-bs-toggle=""popover"" title=""Final amount deposited into your account after taxes and other garnishments"" data-bs-placement=""auto"" class=""text-info"">
+<span class=""ft-tooltip"" data-tip=""Final amount deposited into your account after taxes and other garnishments"">
 net amount
 </span>
 of";
 
     private string RecurringBillsFormPrompt { get; } =
     @"I pay a
-<span data-bs-toggle=""popover"" title=""Same amount every month/year/etc, e.g. phone, internet, auto insurance, groceries, etc"" data-bs-placement=""auto"" class=""text-info"">
+<span class=""ft-tooltip"" data-tip=""Same amount every month/year/etc, e.g. phone, internet, auto insurance, groceries, etc"">
 predictable recurring
 </span>
 bill of";
 
     private string HouseholdBudgetsFormPrompt { get; } =
     @"I estimate that I need to budget a
-<span data-bs-toggle=""popover"" title=""Differring amounts on hard to predict time periods, e.g. $150/quarter for auto maintenance, $100/month for family outings, etc"" data-bs-placement=""auto"" class=""text-info"">
+<span class=""ft-tooltip"" data-tip=""Differing amounts on hard to predict time periods, e.g. $150/quarter for auto maintenance, $100/month for family outings, etc"">
 less predictable shared amount
 </span>
 of";
 
     private string PersonalBudgetsFormPrompt { get; } =
     @"I estimate that someone in my household needs to budget a
-<span data-bs-toggle=""popover"" title=""For a personal spending allowance, haircut, eating lunch at work, etc"" data-bs-placement=""auto"" class=""text-info"">
+<span class=""ft-tooltip"" data-tip=""For a personal spending allowance, haircut, eating lunch at work, etc"">
 personally available
 </span>
 amount of";
 
     private string EventBudgetsFormPrompt { get; } =
     @"I estimate that I need a
-<span data-bs-toggle=""popover"" title=""Differring amounts on strictly or loosely occuring time periods, e.g. Christmas, Birthdays, vacations, etc"" data-bs-placement=""auto"" class=""text-info"">
+<span class=""ft-tooltip"" data-tip=""Differing amounts on strictly or loosely occurring time periods, e.g. Christmas, Birthdays, vacations, etc"">
 recurring event
 </span>
 budget of";
@@ -292,11 +291,7 @@ budget of";
 
     protected async override Task OnAfterRenderAsync(bool firstRender)
     {
-        if (firstRender)
-        {
-            await this.JSInterop.InitializePopovers();
-        }
-        else
+        if (!firstRender)
         {
             this.UpdateLocalStorage();
         }

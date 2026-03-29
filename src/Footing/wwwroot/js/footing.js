@@ -6,15 +6,6 @@ window.Footing = {
         }
     },
 
-    initializePopovers: function () {
-        var isTouchDevice = ("ontouchstart" in window) || window.DocumentTouch && document instanceof DocumentTouch;
-        document.querySelectorAll('[data-bs-toggle="popover"]').forEach(function (el) {
-            new bootstrap.Popover(el, {
-                trigger: isTouchDevice ? "click" : "hover"
-            });
-        });
-    },
-
     toggleTheme: function () {
         var html = document.documentElement;
         var current = html.getAttribute('data-theme');

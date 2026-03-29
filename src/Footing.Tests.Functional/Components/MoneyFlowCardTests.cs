@@ -21,7 +21,8 @@ public class MoneyFlowCardTests : BunitContext
             .Add(c => c.Name, name)
             .Add(c => c.Label, label)
             .Add(c => c.FormPrompt, formPrompt)
-            .Add(c => c.FormAmountDescriptionConnectorWord, connectorWord));
+            .Add(c => c.FormAmountDescriptionConnectorWord, connectorWord)
+            .Add(c => c.IsOpen, true));
     }
 
     private IRenderedComponent<MoneyFlowCard> RenderCardWithCallback(
@@ -37,7 +38,8 @@ public class MoneyFlowCardTests : BunitContext
             .Add(c => c.Name, name)
             .Add(c => c.Label, label)
             .Add(c => c.FormPrompt, formPrompt)
-            .Add(c => c.FormAmountDescriptionConnectorWord, connectorWord));
+            .Add(c => c.FormAmountDescriptionConnectorWord, connectorWord)
+            .Add(c => c.IsOpen, true));
     }
 
     [Fact]
@@ -55,7 +57,7 @@ public class MoneyFlowCardTests : BunitContext
     }
 
     [Fact]
-    public void RendersExistingMoneyFlows_InTable()
+    public void RendersExistingMoneyFlows()
     {
         var flows = new MoneyFlows { Direction = MoneyFlowDirection.Income };
         flows.Add(new MoneyFlow { Name = "Salary", Amount = 2000m, Period = Period.BiWeekly });
@@ -104,8 +106,8 @@ public class MoneyFlowCardTests : BunitContext
     }
 
     [Fact]
-    public void EmptyFlows_RendersEmptyTable() =>
-        RenderCard().FindAll("table tr").Count.Should().Be(0);
+    public void EmptyFlows_RendersNoEntries() =>
+        RenderCard().FindAll(".ft-entry-chip").Count.Should().Be(0);
 
     [Fact]
     public void AddButton_SubmitsValidForm_AddsMoneyFlow()

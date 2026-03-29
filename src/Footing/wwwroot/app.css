@@ -843,6 +843,205 @@ h1:focus {
     transition: transform 0.2s;
 }
 
+/* ============================================================
+   Inline Tooltips (replaces Bootstrap Popovers)
+   ============================================================ */
+
+.ft-tooltip {
+    position: relative;
+    color: var(--ft-accent);
+    cursor: help;
+    border-bottom: 1px dashed var(--ft-accent);
+    white-space: nowrap;
+}
+
+.ft-tooltip::after {
+    content: attr(data-tip);
+    position: absolute;
+    bottom: calc(100% + 0.4rem);
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: var(--ft-text);
+    color: var(--ft-bg-surface);
+    padding: 0.35rem 0.6rem;
+    border-radius: var(--ft-radius-sm);
+    font-size: var(--ft-text-xs);
+    font-weight: var(--ft-weight-body);
+    line-height: 1.4;
+    white-space: normal;
+    width: 15rem;
+    text-align: center;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.15s;
+    z-index: 100;
+}
+
+.ft-tooltip:hover::after,
+.ft-tooltip:focus::after {
+    opacity: 1;
+}
+
+/* ============================================================
+   Money Input Adornment (fo-si0.9)
+   ============================================================ */
+
+.ft-input-money {
+    display: inline-flex;
+    align-items: center;
+    border: 1px solid var(--ft-bg-topbar-border);
+    border-radius: var(--ft-radius-sm);
+    background-color: var(--ft-bg-surface);
+    transition: border-color 0.2s;
+    overflow: hidden;
+}
+
+.ft-input-money:focus-within {
+    border-color: var(--ft-focus-ring);
+    box-shadow: 0 0 0 2px rgba(37, 140, 251, 0.15);
+}
+
+.ft-input-money__prefix {
+    padding: var(--ft-space-xs) var(--ft-space-sm);
+    color: var(--ft-text-muted);
+    font-size: var(--ft-text-sm);
+    font-weight: var(--ft-weight-label);
+    background-color: var(--ft-bg-topbar);
+    border-right: 1px solid var(--ft-bg-topbar-border);
+    user-select: none;
+}
+
+.ft-input-money__field {
+    border: none !important;
+    box-shadow: none !important;
+    background-color: transparent !important;
+    padding: var(--ft-space-xs) var(--ft-space-sm) !important;
+    font-size: var(--ft-text-sm);
+    color: var(--ft-text);
+    width: 7rem;
+    outline: none;
+}
+
+.ft-period-select {
+    padding: var(--ft-space-xs) var(--ft-space-sm) !important;
+    border: 1px solid var(--ft-bg-topbar-border) !important;
+    border-radius: var(--ft-radius-sm) !important;
+    background-color: var(--ft-bg-surface) !important;
+    color: var(--ft-text) !important;
+    font-size: var(--ft-text-sm) !important;
+    transition: border-color 0.2s !important;
+    cursor: pointer;
+}
+
+.ft-period-select:focus {
+    border-color: var(--ft-focus-ring) !important;
+    box-shadow: 0 0 0 2px rgba(37, 140, 251, 0.15) !important;
+    outline: none !important;
+}
+
+.ft-add-btn {
+    transition: transform 0.15s, background-color 0.15s !important;
+}
+
+.ft-add-btn:hover {
+    transform: translateY(-1px);
+}
+
+/* ============================================================
+   Entry Chips (fo-si0.10)
+   ============================================================ */
+
+.ft-entry-list {
+    list-style: none;
+    padding: 0;
+    margin: var(--ft-space-md) 0 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--ft-space-xs);
+}
+
+.ft-entry-chip {
+    display: flex;
+    align-items: center;
+    gap: var(--ft-space-sm);
+    padding: var(--ft-space-xs) var(--ft-space-sm);
+    background-color: var(--ft-bg-topbar);
+    border: 1px solid var(--ft-bg-topbar-border);
+    border-radius: var(--ft-radius-md);
+    font-size: var(--ft-text-sm);
+}
+
+.ft-entry-chip__name {
+    flex: 1;
+    color: var(--ft-text);
+    font-weight: var(--ft-weight-label);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.ft-entry-chip__amount {
+    color: var(--ft-text-muted);
+    white-space: nowrap;
+    font-size: var(--ft-text-xs);
+}
+
+.ft-entry-chip__delete {
+    cursor: pointer;
+    color: var(--ft-text-muted);
+    font-size: 1.1rem;
+    line-height: 1;
+    flex-shrink: 0;
+    transition: color 0.15s, transform 0.15s;
+    padding: 2px;
+    border-radius: var(--ft-radius-sm);
+}
+
+.ft-entry-chip__delete:hover {
+    color: var(--ft-amount-negative);
+    transform: scale(1.2);
+}
+
+/* ============================================================
+   Export Button and Privacy Banner (fo-si0.11)
+   ============================================================ */
+
+.ft-privacy-banner {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--ft-space-sm);
+    font-size: var(--ft-text-sm);
+    color: var(--ft-text-muted);
+    margin-bottom: var(--ft-space-lg);
+    padding: var(--ft-space-sm) var(--ft-space-md);
+    background-color: var(--ft-bg-topbar);
+    border: 1px solid var(--ft-bg-topbar-border);
+    border-radius: var(--ft-radius-md);
+}
+
+.ft-privacy-banner__icon {
+    font-size: var(--ft-text-base);
+    flex-shrink: 0;
+    margin-top: 1px;
+}
+
+.ft-privacy-banner em {
+    font-style: normal;
+    line-height: 1.5;
+}
+
+.ft-export-btn {
+    padding: var(--ft-space-sm) var(--ft-space-xl) !important;
+    font-size: var(--ft-text-sm) !important;
+    border-radius: var(--ft-radius-md) !important;
+    transition: transform 0.15s, background-color 0.15s !important;
+    cursor: pointer;
+}
+
+.ft-export-btn:hover {
+    transform: translateY(-1px);
+}
+
 .text-info {
     color: var(--ft-accent) !important;
 }

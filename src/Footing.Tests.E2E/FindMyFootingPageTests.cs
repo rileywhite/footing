@@ -8,14 +8,31 @@ namespace Footing.Tests.E2E;
 public class FindMyFootingPageTests
 {
     private readonly PlaywrightFixture _fixture;
+    private const string StorageKey = "3794bdc6-f064-43e6-9a1e-8bb2c03d16cb";
+
     public FindMyFootingPageTests(PlaywrightFixture fixture) => _fixture = fixture;
 
     private void SkipIfUnavailable() =>
         Skip.If(!_fixture.ServerAvailable, "Server not available");
 
-    private async Task<IPage> NavigateToFindMyFooting()
+    private async Task<IPage> NavigateToFindMyFooting(bool withExistingData = false)
     {
         var page = await _fixture.Browser.NewPageAsync();
+
+        if (withExistingData)
+        {
+            await page.GotoAsync(_fixture.BaseUrl);
+            await page.EvaluateAsync($@"
+                localStorage.setItem('{StorageKey}', JSON.stringify({{
+                    Inflows: [{{ Id: '00000000-0000-0000-0000-000000000001', Name: 'Salary', Amount: 2000, Period: 'Monthly' }}],
+                    RecurringBills: [],
+                    HouseholdBudgets: [],
+                    PersonalBudgets: [],
+                    EventBudgets: []
+                }}));
+            ");
+        }
+
         await page.GotoAsync($"{_fixture.BaseUrl}/find-my-footing");
         // WASM interactive component needs time to download and initialize
         await page.WaitForSelectorAsync("#moneyFlows", new() { Timeout = 60000, State = WaitForSelectorState.Attached });
@@ -35,7 +52,7 @@ public class FindMyFootingPageTests
     public async Task FindMyFooting_ShowsFiveMoneyFlowCards()
     {
         SkipIfUnavailable();
-        var page = await NavigateToFindMyFooting();
+        var page = await NavigateToFindMyFooting(withExistingData: true);
         (await page.Locator("#moneyFlows > .card").CountAsync()).Should().BeGreaterThanOrEqualTo(5);
         await page.CloseAsync();
     }
@@ -71,10 +88,10 @@ public class FindMyFootingPageTests
     public async Task FindMyFooting_CanExpandIncomeSection()
     {
         SkipIfUnavailable();
-        var page = await NavigateToFindMyFooting();
+        var page = await NavigateToFindMyFooting(withExistingData: true);
         await page.Locator("#incomeHeading button").ClickAsync();
-        await page.WaitForSelectorAsync("#incomeDetails.show, #incomeDetails.collapse.show",
-            new() { Timeout = 5000 });
+        await page.WaitForSelectorAsync("#incomeDetails",
+            new() { Timeout = 5000, State = WaitForSelectorState.Attached });
         (await page.Locator("#incomeDetails button[type='submit']").CountAsync()).Should().Be(1);
         await page.CloseAsync();
     }
@@ -83,18 +100,18 @@ public class FindMyFootingPageTests
     public async Task FindMyFooting_CanAddIncomeItem()
     {
         SkipIfUnavailable();
-        var page = await NavigateToFindMyFooting();
+        var page = await NavigateToFindMyFooting(withExistingData: true);
         await page.Locator("#incomeHeading button").ClickAsync();
-        await page.WaitForSelectorAsync("#incomeDetails.show, #incomeDetails.collapse.show",
-            new() { Timeout = 5000 });
+        await page.WaitForSelectorAsync("#incomeDetails",
+            new() { Timeout = 5000, State = WaitForSelectorState.Attached });
 
         await page.Locator("#incomeDetails input[placeholder='xxx.xx']").FillAsync("1000");
-        await page.Locator("#incomeDetails input[placeholder='how often?']").FillAsync("Weekly");
+        await page.Locator("#incomeDetails select").SelectOptionAsync("Weekly");
         await page.Locator("#incomeDetails input[placeholder='Income Description']").FillAsync("Test Salary");
         await page.Locator("#incomeDetails button[type='submit']").ClickAsync();
 
-        await page.WaitForSelectorAsync("#incomeDetails table tr");
-        (await page.Locator("#incomeDetails table").TextContentAsync()).Should().Contain("Test Salary");
+        await page.WaitForSelectorAsync("#incomeDetails .ft-entry-chip");
+        (await page.Locator("#incomeDetails .ft-entry-list").TextContentAsync()).Should().Contain("Test Salary");
         await page.CloseAsync();
     }
 
@@ -121,7 +138,7 @@ public class FindMyFootingPageTests
     public async Task FindMyFooting_ShowsAllCategorySections()
     {
         SkipIfUnavailable();
-        var page = await NavigateToFindMyFooting();
+        var page = await NavigateToFindMyFooting(withExistingData: true);
         foreach (var section in new[] { "income", "recurringBills", "householdBudgets", "personalBudgets", "eventBudgets" })
             (await page.Locator($"#{section}Heading").CountAsync()).Should().Be(1, $"section {section} should exist");
         await page.CloseAsync();
