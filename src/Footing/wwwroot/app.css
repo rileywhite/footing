@@ -634,17 +634,74 @@ h1:focus {
 }
 
 /* ============================================================
-   Net Total Card — Highlighted
+   Sticky Net Total Bar
    ============================================================ */
 
-.ft-net-total .card-header {
-    background-color: var(--ft-primary);
-    border-color: var(--ft-primary);
+.ft-sticky-total {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 200;
+    cursor: pointer;
+    transition: background-color 0.3s;
 }
 
-.ft-net-total .card-header .btn-link,
-.ft-net-total .card-header .btn-link:hover {
+.ft-sticky-total--positive {
+    background-color: var(--ft-primary);
+}
+
+.ft-sticky-total--negative {
+    background-color: var(--ft-amount-negative, #dc3545);
+}
+
+.ft-sticky-total__summary {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    height: 3rem;
+    padding: 0 1rem;
     color: #fff;
+    font-weight: var(--ft-weight-heading);
+}
+
+.ft-sticky-total__summary .monetary-amount-highlight-positive,
+.ft-sticky-total__summary .monetary-amount-highlight-negative {
+    color: #fff;
+}
+
+.ft-sticky-total__amount {
+    transition: transform 0.2s;
+}
+
+.ft-sticky-total__chevron {
+    font-size: 0.7rem;
+    opacity: 0.7;
+    margin-left: 0.25rem;
+}
+
+.ft-sticky-total__detail {
+    padding: var(--ft-space-md) var(--ft-space-lg);
+    background-color: var(--ft-bg-surface);
+    border-top: 1px solid var(--ft-bg-topbar-border);
+    color: var(--ft-text);
+    max-width: 54rem;
+    margin: 0 auto;
+}
+
+.ft-sticky-total__detail h5 {
+    font-size: var(--ft-text-base);
+    font-weight: var(--ft-weight-heading);
+    margin-bottom: var(--ft-space-xs);
+    color: var(--ft-text);
+}
+
+.ft-sticky-total__detail p {
+    font-size: var(--ft-text-sm);
+    color: var(--ft-text-muted);
+    margin-bottom: 0;
+    line-height: 1.5;
 }
 
 /* ============================================================

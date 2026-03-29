@@ -38,42 +38,46 @@
                    Label="Event Budget"
                    FormPrompt="@EventBudgetsFormPrompt"
                    FormAmountDescriptionConnectorWord="for" />
-    <div class="card ft-net-total @MonetaryAmount.AmountSensitiveCssClass">
-        <div id="totalHeading" class="card-header">
-            <h5>
-                <button class="button btn btn-link btn-accordian-header" type="button" data-bs-toggle="collapse" data-bs-target="#totalDetails" aria-expanded="true" aria-controls="totalDetails">
-                    Net Total <MonetaryAmountDisplay Amount=@NetTotalWeeklyAmount /> / Week
-                </button>
-            </h5>
-        </div>
-        <div id="totalDetails" class="collapse" aria-labelledby="totalHeading" data-bs-parent="#moneyFlows">
-            <div class="card-body">
-                @if (this.NetTotalWeeklyAmount.IsNegative)
-                {
-                    <h5>Time to roll up your sleeves</h5>
-                    <p>
-                        It's a good time to take a hard look at your expenses. It's no fun, but with hard work, you can pull yourself back into the
-                        net positive territory!
-                    </p>
-                }
-                else
-                {
-                    <h5>You're looking good so far</h5>
-                    <p>
-                        This could always change as you notice new expenses that you aren't yet tracking and as unexpected expenses
-                        appear. It's a good idea to stash your extra money somewhere where it will earn interest.
-                    </p>
-                }
-            </div>
-        </div>
-    </div>
     <div class="ft-export">
         <button class="btn btn-accent" @onclick="ExportToExcel">Download Excel Spreadsheet</button>
     </div>
 </div>
 
+<div class="ft-sticky-total @(NetTotalWeeklyAmount.IsNegative ? "ft-sticky-total--negative" : "ft-sticky-total--positive") @(stickyExpanded ? "ft-sticky-total--expanded" : "")"
+     @onclick="ToggleStickyExpand">
+    <div id="totalHeading" class="ft-sticky-total__summary @MonetaryAmount.AmountSensitiveCssClass">
+        <span class="ft-sticky-total__label">Net Total</span>
+        <span class="ft-sticky-total__amount">
+            <MonetaryAmountDisplay Amount=@NetTotalWeeklyAmount /> / Week
+        </span>
+        <span class="ft-sticky-total__chevron" aria-hidden="true">@(stickyExpanded ? "\u25BC" : "\u25B2")</span>
+    </div>
+    @if (stickyExpanded)
+    {
+        <div class="ft-sticky-total__detail">
+            @if (this.NetTotalWeeklyAmount.IsNegative)
+            {
+                <h5>Time to roll up your sleeves</h5>
+                <p>
+                    It's a good time to take a hard look at your expenses. It's no fun, but with hard work, you can pull yourself back into the
+                    net positive territory!
+                </p>
+            }
+            else
+            {
+                <h5>You're looking good so far</h5>
+                <p>
+                    This could always change as you notice new expenses that you aren't yet tracking and as unexpected expenses
+                    appear. It's a good idea to stash your extra money somewhere where it will earn interest.
+                </p>
+            }
+        </div>
+    }
+</div>
+
 @code {
     private static string FootingAnalysisStorageKey = "3794bdc6-f064-43e6-9a1e-8bb2c03d16cb";
+    private bool stickyExpanded;
 
     public FootingAnalysis FootingAnalysis { get; set; } = null!;
 
@@ -92,6 +96,8 @@
     }
 
     private MonetaryAmount NetTotalWeeklyAmount => this.FootingAnalysis.WeeklyTotalMoneyFlow;
+
+    private void ToggleStickyExpand() => stickyExpanded = !stickyExpanded;
 
     private string IncomesFormPrompt { get; } =
     @"I receive a
