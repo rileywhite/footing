@@ -26,18 +26,6 @@
     --ft-bg-topbar: #ede8e0;
     --ft-bg-topbar-border: #dfd8cc;
 
-    /* --- Sidebar --- */
-    --ft-sidebar-bg: #1e2e28;
-    --ft-sidebar-bg-end: #182420;
-    --ft-sidebar-text: #c8d4da;
-    --ft-sidebar-text-active: #ffffff;
-    --ft-sidebar-active-bg: rgba(255, 255, 255, 0.15);
-    --ft-sidebar-hover-bg: rgba(255, 255, 255, 0.08);
-    --ft-sidebar-toprow-bg: rgba(0, 0, 0, 0.25);
-    --ft-sidebar-border: rgba(255, 255, 255, 0.08);
-    --ft-sidebar-toggler-icon: rgba(255, 255, 255, 0.55);
-    --ft-sidebar-toggler-checked-bg: rgba(255, 255, 255, 0.35);
-
     /* --- Focus --- */
     --ft-focus-ring: #258cfb;
 
@@ -119,18 +107,6 @@
     --ft-bg-topbar: #222b26;
     --ft-bg-topbar-border: #333d37;
 
-    /* --- Sidebar --- */
-    --ft-sidebar-bg: #161e1a;
-    --ft-sidebar-bg-end: #111916;
-    --ft-sidebar-text: #a8b8aa;
-    --ft-sidebar-text-active: #ffffff;
-    --ft-sidebar-active-bg: rgba(255, 255, 255, 0.12);
-    --ft-sidebar-hover-bg: rgba(255, 255, 255, 0.06);
-    --ft-sidebar-toprow-bg: rgba(0, 0, 0, 0.35);
-    --ft-sidebar-border: rgba(255, 255, 255, 0.06);
-    --ft-sidebar-toggler-icon: rgba(255, 255, 255, 0.5);
-    --ft-sidebar-toggler-checked-bg: rgba(255, 255, 255, 0.25);
-
     /* --- Focus --- */
     --ft-focus-ring: #5ca8f5;
 
@@ -183,18 +159,6 @@
         --ft-bg-surface: #252e2a;
         --ft-bg-topbar: #222b26;
         --ft-bg-topbar-border: #333d37;
-
-        /* --- Sidebar --- */
-        --ft-sidebar-bg: #161e1a;
-        --ft-sidebar-bg-end: #111916;
-        --ft-sidebar-text: #a8b8aa;
-        --ft-sidebar-text-active: #ffffff;
-        --ft-sidebar-active-bg: rgba(255, 255, 255, 0.12);
-        --ft-sidebar-hover-bg: rgba(255, 255, 255, 0.06);
-        --ft-sidebar-toprow-bg: rgba(0, 0, 0, 0.35);
-        --ft-sidebar-border: rgba(255, 255, 255, 0.06);
-        --ft-sidebar-toggler-icon: rgba(255, 255, 255, 0.5);
-        --ft-sidebar-toggler-checked-bg: rgba(255, 255, 255, 0.25);
 
         /* --- Focus --- */
         --ft-focus-ring: #5ca8f5;
@@ -1264,7 +1228,7 @@ a.text-info:hover {
 }
 
 .theme-toggle:hover {
-    background-color: var(--ft-sidebar-hover-bg);
+    background-color: var(--ft-bg-topbar-border);
 }
 
 .theme-toggle .icon-sun,
@@ -1303,4 +1267,97 @@ a.text-info:hover {
     :root:not([data-theme]) .theme-toggle .icon-moon {
         display: none;
     }
+}
+
+/* ============================================================
+   Micro-interactions and Transitions (fo-si0.15)
+   ============================================================ */
+
+/* Section reveal animation */
+.ft-section--open {
+    animation: ft-reveal 0.18s ease-out;
+}
+
+@keyframes ft-reveal {
+    from {
+        opacity: 0;
+        transform: translateY(-6px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Card header hover */
+.card-header .btn-link:hover {
+    background-color: var(--ft-bg-topbar-border);
+    border-radius: var(--ft-radius-sm);
+}
+
+/* Focus ring transition on all interactive elements */
+input:focus,
+select:focus,
+textarea:focus,
+button:focus-visible {
+    transition: box-shadow 0.15s, border-color 0.15s;
+}
+
+/* Chevron rotation animation */
+.ft-chevron {
+    transition: transform 0.2s ease;
+}
+
+[aria-expanded="true"] .ft-chevron {
+    transform: rotate(90deg);
+}
+
+/* Entry chip entrance */
+.ft-entry-chip {
+    animation: ft-chip-in 0.15s ease-out;
+}
+
+@keyframes ft-chip-in {
+    from {
+        opacity: 0;
+        transform: scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+/* ============================================================
+   Branded Loading State (fo-si0.15)
+   ============================================================ */
+
+.ft-loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: var(--ft-space-md);
+    height: 100%;
+    min-height: 8rem;
+    color: var(--ft-text-muted);
+}
+
+.ft-loading__spinner {
+    display: block;
+    width: 2rem;
+    height: 2rem;
+    border: 2px solid var(--ft-bg-topbar-border);
+    border-top-color: var(--ft-primary);
+    border-radius: 50%;
+    animation: ft-spin 0.7s linear infinite;
+}
+
+.ft-loading__text {
+    font-size: var(--ft-text-sm);
+    color: var(--ft-text-muted);
+}
+
+@keyframes ft-spin {
+    to { transform: rotate(360deg); }
 }
