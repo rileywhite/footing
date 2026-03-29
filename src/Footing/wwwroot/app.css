@@ -420,17 +420,6 @@ a:hover, .btn-link:hover {
     border-color: var(--ft-primary-border);
 }
 
-.btn-outline-primary {
-    color: var(--ft-primary);
-    border-color: var(--ft-primary);
-}
-
-.btn-outline-primary:hover {
-    color: #fff;
-    background-color: var(--ft-primary);
-    border-color: var(--ft-primary);
-}
-
 .btn-accent {
     color: var(--ft-accent-text);
     background-color: var(--ft-accent);
@@ -445,17 +434,6 @@ a:hover, .btn-link:hover {
 .btn-accent:active, .btn-accent:focus-visible {
     background-color: var(--ft-accent-hover);
     border-color: var(--ft-accent-hover);
-}
-
-.btn-outline-accent {
-    color: var(--ft-accent);
-    border-color: var(--ft-accent);
-}
-
-.btn-outline-accent:hover {
-    color: var(--ft-accent-text);
-    background-color: var(--ft-accent);
-    border-color: var(--ft-accent);
 }
 
 .btn-accordian-header:focus {
@@ -511,91 +489,10 @@ h1:focus {
 }
 
 /* ============================================================
-   Cards — Design Token Integration
+   Money Flow Section — Header and Form
    ============================================================ */
 
-.card {
-    background-color: var(--ft-bg-surface);
-    border-color: var(--ft-bg-topbar-border);
-}
-
-.card-header {
-    background-color: var(--ft-bg-topbar);
-    border-bottom-color: var(--ft-bg-topbar-border);
-}
-
-.card-header .btn-link,
-.card-header .btn-link:hover,
-.card-header .btn-link:focus {
-    color: var(--ft-text);
-    text-decoration: none;
-}
-
-.card-header .btn-link:hover {
-    color: var(--ft-primary);
-}
-
-/* ============================================================
-   Tables — Design Token Integration
-   ============================================================ */
-
-.table {
-    color: var(--ft-text);
-    border-color: var(--ft-bg-topbar-border);
-}
-
-.table > :not(caption) > * > * {
-    background-color: transparent;
-    color: var(--ft-text);
-    border-bottom-color: var(--ft-bg-topbar-border);
-}
-
-/* ============================================================
-   Forms — Design Token Integration
-   ============================================================ */
-
-.form-control, .form-select {
-    color: var(--ft-text);
-    background-color: var(--ft-bg-surface);
-    border-color: var(--ft-bg-topbar-border);
-}
-
-.form-control::placeholder {
-    color: var(--ft-text-muted);
-}
-
-.form-control:focus, .form-select:focus {
-    color: var(--ft-text);
-    background-color: var(--ft-bg-surface);
-    border-color: var(--ft-focus-ring);
-}
-
-/* ============================================================
-   Accordion — Enhanced Styling
-   ============================================================ */
-
-#moneyFlows .card {
-    border-radius: 0;
-    border-bottom: 0;
-    transition: box-shadow 0.15s ease;
-}
-
-#moneyFlows .card:first-child {
-    border-top-left-radius: var(--ft-radius-md);
-    border-top-right-radius: var(--ft-radius-md);
-}
-
-#moneyFlows .card:last-child {
-    border-bottom-left-radius: var(--ft-radius-md);
-    border-bottom-right-radius: var(--ft-radius-md);
-    border-bottom: 1px solid var(--ft-bg-topbar-border);
-}
-
-#moneyFlows .card-header h5 {
-    margin: 0;
-}
-
-#moneyFlows .card-header .btn-link {
+.card-header .btn-link {
     font-weight: var(--ft-weight-heading);
     font-size: var(--ft-text-sm);
     padding: var(--ft-space-xs) 0;
@@ -606,13 +503,9 @@ h1:focus {
     gap: var(--ft-space-sm);
 }
 
-#moneyFlows .card-body {
+.card-body {
     padding: var(--ft-space-md) var(--ft-space-lg);
 }
-
-/* ============================================================
-   Money Flow Form — Improved Layout
-   ============================================================ */
 
 #moneyFlows dl {
     display: grid;
@@ -634,41 +527,6 @@ h1:focus {
     align-items: center;
     gap: var(--ft-space-sm);
     flex-wrap: wrap;
-}
-
-#moneyFlows dd input[type="number"],
-#moneyFlows dd input[type="text"] {
-    padding: var(--ft-space-xs) var(--ft-space-sm);
-    border: 1px solid var(--ft-bg-topbar-border);
-    border-radius: var(--ft-radius-sm);
-    background-color: var(--ft-bg-surface);
-    color: var(--ft-text);
-    font-size: var(--ft-text-sm);
-}
-
-#moneyFlows dd select {
-    padding: var(--ft-space-xs) var(--ft-space-sm);
-    border: 1px solid var(--ft-bg-topbar-border);
-    border-radius: var(--ft-radius-sm);
-    background-color: var(--ft-bg-surface);
-    color: var(--ft-text);
-    font-size: var(--ft-text-sm);
-}
-
-/* ============================================================
-   Delete Button in Money Flow Table
-   ============================================================ */
-
-#moneyFlows .table .bi-x {
-    cursor: pointer;
-    opacity: 0.5;
-    transition: opacity 0.15s, color 0.15s;
-    color: var(--ft-text-muted);
-}
-
-#moneyFlows .table .bi-x:hover {
-    opacity: 1;
-    color: var(--ft-amount-negative);
 }
 
 /* ============================================================
@@ -889,14 +747,6 @@ h1:focus {
     max-width: 42rem;
 }
 
-.ft-privacy-inline {
-    font-size: var(--ft-text-sm);
-    color: var(--ft-text-muted);
-    margin-bottom: var(--ft-space-lg);
-    padding: var(--ft-space-sm) var(--ft-space-md);
-    border-left: 3px solid var(--ft-bg-topbar-border);
-}
-
 .ft-section-card {
     margin-bottom: var(--ft-space-xs);
     border-radius: var(--ft-radius-md) !important;
@@ -923,15 +773,6 @@ h1:focus {
     line-height: 1.5;
 }
 
-.ft-entries-compact {
-    margin-top: var(--ft-space-md);
-    font-size: var(--ft-text-sm);
-}
-
-.ft-entries-compact td {
-    padding: var(--ft-space-xs) var(--ft-space-sm);
-}
-
 .ft-skip-link {
     margin-top: var(--ft-space-sm);
     text-align: right;
@@ -946,13 +787,6 @@ h1:focus {
 .ft-skip-link a:hover {
     color: var(--ft-primary);
     text-decoration: underline;
-}
-
-/* Net total in conversational mode */
-.ft-conversational .ft-net-total {
-    margin-top: var(--ft-space-md);
-    border-radius: var(--ft-radius-md) !important;
-    border-bottom: 1px solid var(--ft-bg-topbar-border) !important;
 }
 
 /* ============================================================
