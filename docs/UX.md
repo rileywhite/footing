@@ -1,358 +1,224 @@
-# Footing UX & Workflow Design Guide
+# Footing Design Principles
 
-This document defines the user experience principles, interaction patterns, and workflow
-design for Footing. It builds on the brand personality of a "patient teacher" and the core
-values: reduce anxiety, earn simplicity, and meet people where they are.
-
----
-
-## Brand Personality in UX
-
-Footing is a **patient teacher** — never judgmental, always encouraging. Every interaction
-should feel like a conversation with a knowledgeable friend who wants you to succeed.
-
-| Principle | What it means in practice |
-|---|---|
-| **Reduce anxiety** | No financial jargon. No red warnings on first visit. Frame negatives as opportunities. |
-| **Earn simplicity** | Start with the minimum viable UI. Reveal complexity only as the user engages deeper. |
-| **Meet people where they are** | Don't assume financial literacy. Don't assume shame. Don't assume expertise. |
+This document defines the enduring UX principles, brand personality, and design
+philosophy for Footing. It describes *why* we make design decisions, not *what*
+specific UI elements look like — implementation details belong in the code.
 
 ---
 
-## User Flows
+## Brand Personality: The Patient Teacher
 
-### First Visit (Onboarding)
+Footing is a **patient teacher** — never judgmental, always encouraging. Every
+interaction should feel like a conversation with a knowledgeable friend who
+genuinely wants you to succeed with your finances.
 
-```
-Landing (/)
-  |
-  +-- "Get Started" --> Footing Me (/footing-me)
-  |                       User sees empty accordion sections
-  |                       Privacy notice ("Nothing you put here leaves your browser")
-  |                       First action: add an income entry
-  |
-  +-- "There Is Hope" --> Control Your Money (/control-your-money)
-                           Empathetic narrative about financial anxiety
-                           Ends with CTA back to Footing Me
-```
-
-**Design intent:** Two entry paths serve two emotional states. "Get Started" is for users
-ready to act. "There Is Hope" is for users who need reassurance first. Both paths converge
-on the same tool.
-
-**Key rules for onboarding:**
-- No sign-up, no account creation, no email capture — ever.
-- The privacy notice on Footing Me is the first thing the user reads in the tool area.
-  It must remain above the fold.
-- The landing page hero text sets the emotional tone. Keep it short, warm, and direct.
-
-### Core Workflow (Footing Me)
-
-```
-Footing Me (/footing-me)
-  |
-  +-- Income section (collapsed by default)
-  |     Add income entries: amount + frequency + description
-  |
-  +-- Recurring Bills section
-  |     Add predictable recurring expenses
-  |
-  +-- Household Budgets section
-  |     Add variable shared expenses
-  |
-  +-- Personal Budgets section
-  |     Add individual spending allowances
-  |
-  +-- Event Budgets section
-  |     Add seasonal/occasional expenses
-  |
-  +-- Net Total (always visible as collapsed header)
-  |     Shows weekly net: income minus all expenses
-  |     Expands to show contextual guidance
-  |
-  +-- Export to Excel button
-```
-
-**Progression model:** The accordion order is intentional — it mirrors the mental model of
-"what comes in" before "what goes out," with expenses broken into increasingly granular
-categories. Users naturally work top-to-bottom.
-
-**Key rules:**
-- Each section shows its weekly subtotal in the collapsed header. Users see running
-  feedback without expanding anything.
-- The Net Total card uses the primary brand color to stand out from expense sections.
-- Negative net totals show encouraging ("roll up your sleeves") language, not alarming
-  language.
-
-### Data Lifecycle
-
-```
-User enters data --> Saved to localStorage automatically
-                     (every render after first)
-  |
-  +-- "Clear" link --> Confirmation dialog --> Wipes localStorage
-  |
-  +-- "Download Excel" --> Generates .xlsx in-browser --> File download
-```
-
-**Key rules:**
-- Auto-save is silent. No toast, no "saved" indicator. Saving is a given, not an event.
-- The clear action requires confirmation. This is the only destructive action in the app.
-- Excel export works offline. No server round-trip.
+The patient teacher:
+- **Explains without condescending.** Financial concepts are introduced through
+  context, not jargon. When a term needs definition, it appears as a hint the
+  user can choose to engage with — not a lecture they must sit through.
+- **Celebrates small wins honestly.** A positive balance is acknowledged with
+  cautious optimism ("you're looking good so far"), not confetti. We know
+  circumstances change.
+- **Reframes setbacks as opportunities.** A negative balance is an invitation
+  to take action ("time to roll up your sleeves"), never an alarm or a judgment.
+- **Waits for the user to be ready.** We offer two emotional entry points:
+  one for users ready to act, one for users who need reassurance first. Both
+  paths lead to the same capability.
 
 ---
 
-## Page-to-Page Navigation
+## Core UX Principles
 
-### Sidebar Navigation
+### 1. Reduce Anxiety
 
-The sidebar is the primary navigation mechanism. It contains three links:
+Financial tools often amplify the stress they claim to relieve. Footing does
+the opposite.
 
-| Link | Route | Purpose |
-|---|---|---|
-| Home | `/` | Landing page with hero + entry cards |
-| Footing Me | `/footing-me` | The core financial tool |
-| Control Your Money | `/control-your-money` | Empathetic onboarding narrative |
+- No financial jargon in primary UI paths. Technical terms are available on
+  demand through contextual hints, never required to proceed.
+- Negative outcomes use action-oriented language, not alarm language. There is
+  no "danger," "warning," or "you're in trouble" in the vocabulary.
+- First visits are calm. No aggressive onboarding, no urgency, no countdown
+  timers, no "complete your profile" pressure.
+- The empty state *is* the tool. Users see what they can do immediately, not a
+  gate they must pass through.
 
-**Navigation rules:**
-- The active page is highlighted in the sidebar.
-- Sidebar collapses to a hamburger toggle on small screens.
-- Navigation never discards entered data (it persists in localStorage).
+### 2. Earn Simplicity
 
-### Top Bar
+Simplicity is not the absence of features — it's the careful sequencing of
+complexity.
 
-The top bar contains external links (Buy Me A Coffee, Become a Patron, Learn More) and
-the theme toggle. These are secondary actions — support links, not core navigation.
+- Start with the minimum viable interaction. Reveal deeper capabilities only as
+  the user engages and demonstrates readiness.
+- Order information to mirror the user's mental model: what comes in before
+  what goes out, broad categories before granular ones.
+- Every piece of visible information should earn its place. If a user doesn't
+  need it at their current step, defer it.
+- Running feedback (subtotals, net calculations) stays visible without requiring
+  the user to seek it out.
 
-**Rules:**
-- External links open in new tabs.
-- The theme toggle is always accessible, never hidden behind a menu.
+### 3. Meet People Where They Are
 
----
+We make no assumptions about our users' financial literacy, emotional state,
+or technical expertise.
 
-## Empty States
-
-Footing has one primary empty state: when the user first visits Footing Me with no
-data in localStorage.
-
-### Empty Footing Me
-
-When all accordion sections are empty:
-- Each section header shows `$0.00 / Week`.
-- The Net Total shows `$0.00 / Week`.
-- The privacy notice provides context ("Nothing you put in here will be sent to our servers").
-- No placeholder illustrations or "get started" prompts inside sections — the form itself
-  is the prompt.
-
-**Philosophy:** The empty state IS the tool. The forms are visible immediately. No gates,
-no tutorials, no "add your first item" hero images. The user sees the input fields and
-understands what to do.
-
-### After Clearing Data
-
-Same as the initial empty state. The confirmation dialog is the only ceremony around
-data deletion. Once cleared, the UI resets silently.
+- Don't assume financial literacy. A user who doesn't know what "net income"
+  means deserves the same quality tool as a user who does.
+- Don't assume shame. Many people feel embarrassed about their financial
+  situation. The tone must never reinforce that.
+- Don't assume expertise with digital tools. The interface should be
+  self-evident. If it needs a tutorial, it's too complex.
+- Don't assume a specific device or context. The experience must work on
+  whatever screen the user has available.
 
 ---
 
-## Interaction Patterns
+## Interaction Principles
 
-### Form Entry (Money Flow Cards)
+### Progressive Disclosure
 
-Each money flow section uses the same form pattern:
+Reveal complexity gradually. The user's first interaction should be the simplest
+possible version of the tool. Deeper features emerge as engagement deepens.
 
-```
-[Prompt text with popover hint]
-$[amount] [frequency dropdown] [connector word] [description]
-[Add button]
-```
+- Collapsed-by-default patterns let users control their depth of engagement.
+- The natural top-to-bottom flow guides users through a logical progression
+  without requiring instructions.
+- Contextual guidance appears at the moment it's relevant, not in advance.
 
-**Pattern rules:**
-- The prompt reads as a natural sentence: "I receive a net amount of $[X] [every week]
-  from [my job]."
-- Popover hints explain financial terms on hover/tap. They use `text-info` styling to
-  signal interactivity.
-- The frequency dropdown defaults to "how often?" — not a pre-selected value.
-- Validation uses DataAnnotations. Invalid fields get a 1px red outline.
-- The Add button is a primary button. One primary action per form.
+### Immediate Feedback
 
-### Entry Deletion
+Every user action should produce a visible result without delay.
 
-- Each table row has an "X" icon for deletion.
-- The icon starts at 50% opacity and darkens on hover.
-- On hover, it turns the negative amount color (red).
-- No confirmation dialog for individual deletions — the action is small and recoverable
-  by re-entry.
+- Data entry instantly updates running calculations. There is no "submit" step
+  between entering data and seeing its effect.
+- Auto-save is silent and assumed. Saving is a given, not an event worth
+  announcing.
+- State changes (theme toggle, section expand/collapse) are instantaneous and
+  require no confirmation.
 
-### Accordion Behavior
+### Forgiveness Over Prevention
 
-- Sections are mutually exclusive — expanding one collapses others (Bootstrap parent
-  accordion).
-- Section headers always show the weekly subtotal, even when collapsed.
-- Click anywhere on the header row to expand/collapse.
+Let users act freely. Protect them from catastrophe, not from small mistakes.
 
-### Theme Toggle
+- Individual item deletion requires no confirmation — the action is small and
+  easily reversed by re-entry.
+- Bulk destructive actions (clearing all data) require explicit confirmation.
+  This is the only ceremony around data deletion.
+- There are no "are you sure?" dialogs for routine actions. Trust the user.
+- Undo-ability is preferred over gatekeeping.
 
-- Click toggles between light and dark mode.
-- Preference is stored via `data-theme` attribute on `<html>`.
-- Respects `prefers-color-scheme` when no explicit choice has been made.
-- Icon changes: sun in dark mode (switch to light), moon in light mode (switch to dark).
+### No Dead Ends
 
-### Excel Export
+Every state in the application should offer a clear path forward.
 
-- Single button at the bottom of the accordion.
-- Generates the file entirely client-side using Simplexcel.
-- Downloads as `Footing.xlsx`.
-- No loading spinner needed — generation is near-instant for typical data sizes.
+- Every page has an obvious next action or clear orientation.
+- Motivational content leads to the tool. The tool leads to export. There is
+  always a next step.
+- Error states always provide an action the user can take (retry, reload,
+  resume).
+- Empty states are functional, not decorative. The empty form *is* the prompt.
 
 ---
 
-## Error Handling UX
+## Tone of Voice
 
-### Blazor Error Boundary
+### Writing Principles
 
-Runtime errors display a yellow warning bar with "An error has occurred." This is the
-framework default, styled with brand tokens (`--ft-error-bg`, `--ft-error-text`).
+- **First and second person.** "I receive," "your money," "you can do this."
+  The app speaks *with* the user, not *at* them.
+- **Active, empowering language.** "Take Control of Your Money," not "Financial
+  Dashboard" or "Budget Tracker."
+- **Short sentences.** One idea per sentence. One concept per paragraph in
+  narrative content.
+- **Emotional emphasis through restraint.** Italics for emotional moments
+  (*You can do this.*), not exclamation points or emoji.
 
-**Rules:**
-- Keep the error message generic for end users.
-- The "Reload" link and dismiss button are always available.
+### What We Don't Say
 
-### Server Reconnection
+- No clinical or corporate language ("dashboard," "metrics," "KPIs").
+- No shame-adjacent language ("overspending," "debt problem," "financial
+  trouble").
+- No false urgency ("act now," "don't miss out," "limited time").
+- No hollow positivity ("everything is awesome!"). Encouragement must be honest.
 
-When the Blazor SignalR connection drops, the reconnect modal appears:
+### Contextual Guidance
 
-1. **Rejoining** — animated dots, "Rejoining the server..." message.
-2. **Retry** — "Rejoin failed... trying again in X seconds."
-3. **Failed** — "Failed to rejoin. Please retry or reload the page." with a Retry button.
-4. **Paused** — "The session has been paused by the server." with a Resume button.
-
-**Rules:**
-- The modal is a `<dialog>` element for proper accessibility.
-- It appears as a centered overlay with backdrop.
-- The user always has an action available (Retry or Resume).
-
-### Not Found (404)
-
-Minimal page with "Not Found" heading and a brief message. No illustration, no search
-box, no suggestions.
-
-### Validation Errors
-
-- Individual field validation uses colored outlines (green for valid, red for invalid).
-- A `ValidationSummary` appears below the form when submission fails.
-- Validation messages use `--ft-invalid` color.
+Guidance text adapts to the user's situation:
+- **Positive outcomes:** Cautiously optimistic. Acknowledge the good while
+  recognizing that circumstances change.
+- **Negative outcomes:** Action-oriented. Frame as an invitation to adjust, not
+  as a failure to fix.
+- **Neutral/empty states:** Calm and welcoming. The tool is ready when you are.
 
 ---
 
-## Responsive Design
+## Privacy as a Feature
 
-### Breakpoints
+Privacy is not a legal obligation we grudgingly fulfill — it is a core product
+feature and a trust signal.
 
-| Breakpoint | Behavior |
-|---|---|
-| < 641px | Single-column card grid on landing. Sidebar collapses to toggle. |
-| >= 641px | Two-column card grid on landing. Sidebar expands. |
-
-### Mobile Considerations
-
-- The sidebar toggle is a checkbox-based pattern (no JavaScript for open/close).
-- Forms use `size` attributes on inputs for natural sizing.
-- Popovers use `data-bs-placement="auto"` to adapt to available space.
-- Tables in money flow sections may scroll horizontally on narrow screens.
-
----
-
-## Tone of Voice in UI Copy
-
-### Headings
-
-- Use active, empowering language: "Take Control of Your Money," "Manage My Money."
-- Avoid passive or clinical language: not "Financial Dashboard" or "Budget Tracker."
-
-### Body Copy
-
-- Write in first and second person: "I receive," "your money," "you can do this."
-- Keep sentences short. One idea per paragraph on the motivational page.
-- Use italics for emotional emphasis: "*You can do this.*"
-- Financial terms get popover explanations, not inline definitions.
-
-### Contextual Guidance (Net Total)
-
-- **Positive net:** "You're looking good so far" — cautiously optimistic, not celebratory.
-  Acknowledges that things change.
-- **Negative net:** "Time to roll up your sleeves" — action-oriented, not alarming. No
-  "you're in trouble" or "danger" language.
-
-### Privacy Notice
-
-- Always present on Footing Me.
-- Plain language: "Nothing you put in here will be sent to our servers."
-- Includes a "clear" action link inline — accessible but not prominent.
+- **No data leaves the browser.** All user financial data is stored locally.
+  There are no server-side databases, no analytics on user finances, no data
+  sharing of any kind.
+- **No accounts, no sign-up, no email capture — ever.** The tool works
+  immediately, with zero friction. Identity is not required because we don't
+  store anything to associate it with.
+- **The privacy notice is a first-class UI element.** It appears early and
+  prominently — not buried in a footer or hidden behind a link. It is written
+  in plain language, not legalese.
+- **Export is local.** File generation happens entirely in the browser. No
+  server round-trip, no temporary cloud storage.
+- **Clearing data is real.** When the user clears their data, it is gone. There
+  is no soft delete, no recycle bin, no "we kept a backup just in case."
 
 ---
 
-## Accessibility
+## Accessibility Standards
 
-### Current Implementation
+Accessibility is not a checklist item — it is a design constraint that applies
+to every decision.
 
-- Semantic HTML: `<nav>`, `<main>`, `<article>`, `<dialog>`.
-- ARIA labels on the theme toggle button.
-- `aria-hidden="true"` on decorative icons.
-- Focus ring uses `--ft-focus-ring` token for visibility.
-- Keyboard-navigable accordion via Bootstrap's collapse component.
-- Color contrast ratios maintained across light and dark themes.
+### Principles
+
+- **Semantic HTML first.** Use the right element for the job (`<nav>`, `<main>`,
+  `<dialog>`, `<button>`) before reaching for ARIA attributes.
+- **Keyboard access is non-negotiable.** Every interactive element must be
+  reachable and operable via keyboard alone.
+- **Color is never the sole signifier.** Information conveyed through color
+  (positive/negative amounts, validation states) must also be conveyed through
+  text, icons, or symbols (+/- signs, labels).
+- **Both themes must pass contrast.** New color tokens must meet contrast
+  requirements in both light and dark modes.
+- **Focus visibility matters.** Focus indicators must be clearly visible. They
+  are a feature for keyboard users, not a cosmetic problem to suppress.
 
 ### Guidelines for New Features
 
-- All interactive elements must be keyboard-accessible.
+- Test keyboard navigation before considering the feature complete.
 - Use `aria-label` or `aria-labelledby` on controls without visible text labels.
-- Never rely on color alone to convey meaning (e.g., positive/negative amounts also
-  use +/- signs).
-- Test both light and dark modes for contrast compliance.
-- The reconnect modal uses `<dialog>` — new modals should follow the same pattern.
+- New modal or overlay patterns should use `<dialog>` for proper focus trapping
+  and screen reader announcement.
+- Verify contrast ratios in both light and dark themes.
 
 ---
 
-## Design Token Usage
+## Design Token Philosophy
 
-All colors are defined as CSS custom properties with the `--ft-` prefix. Components
-must use tokens, never hardcoded color values.
+Visual consistency comes from a shared token system, not from copying hex values
+between files.
 
-### Token Categories
+### Principles
 
-| Category | Prefix | Example |
-|---|---|---|
-| Brand | `--ft-primary`, `--ft-accent` | Buttons, links, highlighted cards |
-| Monetary | `--ft-amount-positive`, `--ft-amount-negative` | Income vs. expense coloring |
-| Text | `--ft-text`, `--ft-text-muted` | Body copy, secondary labels |
-| Background | `--ft-bg`, `--ft-bg-surface`, `--ft-bg-topbar` | Page, cards, top bar |
-| Sidebar | `--ft-sidebar-*` | Navigation panel |
-| Focus | `--ft-focus-ring` | Keyboard focus indicators |
-| Validation | `--ft-valid`, `--ft-invalid` | Form field states |
-| Error UI | `--ft-error-*` | Error boundaries, error pages |
-| Modal | `--ft-modal-*` | Reconnect dialog |
-
-### Dark Mode
-
-- Dark mode is activated via `data-theme="dark"` on the root element.
-- Falls back to `prefers-color-scheme: dark` when no explicit theme is set.
-- Every token has a dark-mode variant. New tokens must define both light and dark values.
-
----
-
-## Workflow Principles
-
-1. **No login, no friction.** The tool works immediately. Data stays in the browser.
-2. **Progressive disclosure.** Start with income, reveal expense categories, end with
-   the net total. Don't show everything at once.
-3. **Immediate feedback.** Every entry instantly updates the weekly subtotal in the
-   section header and the net total.
-4. **No dead ends.** Every page has a clear next action. The motivational page leads
-   to the tool. The tool leads to export.
-5. **Forgiveness over prevention.** Let users delete entries freely. Only confirm
-   destructive bulk actions (clear all data).
-6. **Privacy is a feature.** The privacy notice isn't legalese — it's a trust signal.
-   Surface it early and prominently.
-7. **Encourage, don't judge.** A negative balance isn't a failure message. It's an
-   invitation to take action.
+- **Tokens over hardcoded values.** All colors, and eventually spacing and
+  typography, are defined as CSS custom properties with the `--ft-` prefix.
+  Components must reference tokens, never literal values.
+- **Semantic naming.** Tokens describe their *purpose* (`--ft-amount-positive`),
+  not their *appearance* (`--ft-green`). This allows the palette to evolve
+  without renaming.
+- **Theme completeness.** Every token must have both a light and a dark mode
+  value. Adding a token to one theme without the other is a bug.
+- **Brand coherence.** The token palette derives from the Riverbed brand
+  identity. New tokens should feel like they belong to the same family — warm,
+  natural, grounded.
+- **Restraint.** Not every subtle variation needs its own token. Prefer reusing
+  existing tokens with opacity or derived values over proliferating new ones.
