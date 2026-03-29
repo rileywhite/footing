@@ -537,55 +537,54 @@ h1:focus {
     line-height: 1.6;
 }
 
-.ft-cards {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: var(--ft-space-lg);
-    max-width: 48rem;
+.ft-narrative {
+    max-width: 36rem;
     margin: 0 auto;
+    padding: 0 var(--ft-space-md) var(--ft-space-xl);
 }
 
-@media (min-width: 641px) {
-    .ft-cards {
-        grid-template-columns: 1fr 1fr;
-    }
-}
-
-.ft-card {
-    background-color: var(--ft-bg-surface);
-    border: 1px solid var(--ft-bg-topbar-border);
-    border-radius: var(--ft-radius-lg);
-    padding: var(--ft-space-lg) var(--ft-space-lg);
-    transition: box-shadow 0.2s, border-color 0.2s;
-}
-
-.ft-card:hover {
-    border-color: var(--ft-primary);
-    box-shadow: var(--ft-shadow-md);
-}
-
-.ft-card h3 {
-    font-size: var(--ft-text-xl);
-    font-weight: var(--ft-weight-heading);
-    margin-bottom: var(--ft-space-sm);
-    color: var(--ft-primary);
-}
-
-.ft-card p {
+.ft-narrative p {
+    font-size: var(--ft-text-base);
+    line-height: 1.8;
     color: var(--ft-text-muted);
-    font-size: var(--ft-text-sm);
-    line-height: 1.6;
     margin-bottom: var(--ft-space-md);
 }
 
-.ft-card p:last-of-type {
-    margin-bottom: var(--ft-space-lg);
+.ft-narrative p em {
+    color: var(--ft-accent);
+    font-style: italic;
 }
 
-.ft-card .btn {
-    font-size: var(--ft-text-sm);
-    padding: var(--ft-space-sm) var(--ft-space-lg);
-    border-radius: var(--ft-radius-sm);
+.ft-value-section {
+    text-align: center;
+    max-width: 36rem;
+    margin: 0 auto;
+    padding: var(--ft-space-xl) var(--ft-space-md);
+    border-top: 1px solid var(--ft-bg-topbar-border);
+}
+
+.ft-value-section h2 {
+    font-size: var(--ft-text-2xl);
+    font-weight: var(--ft-weight-heading);
+    color: var(--ft-primary);
+    margin-bottom: var(--ft-space-sm);
+}
+
+.ft-value-section p {
+    font-size: var(--ft-text-base);
+    line-height: 1.6;
+    color: var(--ft-text-muted);
+    margin-bottom: var(--ft-space-md);
+}
+
+.ft-privacy-note {
+    font-size: var(--ft-text-sm) !important;
+    font-style: italic;
+    color: var(--ft-text-muted);
+}
+
+.ft-value-section .btn {
+    margin-top: var(--ft-space-sm);
 }
 
 /* ============================================================
@@ -612,36 +611,6 @@ h1:focus {
     color: var(--ft-primary);
 }
 
-/* ============================================================
-   Control Your Money Page — Improved Layout
-   ============================================================ */
-
-.ft-prose {
-    max-width: 36rem;
-}
-
-.ft-prose h2 {
-    font-size: var(--ft-text-2xl);
-    font-weight: var(--ft-weight-title);
-    margin-bottom: var(--ft-space-lg);
-    color: var(--ft-text);
-}
-
-.ft-prose p {
-    font-size: var(--ft-text-base);
-    line-height: 1.8;
-    color: var(--ft-text-muted);
-    margin-bottom: var(--ft-space-md);
-}
-
-.ft-prose p em {
-    color: var(--ft-accent);
-    font-style: italic;
-}
-
-.ft-prose .btn {
-    margin-top: var(--ft-space-sm);
-}
 
 /* ============================================================
    Find My Footing Page — Header
