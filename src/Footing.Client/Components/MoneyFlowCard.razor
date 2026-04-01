@@ -68,8 +68,10 @@
 
                 @if (OnFirstEntryAdded.HasDelegate)
                 {
-                    <div class="ft-skip-link">
-                        <a href="" @onclick="SkipSection" @onclick:preventDefault>Skip, move on</a>
+                    <div class="ft-move-on">
+                        <button type="button" class="btn btn-outline-primary ft-move-on__btn" @onclick="SkipSection">
+                            Move on
+                        </button>
                     </div>
                 }
             </div>

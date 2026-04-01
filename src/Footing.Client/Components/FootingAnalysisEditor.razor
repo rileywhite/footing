@@ -14,6 +14,7 @@
                 <a href="" @onclick=ClearLocalStorage @onclick:preventDefault>clear</a>
                 it at any time.
             </em>
+            <button type="button" class="btn ft-clear-btn" @onclick=ClearLocalStorage>Clear my data</button>
         </div>
 
         <MoneyFlowCard @bind-MoneyFlows=this.FootingAnalysis.Inflows
@@ -21,7 +22,7 @@
                        Label="Income"
                        FormPrompt="@IncomesFormPrompt"
                        FormAmountDescriptionConnectorWord="from"
-                       GuidingSentence="Let's start with what comes in. What do you earn?"
+                       GuidingSentence="Let's start with what comes in. What money do you receive?"
                        IsOpen="true"
                        IsVisible="true"
                        OnFirstEntryAdded="@(() => RevealNextSection(0))" />
@@ -113,6 +114,7 @@ else
                 <a href="" @onclick=ClearLocalStorage @onclick:preventDefault>clear</a>
                 it at any time.
             </em>
+            <button type="button" class="btn ft-clear-btn" @onclick=ClearLocalStorage>Clear my data</button>
         </div>
 
         <MoneyFlowCard @bind-MoneyFlows=this.FootingAnalysis.Inflows
@@ -204,7 +206,7 @@ else
     private int _revealedSections = 1;
 
     private bool IsSectionVisible(int index) => index < _revealedSections;
-    private bool IsSectionOpen(int index) => index == _revealedSections - 1;
+    private bool IsSectionOpen(int index) => false;
 
     private void RevealNextSection(int currentIndex)
     {

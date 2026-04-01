@@ -776,20 +776,23 @@ h1:focus {
     line-height: 1.5;
 }
 
-.ft-skip-link {
-    margin-top: var(--ft-space-sm);
+.ft-move-on {
+    margin-top: var(--ft-space-md);
     text-align: right;
 }
 
-.ft-skip-link a {
-    font-size: var(--ft-text-sm);
-    color: var(--ft-text-muted);
-    text-decoration: none;
+.ft-move-on__btn {
+    font-size: var(--ft-text-sm) !important;
+    padding: var(--ft-space-xs) var(--ft-space-lg) !important;
+    border-color: var(--ft-primary) !important;
+    color: var(--ft-primary) !important;
+    border-radius: var(--ft-radius-md) !important;
+    transition: background-color 0.15s, color 0.15s !important;
 }
 
-.ft-skip-link a:hover {
-    color: var(--ft-primary);
-    text-decoration: underline;
+.ft-move-on__btn:hover {
+    background-color: var(--ft-primary) !important;
+    color: #fff !important;
 }
 
 /* ============================================================
@@ -1023,6 +1026,26 @@ h1:focus {
 .ft-privacy-banner em {
     font-style: normal;
     line-height: 1.5;
+    flex: 1;
+}
+
+.ft-clear-btn {
+    font-size: var(--ft-text-xs) !important;
+    padding: var(--ft-space-xs) var(--ft-space-sm) !important;
+    color: var(--ft-text-muted) !important;
+    border: 1px solid var(--ft-bg-topbar-border) !important;
+    border-radius: var(--ft-radius-sm) !important;
+    background-color: transparent !important;
+    white-space: nowrap;
+    flex-shrink: 0;
+    align-self: center;
+    transition: color 0.15s, border-color 0.15s, background-color 0.15s !important;
+}
+
+.ft-clear-btn:hover {
+    color: var(--ft-amount-negative) !important;
+    border-color: var(--ft-amount-negative) !important;
+    background-color: var(--ft-bg-surface) !important;
 }
 
 .ft-export-btn {
@@ -1112,13 +1135,29 @@ a.text-info:hover {
 
 /* Section reveal animation */
 .ft-section--open {
-    animation: ft-reveal 0.18s ease-out;
+    animation: ft-reveal 0.3s ease-out;
 }
 
 @keyframes ft-reveal {
     from {
         opacity: 0;
         transform: translateY(-6px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Newly revealed section card — gentle highlight that fades */
+.ft-section-card {
+    animation: ft-card-appear 0.4s ease-out;
+}
+
+@keyframes ft-card-appear {
+    from {
+        opacity: 0;
+        transform: translateY(-4px);
     }
     to {
         opacity: 1;
