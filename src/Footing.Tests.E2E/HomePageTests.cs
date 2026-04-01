@@ -24,12 +24,12 @@ public class HomePageTests
     }
 
     [SkippableFact]
-    public async Task HomePage_HasFootingMeLink()
+    public async Task HomePage_HasFindMyFootingLink()
     {
         SkipIfUnavailable();
         var page = await _fixture.Browser.NewPageAsync();
         await page.GotoAsync(_fixture.BaseUrl);
-        var links = page.Locator("a[href='footing-me']");
+        var links = page.Locator("a[href='find-my-footing']");
         await links.First.WaitForAsync();
         (await links.CountAsync()).Should().BeGreaterThan(0);
         await page.CloseAsync();
@@ -48,14 +48,14 @@ public class HomePageTests
     }
 
     [SkippableFact]
-    public async Task HomePage_NavigatesToFootingMe()
+    public async Task HomePage_NavigatesToFindMyFooting()
     {
         SkipIfUnavailable();
         var page = await _fixture.Browser.NewPageAsync();
         await page.GotoAsync(_fixture.BaseUrl);
-        await page.Locator("a[href='footing-me']").First.ClickAsync();
-        await page.WaitForURLAsync("**/footing-me");
-        page.Url.Should().Contain("footing-me");
+        await page.Locator("a[href='find-my-footing']").First.ClickAsync();
+        await page.WaitForURLAsync("**/find-my-footing");
+        page.Url.Should().Contain("find-my-footing");
         await page.CloseAsync();
     }
 }

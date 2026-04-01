@@ -5,73 +5,73 @@ using Xunit;
 namespace Footing.Tests.E2E;
 
 [Collection("Playwright")]
-public class FootingMePageTests
+public class FindMyFootingPageTests
 {
     private readonly PlaywrightFixture _fixture;
-    public FootingMePageTests(PlaywrightFixture fixture) => _fixture = fixture;
+    public FindMyFootingPageTests(PlaywrightFixture fixture) => _fixture = fixture;
 
     private void SkipIfUnavailable() =>
         Skip.If(!_fixture.ServerAvailable, "Server not available");
 
-    private async Task<IPage> NavigateToFootingMe()
+    private async Task<IPage> NavigateToFindMyFooting()
     {
         var page = await _fixture.Browser.NewPageAsync();
-        await page.GotoAsync($"{_fixture.BaseUrl}/footing-me");
+        await page.GotoAsync($"{_fixture.BaseUrl}/find-my-footing");
         // WASM interactive component needs time to download and initialize
         await page.WaitForSelectorAsync("#moneyFlows", new() { Timeout = 60000, State = WaitForSelectorState.Attached });
         return page;
     }
 
     [SkippableFact]
-    public async Task FootingMe_LoadsWithTitle()
+    public async Task FindMyFooting_LoadsWithTitle()
     {
         SkipIfUnavailable();
-        var page = await NavigateToFootingMe();
+        var page = await NavigateToFindMyFooting();
         (await page.Locator("h1").TextContentAsync()).Should().Contain("Manage My Money");
         await page.CloseAsync();
     }
 
     [SkippableFact]
-    public async Task FootingMe_ShowsFiveMoneyFlowCards()
+    public async Task FindMyFooting_ShowsFiveMoneyFlowCards()
     {
         SkipIfUnavailable();
-        var page = await NavigateToFootingMe();
+        var page = await NavigateToFindMyFooting();
         (await page.Locator("#moneyFlows > .card").CountAsync()).Should().BeGreaterThanOrEqualTo(5);
         await page.CloseAsync();
     }
 
     [SkippableFact]
-    public async Task FootingMe_ShowsIncomeSection()
+    public async Task FindMyFooting_ShowsIncomeSection()
     {
         SkipIfUnavailable();
-        var page = await NavigateToFootingMe();
+        var page = await NavigateToFindMyFooting();
         (await page.Locator("#incomeHeading").CountAsync()).Should().Be(1);
         await page.CloseAsync();
     }
 
     [SkippableFact]
-    public async Task FootingMe_ShowsNetTotal()
+    public async Task FindMyFooting_ShowsNetTotal()
     {
         SkipIfUnavailable();
-        var page = await NavigateToFootingMe();
+        var page = await NavigateToFindMyFooting();
         (await page.Locator("#totalHeading").TextContentAsync()).Should().Contain("Net Total");
         await page.CloseAsync();
     }
 
     [SkippableFact]
-    public async Task FootingMe_ShowsExportButton()
+    public async Task FindMyFooting_ShowsExportButton()
     {
         SkipIfUnavailable();
-        var page = await NavigateToFootingMe();
+        var page = await NavigateToFindMyFooting();
         (await page.Locator("input[value='Download Excel Spreadsheet']").CountAsync()).Should().Be(1);
         await page.CloseAsync();
     }
 
     [SkippableFact]
-    public async Task FootingMe_CanExpandIncomeSection()
+    public async Task FindMyFooting_CanExpandIncomeSection()
     {
         SkipIfUnavailable();
-        var page = await NavigateToFootingMe();
+        var page = await NavigateToFindMyFooting();
         await page.Locator("#incomeHeading button").ClickAsync();
         await page.WaitForSelectorAsync("#incomeDetails.show, #incomeDetails.collapse.show",
             new() { Timeout = 5000 });
@@ -80,10 +80,10 @@ public class FootingMePageTests
     }
 
     [SkippableFact]
-    public async Task FootingMe_CanAddIncomeItem()
+    public async Task FindMyFooting_CanAddIncomeItem()
     {
         SkipIfUnavailable();
-        var page = await NavigateToFootingMe();
+        var page = await NavigateToFindMyFooting();
         await page.Locator("#incomeHeading button").ClickAsync();
         await page.WaitForSelectorAsync("#incomeDetails.show, #incomeDetails.collapse.show",
             new() { Timeout = 5000 });
@@ -99,29 +99,29 @@ public class FootingMePageTests
     }
 
     [SkippableFact]
-    public async Task FootingMe_ShowsPrivacyNotice()
+    public async Task FindMyFooting_ShowsPrivacyNotice()
     {
         SkipIfUnavailable();
-        var page = await NavigateToFootingMe();
+        var page = await NavigateToFindMyFooting();
         (await page.Locator("em").First.TextContentAsync())
             .Should().Contain("Nothing you put in here will be sent to our servers");
         await page.CloseAsync();
     }
 
     [SkippableFact]
-    public async Task FootingMe_HasClearLink()
+    public async Task FindMyFooting_HasClearLink()
     {
         SkipIfUnavailable();
-        var page = await NavigateToFootingMe();
+        var page = await NavigateToFindMyFooting();
         (await page.Locator("a:has-text('clear')").CountAsync()).Should().Be(1);
         await page.CloseAsync();
     }
 
     [SkippableFact]
-    public async Task FootingMe_ShowsAllCategorySections()
+    public async Task FindMyFooting_ShowsAllCategorySections()
     {
         SkipIfUnavailable();
-        var page = await NavigateToFootingMe();
+        var page = await NavigateToFindMyFooting();
         foreach (var section in new[] { "income", "recurringBills", "householdBudgets", "personalBudgets", "eventBudgets" })
             (await page.Locator($"#{section}Heading").CountAsync()).Should().Be(1, $"section {section} should exist");
         await page.CloseAsync();
