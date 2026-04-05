@@ -1,0 +1,198 @@
+@using Footing.Client.ViewModels
+
+@if (IsVisible)
+{
+    <div class="card ft-section-card">
+        <div id="@(Name)Heading" class="card-header">
+            <h5>
+                <button class="btn btn-link btn-accordian-header @(CompactMode ? "ft-compact-header" : "")"
+                        type="button"
+                        @onclick="ToggleOpen"
+                        aria-expanded="@_isOpen.ToString().ToLower()"
+                        aria-controls="@(Name)Details">
+                    @Label <MonetaryAmountDisplay Amount="this.MoneyFlows.WeeklyTotalMoneyFlow" /> / Week
+                    <span class="ft-chevron" aria-hidden="true">@(_isOpen ? "▼" : "▶")</span>
+                </button>
+            </h5>
+        </div>
+    </div>
+    @if (_isOpen)
+    {
+        <div id="@(Name)Details" class="ft-section--open" aria-labelledby="@(Name)Heading">
+            <div class="card-body">
+                @if (!string.IsNullOrEmpty(GuidingSentence))
+                {
+                    <p class="ft-guiding-sentence">@GuidingSentence</p>
+                }
+
+                <EditForm Model="@Model" OnValidSubmit="AddMoneyFlow">
+                    <DataAnnotationsValidator />
+                    <dl>
+                        <dt>
+                            @((MarkupString)FormPrompt)
+                        </dt>
+                        <dd>
+                            <div class="ft-input-money">
+                                <span class="ft-input-money__prefix" aria-hidden="true">$</span>
+                                <InputNumber class="ft-input-money__field" placeholder="xxx.xx" @bind-Value="Model.Amount" />
+                            </div>
+                            <InputSelect class="ft-period-select" @bind-Value="Model.Period">
+                                <option value="">how often?</option>
+                                @foreach (Period period in Enum.GetValues(typeof(Period)))
+                                {
+                                    <option value="@period">@GetPeriodDescription(period)</option>
+                                }
+                            </InputSelect>
+                        </dd>
+                        <dt>@FormAmountDescriptionConnectorWord</dt>
+                        <dd><InputText size="30" placeholder="@($"{Label} Description")" @bind-Value="Model.Name" /></dd>
+                    </dl>
+
+                    <button type="submit" class="btn btn-primary ft-add-btn">Add</button>
+                    <ValidationSummary />
+                </EditForm>
+
+                @if (this.MoneyFlows.Count > 0)
+                {
+                    <ul class="ft-entry-list">
+                        @foreach (var moneyFlow in this.MoneyFlows)
+                        {
+                            <li class="ft-entry-chip">
+                                <span class="ft-entry-chip__name">@moneyFlow.Name</span>
+                                <span class="ft-entry-chip__amount"><MonetaryAmountDisplay Amount="@moneyFlow.Amount" /> / @GetPeriodShortLabel(moneyFlow.Period)</span>
+                                <span class="bi bi-x ft-entry-chip__delete" role="button" aria-label="Remove @moneyFlow.Name" @onclick="@(() => this.RemoveMoneyFlow(moneyFlow.Id))"></span>
+                            </li>
+                        }
+                    </ul>
+                }
+
+                @if (OnAdvanceRequested.HasDelegate)
+                {
+                    <div class="ft-move-on">
+                        <button type="button"
+                                class="btn ft-move-on__btn @(_hasNotifiedFirstEntry ? "btn-primary ft-move-on__btn--ready" : "btn-outline-primary")"
+                                @onclick="AdvanceSection">
+                            Move on
+                        </button>
+                    </div>
+                }
+            </div>
+        </div>
+    }
+}
+
+@code{
+    [Parameter]
+    public MoneyFlows MoneyFlows { get; set; } = null!;
+
+    [Parameter]
+    public EventCallback<MoneyFlows> MoneyFlowsChanged { get; set; }
+
+    [Parameter]
+    public string Name { get; set; } = null!;
+
+    [Parameter]
+    public string Label { get; set; } = null!;
+
+    [Parameter]
+    public string FormPrompt { get; set; } = null!;
+
+    [Parameter]
+    public string FormAmountDescriptionConnectorWord { get; set; } = null!;
+
+    [Parameter]
+    public string? GuidingSentence { get; set; }
+
+    [Parameter]
+    public bool IsOpen { get; set; }
+
+    [Parameter]
+    public bool IsVisible { get; set; } = true;
+
+    [Parameter]
+    public EventCallback OnFirstEntryAdded { get; set; }
+
+    [Parameter]
+    public EventCallback OnAdvanceRequested { get; set; }
+
+    [Parameter]
+    public bool CompactMode { get; set; }
+
+    private bool _isOpen;
+    private bool _hasNotifiedFirstEntry;
+    private bool _initialized;
+
+    private NewMoneyFlowModel Model { get; set; } = new NewMoneyFlowModel();
+
+    protected override void OnParametersSet()
+    {
+        if (!_initialized)
+        {
+            _isOpen = IsOpen;
+            if (IsOpen || CompactMode) _initialized = true;
+        }
+    }
+
+    private void ToggleOpen()
+    {
+        _isOpen = !_isOpen;
+    }
+
+    private async Task AddMoneyFlow()
+    {
+        this.MoneyFlows.Add(
+            new MoneyFlow
+            {
+                Name = this.Model.Name ?? "",
+                Amount = this.Model.Amount ?? default,
+                Period = this.Model.Period ?? default,
+            });
+        this.Model = new NewMoneyFlowModel();
+        await this.MoneyFlowsChanged.InvokeAsync(this.MoneyFlows);
+
+        if (!_hasNotifiedFirstEntry && OnFirstEntryAdded.HasDelegate)
+        {
+            _hasNotifiedFirstEntry = true;
+            await OnFirstEntryAdded.InvokeAsync();
+        }
+    }
+
+    private async Task RemoveMoneyFlow(Guid id)
+    {
+        var moneyFlow = this.MoneyFlows.First(mf => mf.Id == id);
+        this.MoneyFlows.Remove(moneyFlow);
+        await this.MoneyFlowsChanged.InvokeAsync(this.MoneyFlows);
+    }
+
+    private async Task AdvanceSection()
+    {
+        _hasNotifiedFirstEntry = true;
+        await OnAdvanceRequested.InvokeAsync();
+    }
+
+    private string GetPeriodDescription(Period period) => period switch
+    {
+        Period.Daily => "every day",
+        Period.Weekly => "every week",
+        Period.BiWeekly => "every two weeks",
+        Period.SemiMonthly => "twice per month",
+        Period.Monthly => "every month",
+        Period.Quarterly => "every three months",
+        Period.SemiAnnually => "every six months",
+        Period.Annually => "every year",
+        _ => throw new ArgumentException($"Unknown period: {period}"),
+    };
+
+    private string GetPeriodShortLabel(Period period) => period switch
+    {
+        Period.Daily => "day",
+        Period.Weekly => "wk",
+        Period.BiWeekly => "2wk",
+        Period.SemiMonthly => "2×/mo",
+        Period.Monthly => "mo",
+        Period.Quarterly => "qtr",
+        Period.SemiAnnually => "6mo",
+        Period.Annually => "yr",
+        _ => period.ToString(),
+    };
+}

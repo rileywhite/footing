@@ -1,0 +1,15 @@
+<Solution>
+  <Configurations>
+    <Platform Name="Any CPU" />
+    <Platform Name="x64" />
+    <Platform Name="x86" />
+  </Configurations>
+  <Project Path="Footing.AppHost/Footing.AppHost.csproj" />
+  <Project Path="Footing.Client/Footing.Client.csproj" />
+  <Project Path="Footing.ServiceDefaults/Footing.ServiceDefaults.csproj" />
+  <Project Path="Footing.Tests.E2E/Footing.Tests.E2E.csproj" />
+  <Project Path="Footing.Tests.Functional/Footing.Tests.Functional.csproj" />
+  <Project Path="Footing.Tests.Integration/Footing.Tests.Integration.csproj" />
+  <Project Path="Footing.Tests.Unit/Footing.Tests.Unit.csproj" />
+  <Project Path="Footing/Footing.csproj" />
+</Solution>

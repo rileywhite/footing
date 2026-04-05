@@ -1,0 +1,40 @@
+{
+  "architecture": [
+    "aspire",
+    "aspire-configuration",
+    "aspire-service-defaults",
+    "dotnet-best-practices",
+    "modern-csharp-coding-standards",
+    "dotnet-project-structure",
+    "dotnet-design-pattern-review",
+    "csharp-async",
+    "dependency-injection-patterns",
+    "type-design-performance",
+    "package-management",
+    "microsoft-extensions-configuration",
+    "containerize-aspnetcore",
+    "multi-stage-dockerfile"
+  ],
+  "ui": [
+    "ui-ux-pro-max",
+    "frontend-design-system",
+    "playwright-blazor-testing",
+    "web-coder",
+    "web-design-reviewer"
+  ],
+  "accessibility": [
+    "accessibility-auditor",
+    "playwright-blazor-testing"
+  ],
+  "testing": [
+    "csharp-xunit",
+    "aspire-integration-testing",
+    "snapshot-testing",
+    "crap-analysis",
+    "dotnet-slopwatch",
+    "playwright-blazor-testing"
+  ],
+  "consent": [
+    "consent-privacy-engineering"
+  ]
+}

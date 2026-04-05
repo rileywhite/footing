@@ -1,0 +1,20 @@
+.runtime/
+.claude/*
+!.claude/review-profile.json
+!.claude/commands/
+.claude/commands/*
+!.claude/commands/review.md
+.logs/
+.beads/
+__pycache__/
+*.secrets.local
+src/README.md
+
+# Gas Town (added by gt)
+state.json
+scripts/
+
+# Beads / Dolt files (added by bd init)
+.dolt/
+*.db
+.beads-credential-key

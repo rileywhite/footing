@@ -1,0 +1,1274 @@
+/* ============================================================
+   Footing Color Palette — CSS Custom Properties
+   Light mode (default) and dark mode variants.
+   ============================================================ */
+
+:root {
+    /* --- Brand --- */
+    --ft-primary: #5a7a6a;
+    --ft-primary-hover: #4d6b5c;
+    --ft-primary-border: #436051;
+    --ft-accent: #b89e78;
+    --ft-accent-hover: #a88e68;
+    --ft-accent-text: #3a2e1e;
+
+    /* --- Monetary --- */
+    --ft-amount-positive: #5a7a6a;
+    --ft-amount-negative: #c0392b;
+
+    /* --- Text --- */
+    --ft-text: #2c3530;
+    --ft-text-muted: #6e7d72;
+
+    /* --- Backgrounds --- */
+    --ft-bg: #f6f2ec;
+    --ft-bg-surface: #ffffff;
+    --ft-bg-topbar: #ede8e0;
+    --ft-bg-topbar-border: #dfd8cc;
+
+    /* --- Focus --- */
+    --ft-focus-ring: #258cfb;
+
+    /* --- Validation --- */
+    --ft-valid: #26b050;
+    --ft-invalid: #c0392b;
+
+    /* --- Error UI --- */
+    --ft-error-bg: #b32121;
+    --ft-error-text: #ffffff;
+    --ft-error-ui-bg: #fef9e7;
+
+    /* --- Reconnect modal --- */
+    --ft-modal-bg: #ffffff;
+    --ft-modal-shadow: rgba(0, 0, 0, 0.3);
+    --ft-modal-backdrop: rgba(0, 0, 0, 0.4);
+    --ft-modal-btn-bg: #5a7a6a;
+    --ft-modal-btn-hover: #4d6b5c;
+    --ft-modal-spinner: #5a7a6a;
+
+    /* --- Checkbox --- */
+    --ft-checkbox-border: #929292;
+
+    /* --- Typography Scale --- */
+    --ft-text-xs: 0.75rem;
+    --ft-text-sm: 0.875rem;
+    --ft-text-base: 1rem;
+    --ft-text-lg: 1.125rem;
+    --ft-text-xl: 1.25rem;
+    --ft-text-2xl: 1.5rem;
+    --ft-text-3xl: 2rem;
+
+    /* --- Font Weights (Rubik) --- */
+    --ft-weight-body: 400;
+    --ft-weight-label: 500;
+    --ft-weight-heading: 600;
+    --ft-weight-title: 700;
+
+    /* --- Spacing --- */
+    --ft-space-xs: 0.25rem;
+    --ft-space-sm: 0.5rem;
+    --ft-space-md: 1rem;
+    --ft-space-lg: 1.5rem;
+    --ft-space-xl: 2rem;
+    --ft-space-2xl: 3rem;
+    --ft-space-3xl: 4rem;
+
+    /* --- Border Radius --- */
+    --ft-radius-sm: 0.25rem;
+    --ft-radius-md: 0.5rem;
+    --ft-radius-lg: 0.75rem;
+
+    /* --- Shadows --- */
+    --ft-shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.08);
+    --ft-shadow-md: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+/* Dark mode: explicit data-theme attribute takes priority */
+[data-theme="dark"] {
+    /* --- Brand --- */
+    --ft-primary: #7da893;
+    --ft-primary-hover: #8fb8a2;
+    --ft-primary-border: #6b9680;
+    --ft-accent: #d4b88a;
+    --ft-accent-hover: #e0c89a;
+    --ft-accent-text: #2e2418;
+
+    /* --- Monetary --- */
+    --ft-amount-positive: #7da893;
+    --ft-amount-negative: #e06050;
+
+    /* --- Text --- */
+    --ft-text: #e2ded6;
+    --ft-text-muted: #9a9690;
+
+    /* --- Backgrounds --- */
+    --ft-bg: #1c2420;
+    --ft-bg-surface: #252e2a;
+    --ft-bg-topbar: #222b26;
+    --ft-bg-topbar-border: #333d37;
+
+    /* --- Focus --- */
+    --ft-focus-ring: #5ca8f5;
+
+    /* --- Validation --- */
+    --ft-valid: #3cc060;
+    --ft-invalid: #e06050;
+
+    /* --- Error UI --- */
+    --ft-error-bg: #a02020;
+    --ft-error-text: #ffffff;
+    --ft-error-ui-bg: #2a2520;
+
+    /* --- Reconnect modal --- */
+    --ft-modal-bg: #252e2a;
+    --ft-modal-shadow: rgba(0, 0, 0, 0.5);
+    --ft-modal-backdrop: rgba(0, 0, 0, 0.6);
+    --ft-modal-btn-bg: #7da893;
+    --ft-modal-btn-hover: #8fb8a2;
+    --ft-modal-spinner: #7da893;
+
+    /* --- Checkbox --- */
+    --ft-checkbox-border: #6a6a66;
+
+    /* --- Shadows (darker for dark backgrounds) --- */
+    --ft-shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.2);
+    --ft-shadow-md: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+/* Fallback: apply dark mode when no explicit theme is set and OS prefers dark */
+@media (prefers-color-scheme: dark) {
+    :root:not([data-theme]) {
+        /* --- Brand --- */
+        --ft-primary: #7da893;
+        --ft-primary-hover: #8fb8a2;
+        --ft-primary-border: #6b9680;
+        --ft-accent: #d4b88a;
+        --ft-accent-hover: #e0c89a;
+        --ft-accent-text: #2e2418;
+
+        /* --- Monetary --- */
+        --ft-amount-positive: #7da893;
+        --ft-amount-negative: #e06050;
+
+        /* --- Text --- */
+        --ft-text: #e2ded6;
+        --ft-text-muted: #9a9690;
+
+        /* --- Backgrounds --- */
+        --ft-bg: #1c2420;
+        --ft-bg-surface: #252e2a;
+        --ft-bg-topbar: #222b26;
+        --ft-bg-topbar-border: #333d37;
+
+        /* --- Focus --- */
+        --ft-focus-ring: #5ca8f5;
+
+        /* --- Validation --- */
+        --ft-valid: #3cc060;
+        --ft-invalid: #e06050;
+
+        /* --- Error UI --- */
+        --ft-error-bg: #a02020;
+        --ft-error-text: #ffffff;
+        --ft-error-ui-bg: #2a2520;
+
+        /* --- Reconnect modal --- */
+        --ft-modal-bg: #252e2a;
+        --ft-modal-shadow: rgba(0, 0, 0, 0.5);
+        --ft-modal-backdrop: rgba(0, 0, 0, 0.6);
+        --ft-modal-btn-bg: #7da893;
+        --ft-modal-btn-hover: #8fb8a2;
+        --ft-modal-spinner: #7da893;
+
+        /* --- Checkbox --- */
+        --ft-checkbox-border: #6a6a66;
+
+        /* --- Shadows (darker for dark backgrounds) --- */
+        --ft-shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.2);
+        --ft-shadow-md: 0 4px 12px rgba(0, 0, 0, 0.3);
+    }
+}
+
+/* ============================================================
+   Base Reset
+   ============================================================ */
+
+*, *::before, *::after {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    margin-top: 0;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+    line-height: 1.2;
+}
+
+p {
+    margin-top: 0;
+    margin-bottom: 1rem;
+}
+
+ul, ol {
+    margin-top: 0;
+    margin-bottom: 1rem;
+}
+
+dl {
+    margin-top: 0;
+    margin-bottom: 1rem;
+}
+
+dt {
+    font-weight: 700;
+}
+
+dd {
+    margin-bottom: 0.5rem;
+    margin-left: 0;
+}
+
+a {
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+button, input, select, textarea {
+    font-family: inherit;
+    font-size: inherit;
+}
+
+/* ============================================================
+   Layout Utilities (replacing Bootstrap utilities)
+   ============================================================ */
+
+.d-flex { display: flex !important; }
+.flex-column { flex-direction: column !important; }
+.justify-content-center { justify-content: center !important; }
+.align-items-center { align-items: center !important; }
+.align-self-center { align-self: center !important; }
+.h-100 { height: 100% !important; }
+.w-100 { width: 100% !important; }
+.text-danger { color: var(--ft-invalid) !important; }
+
+/* ============================================================
+   Button Base (replacing Bootstrap .btn)
+   ============================================================ */
+
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.25rem;
+    font-weight: 400;
+    line-height: 1.5;
+    color: var(--ft-text);
+    text-align: center;
+    text-decoration: none;
+    vertical-align: middle;
+    cursor: pointer;
+    user-select: none;
+    background-color: transparent;
+    border: 1px solid transparent;
+    padding: 0.375rem 0.75rem;
+    font-size: 1rem;
+    border-radius: var(--ft-radius-md);
+    transition: color 0.15s, background-color 0.15s, border-color 0.15s, box-shadow 0.15s;
+}
+
+.btn:disabled,
+.btn[disabled] {
+    opacity: 0.65;
+    cursor: not-allowed;
+}
+
+.btn-link {
+    text-decoration: none;
+    color: var(--ft-primary);
+    background-color: transparent;
+    border-color: transparent;
+    padding: 0;
+}
+
+.btn-link:hover {
+    text-decoration: none;
+    color: var(--ft-primary-hover);
+}
+
+/* ============================================================
+   Card Base (replacing Bootstrap .card)
+   ============================================================ */
+
+.card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    word-wrap: break-word;
+    background-color: var(--ft-bg-surface);
+    background-clip: border-box;
+    border: 1px solid var(--ft-bg-topbar-border);
+    border-radius: var(--ft-radius-md);
+}
+
+.card-header {
+    padding: 0.5rem 1rem;
+    margin-bottom: 0;
+    background-color: var(--ft-bg-topbar);
+    border-bottom: 1px solid var(--ft-bg-topbar-border);
+}
+
+.card-header:first-child {
+    border-radius: calc(var(--ft-radius-md) - 1px) calc(var(--ft-radius-md) - 1px) 0 0;
+}
+
+.card-body {
+    flex: 1 1 auto;
+    padding: 1rem;
+}
+
+/* ============================================================
+   Form Controls Base (replacing Bootstrap form styles)
+   ============================================================ */
+
+.form-control,
+.form-select {
+    display: block;
+    width: 100%;
+    padding: 0.375rem 0.75rem;
+    font-size: 1rem;
+    font-weight: 400;
+    line-height: 1.5;
+    color: var(--ft-text);
+    background-color: var(--ft-bg-surface);
+    background-clip: padding-box;
+    border: 1px solid var(--ft-bg-topbar-border);
+    border-radius: var(--ft-radius-md);
+    transition: border-color 0.15s, box-shadow 0.15s;
+    -webkit-appearance: none;
+    appearance: none;
+}
+
+.form-control:focus,
+.form-select:focus {
+    color: var(--ft-text);
+    background-color: var(--ft-bg-surface);
+    border-color: var(--ft-focus-ring);
+    outline: 0;
+    box-shadow: 0 0 0 0.25rem rgba(37, 140, 251, 0.25);
+}
+
+.form-control::placeholder {
+    color: var(--ft-text-muted);
+    opacity: 1;
+}
+
+/* ============================================================
+   Bootstrap Icons Replacement (.bi-x)
+   ============================================================ */
+
+.bi-x::before {
+    content: "×";
+    font-style: normal;
+    font-weight: 700;
+    font-size: 1.1em;
+    line-height: 1;
+}
+
+/* ============================================================
+   Global Styles
+   ============================================================ */
+
+html, body {
+    font-family: 'Rubik', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    font-weight: var(--ft-weight-body);
+    font-size: var(--ft-text-base);
+    height: 100%;
+    color: var(--ft-text);
+    background-color: var(--ft-bg);
+}
+
+a, .btn-link {
+    color: var(--ft-primary);
+}
+
+a:hover, .btn-link:hover {
+    color: var(--ft-primary-hover);
+}
+
+.btn-primary {
+    color: #fff;
+    background-color: var(--ft-primary);
+    border-color: var(--ft-primary-border);
+}
+
+.btn-primary:hover {
+    background-color: var(--ft-primary-hover);
+    border-color: var(--ft-primary-border);
+}
+
+.btn-primary:active, .btn-primary:focus-visible {
+    background-color: var(--ft-primary-hover);
+    border-color: var(--ft-primary-border);
+}
+
+.btn-accent {
+    color: var(--ft-accent-text);
+    background-color: var(--ft-accent);
+    border-color: var(--ft-accent-hover);
+}
+
+.btn-accent:hover {
+    background-color: var(--ft-accent-hover);
+    border-color: var(--ft-accent-hover);
+}
+
+.btn-accent:active, .btn-accent:focus-visible {
+    background-color: var(--ft-accent-hover);
+    border-color: var(--ft-accent-hover);
+}
+
+.btn-accordian-header:focus {
+    outline: none;
+    box-shadow: none;
+    text-decoration: none;
+}
+
+.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
+    box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem var(--ft-focus-ring);
+}
+
+.content {
+    padding-top: var(--ft-space-md);
+}
+
+h1:focus {
+    outline: none;
+}
+
+.valid.modified:not([type=checkbox]) {
+    outline: 1px solid var(--ft-valid);
+}
+
+.invalid {
+    outline: 1px solid var(--ft-invalid);
+}
+
+.validation-message {
+    color: var(--ft-invalid);
+}
+
+.blazor-error-boundary {
+    background: url(data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNTYiIGhlaWdodD0iNDkiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiIG92ZXJmbG93PSJoaWRkZW4iPjxkZWZzPjxjbGlwUGF0aCBpZD0iY2xpcDAiPjxyZWN0IHg9IjIzNSIgeT0iNTEiIHdpZHRoPSI1NiIgaGVpZ2h0PSI0OSIvPjwvY2xpcFBhdGg+PC9kZWZzPjxnIGNsaXAtcGF0aD0idXJsKCNjbGlwMCkiIHRyYW5zZm9ybT0idHJhbnNsYXRlKC0yMzUgLTUxKSI+PHBhdGggZD0iTTI2My41MDYgNTFDMjY0LjcxNyA1MSAyNjUuODEzIDUxLjQ4MzcgMjY2LjYwNiA1Mi4yNjU4TDI2Ny4wNTIgNTIuNzk4NyAyNjcuNTM5IDUzLjYyODMgMjkwLjE4NSA5Mi4xODMxIDI5MC41NDUgOTIuNzk1IDI5MC42NTYgOTIuOTk2QzI5MC44NzcgOTMuNTEzIDI5MSA5NC4wODE1IDI5MSA5NC42NzgyIDI5MSA5Ny4wNjUxIDI4OS4wMzggOTkgMjg2LjYxNyA5OUwyNDAuMzgzIDk5QzIzNy45NjMgOTkgMjM2IDk3LjA2NTEgMjM2IDk0LjY3ODIgMjM2IDk0LjM3OTkgMjM2LjAzMSA5NC4wODg2IDIzNi4wODkgOTMuODA3MkwyMzYuMzM4IDkzLjAxNjIgMjM2Ljg1OCA5Mi4xMzE0IDI1OS40NzMgNTMuNjI5NCAyNTkuOTYxIDUyLjc5ODUgMjYwLjQwNyA1Mi4yNjU4QzI2MS4yIDUxLjQ4MzcgMjYyLjI5NiA1MSAyNjMuNTA2IDUxWk0yNjMuNTg2IDY2LjAxODNDMjYwLjczNyA2Ni4wMTgzIDI1OS4zMTMgNjcuMTI0NSAyNTkuMzEzIDY5LjMzNyAyNTkuMzEzIDY5LjYxMDIgMjU5LjMzMiA2OS44NjA4IDI1OS4zNzEgNzAuMDg4N0wyNjEuNzk1IDg0LjAxNjEgMjY1LjM4IDg0LjAxNjEgMjY3LjgyMSA2OS43NDc1QzI2Ny44NiA2OS43MzA5IDI2Ny44NzkgNjkuNTg3NyAyNjcuODc5IDY5LjMxNzkgMjY3Ljg3OSA2Ny4xMTgyIDI2Ni40NDggNjYuMDE4MyAyNjMuNTg2IDY2LjAxODNaTTI2My41NzYgODYuMDU0N0MyNjEuMDQ5IDg2LjA1NDcgMjU5Ljc4NiA4Ny4zMDA1IDI1OS43ODYgODkuNzkyMSAyNTkuNzg2IDkyLjI4MzcgMjYxLjA0OSA5My41Mjk1IDI2My41NzYgOTMuNTI5NSAyNjYuMTE2IDkzLjUyOTUgMjY3LjM4NyA5Mi4yODM3IDI2Ny4zODcgODkuNzkyMSAyNjcuMzg3IDg3LjMwMDUgMjY2LjExNiA4Ni4wNTQ3IDI2My41NzYgODYuMDU0N1oiIGZpbGw9IiNGRkU1MDAiIGZpbGwtcnVsZT0iZXZlbm9kZCIvPjwvZz48L3N2Zz4=) no-repeat 1rem/1.8rem, var(--ft-error-bg);
+    padding: 1rem 1rem 1rem 3.7rem;
+    color: var(--ft-error-text);
+}
+
+    .blazor-error-boundary::after {
+        content: "An error has occurred."
+    }
+
+.darker-border-checkbox.form-check-input {
+    border-color: var(--ft-checkbox-border);
+}
+
+.monetary-amount-sensitive .monetary-amount-highlight-positive {
+    color: var(--ft-amount-positive);
+}
+
+.monetary-amount-sensitive .monetary-amount-highlight-negative {
+    color: var(--ft-amount-negative);
+}
+
+/* ============================================================
+   Money Flow Section — Header and Form
+   ============================================================ */
+
+.card-header h5 {
+    margin: 0;
+}
+
+.card-header .btn-link {
+    font-weight: var(--ft-weight-heading);
+    font-size: var(--ft-text-sm);
+    padding: var(--ft-space-xs) 0;
+    width: 100%;
+    text-align: left;
+    display: flex;
+    align-items: center;
+    gap: var(--ft-space-sm);
+}
+
+.card-body {
+    padding: var(--ft-space-md) var(--ft-space-lg);
+}
+
+#moneyFlows dl {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: var(--ft-space-sm) var(--ft-space-md);
+    align-items: center;
+    margin-bottom: var(--ft-space-md);
+}
+
+#moneyFlows dt {
+    font-weight: var(--ft-weight-label);
+    color: var(--ft-text-muted);
+    font-size: var(--ft-text-sm);
+}
+
+#moneyFlows dd {
+    margin-bottom: 0;
+    display: flex;
+    align-items: center;
+    gap: var(--ft-space-sm);
+    flex-wrap: wrap;
+}
+
+/* ============================================================
+   Landing Page — Hero & Cards
+   ============================================================ */
+
+.ft-hero {
+    text-align: center;
+    padding: var(--ft-space-2xl) var(--ft-space-md) var(--ft-space-xl);
+}
+
+.ft-hero h1 {
+    font-size: var(--ft-text-3xl);
+    font-weight: var(--ft-weight-title);
+    color: var(--ft-text);
+    margin-bottom: var(--ft-space-sm);
+}
+
+.ft-hero .ft-tagline {
+    font-size: var(--ft-text-lg);
+    color: var(--ft-text-muted);
+    max-width: 32rem;
+    margin: 0 auto var(--ft-space-xl);
+    line-height: 1.6;
+}
+
+.ft-narrative {
+    max-width: 36rem;
+    margin: 0 auto;
+    padding: 0 var(--ft-space-md) var(--ft-space-xl);
+}
+
+.ft-narrative p {
+    font-size: var(--ft-text-base);
+    line-height: 1.8;
+    color: var(--ft-text-muted);
+    margin-bottom: var(--ft-space-md);
+}
+
+.ft-narrative p em {
+    color: var(--ft-accent);
+    font-style: italic;
+}
+
+.ft-value-section {
+    text-align: center;
+    max-width: 36rem;
+    margin: 0 auto;
+    padding: var(--ft-space-xl) var(--ft-space-md);
+    border-top: 1px solid var(--ft-bg-topbar-border);
+}
+
+.ft-value-section h2 {
+    font-size: var(--ft-text-2xl);
+    font-weight: var(--ft-weight-heading);
+    color: var(--ft-primary);
+    margin-bottom: var(--ft-space-sm);
+}
+
+.ft-value-section p {
+    font-size: var(--ft-text-base);
+    line-height: 1.6;
+    color: var(--ft-text-muted);
+    margin-bottom: var(--ft-space-md);
+}
+
+.ft-privacy-note {
+    font-size: var(--ft-text-sm) !important;
+    font-style: italic;
+    color: var(--ft-text-muted);
+}
+
+.ft-value-section .btn {
+    margin-top: var(--ft-space-sm);
+}
+
+/* ============================================================
+   Landing Page Footer
+   ============================================================ */
+
+.ft-landing-footer {
+    display: flex;
+    justify-content: center;
+    gap: 1.5rem;
+    padding: 2rem 0;
+    margin-top: 2rem;
+    border-top: 1px solid var(--ft-bg-topbar-border);
+}
+
+.ft-landing-footer a {
+    font-size: 0.85rem;
+    color: var(--ft-text-muted);
+    text-decoration: none;
+    transition: color 0.15s;
+}
+
+.ft-landing-footer a:hover {
+    color: var(--ft-primary);
+}
+
+
+/* ============================================================
+   Find My Footing Page — Header
+   ============================================================ */
+
+.ft-page-header {
+    margin-bottom: var(--ft-space-lg);
+}
+
+.ft-page-header h1 {
+    font-size: var(--ft-text-2xl);
+    font-weight: var(--ft-weight-title);
+    color: var(--ft-text);
+    margin-bottom: var(--ft-space-xs);
+}
+
+.ft-page-header p {
+    color: var(--ft-text-muted);
+    font-size: var(--ft-text-sm);
+    margin: 0;
+}
+
+/* ============================================================
+   Sticky Net Total Bar
+   ============================================================ */
+
+.ft-sticky-total {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 200;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.ft-sticky-total--positive {
+    background-color: var(--ft-primary);
+}
+
+.ft-sticky-total--negative {
+    background-color: var(--ft-amount-negative, #dc3545);
+}
+
+.ft-sticky-total__summary {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    height: 3rem;
+    padding: 0 1rem;
+    color: #fff;
+    font-weight: var(--ft-weight-heading);
+}
+
+.ft-sticky-total__summary .monetary-amount-highlight-positive,
+.ft-sticky-total__summary .monetary-amount-highlight-negative {
+    color: #fff;
+}
+
+.ft-sticky-total__amount {
+    transition: transform 0.2s;
+}
+
+.ft-sticky-total__chevron {
+    font-size: 0.7rem;
+    opacity: 0.7;
+    margin-left: 0.25rem;
+}
+
+.ft-sticky-total__detail {
+    padding: var(--ft-space-md) var(--ft-space-lg);
+    background-color: var(--ft-bg-surface);
+    border-top: 1px solid var(--ft-bg-topbar-border);
+    color: var(--ft-text);
+    max-width: 54rem;
+    margin: 0 auto;
+}
+
+.ft-sticky-total__detail h5 {
+    font-size: var(--ft-text-base);
+    font-weight: var(--ft-weight-heading);
+    margin-bottom: var(--ft-space-xs);
+    color: var(--ft-text);
+}
+
+.ft-sticky-total__detail p {
+    font-size: var(--ft-text-sm);
+    color: var(--ft-text-muted);
+    margin-bottom: 0;
+    line-height: 1.5;
+}
+
+/* ============================================================
+   Export Button Area
+   ============================================================ */
+
+.ft-export {
+    padding: var(--ft-space-md) 0;
+    text-align: center;
+}
+
+.ft-export .btn {
+    padding: var(--ft-space-sm) var(--ft-space-xl);
+    font-size: var(--ft-text-sm);
+    border-radius: var(--ft-radius-md);
+}
+
+.ft-compact-actions {
+    padding: var(--ft-space-md) 0;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--ft-space-sm);
+}
+
+.ft-switch-flow {
+    background: none;
+    border: none;
+    padding: 0;
+    font-size: var(--ft-text-sm);
+    color: var(--ft-accent);
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.ft-switch-flow:hover {
+    text-decoration: underline;
+}
+
+/* ============================================================
+   Accent Highlights — Inline Help & Secondary Links
+   ============================================================ */
+
+/* ============================================================
+   Conversational Progressive Flow (First-Time Users)
+   ============================================================ */
+
+.ft-conversational {
+    max-width: 42rem;
+}
+
+.ft-section-card {
+    margin-bottom: var(--ft-space-xs);
+    border-radius: var(--ft-radius-md) !important;
+    border-bottom: 1px solid var(--ft-bg-topbar-border) !important;
+}
+
+.ft-conversational > .ft-section-card + div {
+    background-color: var(--ft-bg-surface);
+    border: 1px solid var(--ft-bg-topbar-border);
+    border-top: 0;
+    border-radius: 0 0 var(--ft-radius-md) var(--ft-radius-md);
+    margin-bottom: var(--ft-space-lg);
+}
+
+.ft-conversational > .ft-section-card + div > .card-body {
+    padding: var(--ft-space-md) var(--ft-space-lg);
+}
+
+.ft-guiding-sentence {
+    font-size: var(--ft-text-lg);
+    font-weight: var(--ft-weight-label);
+    color: var(--ft-text);
+    margin-bottom: var(--ft-space-md);
+    line-height: 1.5;
+}
+
+.ft-move-on {
+    margin-top: var(--ft-space-md);
+    text-align: right;
+}
+
+.ft-move-on__btn {
+    font-size: var(--ft-text-sm) !important;
+    padding: var(--ft-space-xs) var(--ft-space-lg) !important;
+    border-color: var(--ft-primary) !important;
+    color: var(--ft-primary) !important;
+    border-radius: var(--ft-radius-md) !important;
+    transition: background-color 0.15s, color 0.15s !important;
+}
+
+.ft-move-on__btn:hover {
+    background-color: var(--ft-primary) !important;
+    color: #fff !important;
+}
+
+.ft-move-on__btn--ready {
+    background-color: var(--ft-primary) !important;
+    color: #fff !important;
+    animation: ft-move-on-pulse 0.4s ease 0.8s both;
+}
+
+@keyframes ft-move-on-pulse {
+    0% { opacity: 0.7; transform: scale(1); }
+    50% { opacity: 1; transform: scale(1.04); }
+    100% { opacity: 1; transform: scale(1); }
+}
+
+/* ============================================================
+   Compact Summary View (Returning Users)
+   ============================================================ */
+
+.ft-compact-summary {
+    max-width: 42rem;
+}
+
+.ft-compact-summary .ft-section-card {
+    margin-bottom: 0;
+    border-radius: 0 !important;
+    border-bottom: 0 !important;
+}
+
+.ft-compact-summary .ft-section-card:first-of-type {
+    border-top-left-radius: var(--ft-radius-md) !important;
+    border-top-right-radius: var(--ft-radius-md) !important;
+}
+
+.ft-compact-summary .ft-section-card:last-of-type {
+    border-bottom-left-radius: var(--ft-radius-md) !important;
+    border-bottom-right-radius: var(--ft-radius-md) !important;
+    border-bottom: 1px solid var(--ft-bg-topbar-border) !important;
+}
+
+/* When the section body is shown, the card after it needs bottom border removed */
+.ft-compact-summary .ft-section-card + div {
+    border-bottom: 0 !important;
+    border-radius: 0 !important;
+    margin-bottom: 0 !important;
+}
+
+.ft-compact-header {
+    font-size: var(--ft-text-base) !important;
+    padding: var(--ft-space-sm) 0 !important;
+    justify-content: space-between !important;
+}
+
+.ft-chevron {
+    font-size: 0.6rem;
+    opacity: 0.6;
+    margin-left: auto;
+    padding-left: var(--ft-space-sm);
+    transition: transform 0.2s;
+}
+
+/* ============================================================
+   Inline Tooltips (replaces Bootstrap Popovers)
+   ============================================================ */
+
+.ft-tooltip {
+    position: relative;
+    color: var(--ft-accent);
+    cursor: help;
+    border-bottom: 1px dashed var(--ft-accent);
+    white-space: nowrap;
+}
+
+.ft-tooltip::after {
+    content: attr(data-tip);
+    position: absolute;
+    bottom: calc(100% + 0.4rem);
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: var(--ft-text);
+    color: var(--ft-bg-surface);
+    padding: 0.35rem 0.6rem;
+    border-radius: var(--ft-radius-sm);
+    font-size: var(--ft-text-xs);
+    font-weight: var(--ft-weight-body);
+    line-height: 1.4;
+    white-space: normal;
+    width: 15rem;
+    text-align: center;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.15s;
+    z-index: 100;
+}
+
+.ft-tooltip:hover::after,
+.ft-tooltip:focus::after {
+    opacity: 1;
+}
+
+/* ============================================================
+   Money Input Adornment (fo-si0.9)
+   ============================================================ */
+
+.ft-input-money {
+    display: inline-flex;
+    align-items: center;
+    border: 1px solid var(--ft-bg-topbar-border);
+    border-radius: var(--ft-radius-sm);
+    background-color: var(--ft-bg-surface);
+    transition: border-color 0.2s;
+    overflow: hidden;
+}
+
+.ft-input-money:focus-within {
+    border-color: var(--ft-focus-ring);
+    box-shadow: 0 0 0 2px rgba(37, 140, 251, 0.15);
+}
+
+.ft-input-money__prefix {
+    padding: var(--ft-space-xs) var(--ft-space-sm);
+    color: var(--ft-text-muted);
+    font-size: var(--ft-text-sm);
+    font-weight: var(--ft-weight-label);
+    background-color: var(--ft-bg-topbar);
+    border-right: 1px solid var(--ft-bg-topbar-border);
+    user-select: none;
+}
+
+.ft-input-money__field {
+    border: none !important;
+    box-shadow: none !important;
+    background-color: transparent !important;
+    padding: var(--ft-space-xs) var(--ft-space-sm) !important;
+    font-size: var(--ft-text-sm);
+    color: var(--ft-text);
+    width: 7rem;
+    outline: none;
+}
+
+.ft-period-select {
+    padding: var(--ft-space-xs) var(--ft-space-sm) !important;
+    border: 1px solid var(--ft-bg-topbar-border) !important;
+    border-radius: var(--ft-radius-sm) !important;
+    background-color: var(--ft-bg-surface) !important;
+    color: var(--ft-text) !important;
+    font-size: var(--ft-text-sm) !important;
+    transition: border-color 0.2s !important;
+    cursor: pointer;
+}
+
+.ft-period-select:focus {
+    border-color: var(--ft-focus-ring) !important;
+    box-shadow: 0 0 0 2px rgba(37, 140, 251, 0.15) !important;
+    outline: none !important;
+}
+
+.ft-add-btn {
+    transition: transform 0.15s, background-color 0.15s !important;
+}
+
+.ft-add-btn:hover {
+    transform: translateY(-1px);
+}
+
+/* ============================================================
+   Entry Chips (fo-si0.10)
+   ============================================================ */
+
+.ft-entry-list {
+    list-style: none;
+    padding: 0;
+    margin: var(--ft-space-md) 0 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--ft-space-xs);
+}
+
+.ft-entry-chip {
+    display: flex;
+    align-items: center;
+    gap: var(--ft-space-sm);
+    padding: var(--ft-space-xs) var(--ft-space-sm);
+    background-color: var(--ft-bg-topbar);
+    border: 1px solid var(--ft-bg-topbar-border);
+    border-radius: var(--ft-radius-md);
+    font-size: var(--ft-text-sm);
+}
+
+.ft-entry-chip__name {
+    flex: 1;
+    color: var(--ft-text);
+    font-weight: var(--ft-weight-label);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.ft-entry-chip__amount {
+    color: var(--ft-text-muted);
+    white-space: nowrap;
+    font-size: var(--ft-text-xs);
+}
+
+.ft-entry-chip__delete {
+    cursor: pointer;
+    color: var(--ft-text-muted);
+    font-size: 1.1rem;
+    line-height: 1;
+    flex-shrink: 0;
+    transition: color 0.15s, transform 0.15s;
+    padding: 2px;
+    border-radius: var(--ft-radius-sm);
+}
+
+.ft-entry-chip__delete:hover {
+    color: var(--ft-amount-negative);
+    transform: scale(1.2);
+}
+
+/* ============================================================
+   Export Button and Privacy Banner (fo-si0.11)
+   ============================================================ */
+
+.ft-privacy-banner {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--ft-space-sm);
+    font-size: var(--ft-text-sm);
+    color: var(--ft-text-muted);
+    margin-bottom: var(--ft-space-lg);
+    padding: var(--ft-space-sm) var(--ft-space-md);
+    background-color: var(--ft-bg-topbar);
+    border: 1px solid var(--ft-bg-topbar-border);
+    border-radius: var(--ft-radius-md);
+}
+
+.ft-privacy-banner__icon {
+    font-size: var(--ft-text-base);
+    flex-shrink: 0;
+    margin-top: 1px;
+}
+
+.ft-privacy-banner em {
+    font-style: normal;
+    line-height: 1.5;
+    flex: 1;
+}
+
+.ft-clear-btn {
+    font-size: var(--ft-text-xs) !important;
+    padding: var(--ft-space-xs) var(--ft-space-sm) !important;
+    color: var(--ft-text-muted) !important;
+    border: 1px solid var(--ft-bg-topbar-border) !important;
+    border-radius: var(--ft-radius-sm) !important;
+    background-color: transparent !important;
+    white-space: nowrap;
+    flex-shrink: 0;
+    align-self: center;
+    transition: color 0.15s, border-color 0.15s, background-color 0.15s !important;
+}
+
+.ft-clear-btn:hover {
+    color: var(--ft-amount-negative) !important;
+    border-color: var(--ft-amount-negative) !important;
+    background-color: var(--ft-bg-surface) !important;
+}
+
+.ft-export-btn {
+    padding: var(--ft-space-sm) var(--ft-space-xl) !important;
+    font-size: var(--ft-text-sm) !important;
+    border-radius: var(--ft-radius-md) !important;
+    transition: transform 0.15s, background-color 0.15s !important;
+    cursor: pointer;
+}
+
+.ft-export-btn:hover {
+    transform: translateY(-1px);
+}
+
+.text-info {
+    color: var(--ft-accent) !important;
+}
+
+a.text-info:hover {
+    color: var(--ft-accent-hover) !important;
+}
+
+/* ============================================================
+   Theme Toggle
+   ============================================================ */
+
+.theme-toggle {
+    background: none;
+    border: 1px solid var(--ft-bg-topbar-border);
+    border-radius: var(--ft-radius-sm);
+    cursor: pointer;
+    padding: var(--ft-space-xs) var(--ft-space-sm);
+    font-size: var(--ft-text-lg);
+    line-height: 1;
+    color: var(--ft-text);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.2s;
+}
+
+.theme-toggle:hover {
+    background-color: var(--ft-bg-topbar-border);
+}
+
+.theme-toggle .icon-sun,
+.theme-toggle .icon-moon {
+    display: none;
+}
+
+/* Show sun icon in dark mode (click to switch to light) */
+[data-theme="dark"] .theme-toggle .icon-sun {
+    display: inline;
+}
+
+[data-theme="dark"] .theme-toggle .icon-moon {
+    display: none;
+}
+
+/* Show moon icon in light mode (click to switch to dark) */
+[data-theme="light"] .theme-toggle .icon-moon {
+    display: inline;
+}
+
+[data-theme="light"] .theme-toggle .icon-sun {
+    display: none;
+}
+
+/* When no explicit theme, default to showing moon (assume light) */
+:root:not([data-theme]) .theme-toggle .icon-moon {
+    display: inline;
+}
+
+@media (prefers-color-scheme: dark) {
+    :root:not([data-theme]) .theme-toggle .icon-sun {
+        display: inline;
+    }
+
+    :root:not([data-theme]) .theme-toggle .icon-moon {
+        display: none;
+    }
+}
+
+/* ============================================================
+   Micro-interactions and Transitions (fo-si0.15)
+   ============================================================ */
+
+/* Section reveal animation */
+.ft-section--open {
+    animation: ft-reveal 0.3s ease-out;
+}
+
+@keyframes ft-reveal {
+    from {
+        opacity: 0;
+        transform: translateY(-6px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Newly revealed section card — gentle highlight that fades */
+.ft-section-card {
+    animation: ft-card-appear 0.4s ease-out;
+}
+
+@keyframes ft-card-appear {
+    from {
+        opacity: 0;
+        transform: translateY(-4px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Card header hover */
+.card-header .btn-link:hover {
+    background-color: var(--ft-bg-topbar-border);
+    border-radius: var(--ft-radius-sm);
+}
+
+/* Focus ring transition on all interactive elements */
+input:focus,
+select:focus,
+textarea:focus,
+button:focus-visible {
+    transition: box-shadow 0.15s, border-color 0.15s;
+}
+
+/* Chevron rotation animation */
+.ft-chevron {
+    transition: transform 0.2s ease;
+}
+
+[aria-expanded="true"] .ft-chevron {
+    transform: rotate(90deg);
+}
+
+/* Entry chip entrance */
+.ft-entry-chip {
+    animation: ft-chip-in 0.15s ease-out;
+}
+
+@keyframes ft-chip-in {
+    from {
+        opacity: 0;
+        transform: scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+/* ============================================================
+   Branded Loading State (fo-si0.15)
+   ============================================================ */
+
+.ft-loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: var(--ft-space-md);
+    height: 100%;
+    min-height: 8rem;
+    color: var(--ft-text-muted);
+}
+
+.ft-loading__spinner {
+    display: block;
+    width: 2rem;
+    height: 2rem;
+    border: 2px solid var(--ft-bg-topbar-border);
+    border-top-color: var(--ft-primary);
+    border-radius: 50%;
+    animation: ft-spin 0.7s linear infinite;
+}
+
+.ft-loading__text {
+    font-size: var(--ft-text-sm);
+    color: var(--ft-text-muted);
+}
+
+@keyframes ft-spin {
+    to { transform: rotate(360deg); }
+}

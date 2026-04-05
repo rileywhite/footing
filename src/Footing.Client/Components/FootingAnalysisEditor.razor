@@ -1,0 +1,325 @@
+@using Blazored.LocalStorage
+@using Footing.Client.Library
+
+@inject IFootingJSInterop JSInterop
+@inject ISyncLocalStorageService LocalStore
+
+@if (IsFirstTimeUser)
+{
+    <div id="moneyFlows" class="ft-conversational">
+        <div class="ft-privacy-banner">
+            <span class="ft-privacy-banner__icon" aria-hidden="true">&#x1F512;</span>
+            <em>
+                Nothing you put in here will be sent to our servers. It will be saved to your local computer; however, you may
+                <a href="" @onclick=ClearLocalStorage @onclick:preventDefault>clear</a>
+                it at any time.
+            </em>
+            <button type="button" class="btn ft-clear-btn" @onclick=ClearLocalStorage>Clear my data</button>
+        </div>
+
+        <MoneyFlowCard @bind-MoneyFlows=this.FootingAnalysis.Inflows
+                       Name="income"
+                       Label="Income"
+                       FormPrompt="@IncomesFormPrompt"
+                       FormAmountDescriptionConnectorWord="from"
+                       GuidingSentence="Let's start with what comes in. What money do you receive?"
+                       IsOpen="true"
+                       IsVisible="true"
+                       OnFirstEntryAdded="@(() => RevealNextSection(0))"
+                       OnAdvanceRequested="@(() => AdvanceToNextSection(0))" />
+
+        <MoneyFlowCard @bind-MoneyFlows=this.FootingAnalysis.RecurringBills
+                       Name="recurringBills"
+                       Label="Recurring Bill"
+                       FormPrompt="@RecurringBillsFormPrompt"
+                       FormAmountDescriptionConnectorWord="for"
+                       GuidingSentence="Good. Now, what are your regular bills?"
+                       IsOpen="@IsSectionOpen(1)"
+                       IsVisible="@IsSectionVisible(1)"
+                       OnFirstEntryAdded="@(() => RevealNextSection(1))"
+                       OnAdvanceRequested="@(() => AdvanceToNextSection(1))" />
+
+        <MoneyFlowCard @bind-MoneyFlows=this.FootingAnalysis.HouseholdBudgets
+                       Name="householdBudgets"
+                       Label="Household Budget"
+                       FormPrompt="@HouseholdBudgetsFormPrompt"
+                       FormAmountDescriptionConnectorWord="for"
+                       GuidingSentence="What about less predictable household costs?"
+                       IsOpen="@IsSectionOpen(2)"
+                       IsVisible="@IsSectionVisible(2)"
+                       OnFirstEntryAdded="@(() => RevealNextSection(2))"
+                       OnAdvanceRequested="@(() => AdvanceToNextSection(2))" />
+
+        <MoneyFlowCard @bind-MoneyFlows=this.FootingAnalysis.PersonalBudgets
+                       Name="personalBudgets"
+                       Label="Personal Budget"
+                       FormPrompt="@PersonalBudgetsFormPrompt"
+                       FormAmountDescriptionConnectorWord="for"
+                       GuidingSentence="Any personal spending allowances to account for?"
+                       IsOpen="@IsSectionOpen(3)"
+                       IsVisible="@IsSectionVisible(3)"
+                       OnFirstEntryAdded="@(() => RevealNextSection(3))"
+                       OnAdvanceRequested="@(() => AdvanceToNextSection(3))" />
+
+        <MoneyFlowCard @bind-MoneyFlows=this.FootingAnalysis.EventBudgets
+                       Name="eventBudgets"
+                       Label="Event Budget"
+                       FormPrompt="@EventBudgetsFormPrompt"
+                       FormAmountDescriptionConnectorWord="for"
+                       GuidingSentence="Finally, any recurring events like holidays or birthdays?"
+                       IsOpen="@IsSectionOpen(4)"
+                       IsVisible="@IsSectionVisible(4)"
+                       OnFirstEntryAdded="@(() => RevealNextSection(4))"
+                       OnAdvanceRequested="@(() => AdvanceToNextSection(4))" />
+
+        <div class="ft-export">
+            <input type="button" class="btn btn-accent ft-export-btn" value="Download Excel Spreadsheet" @onclick="ExportToExcel" />
+        </div>
+    </div>
+
+    <div class="ft-sticky-total @(NetTotalWeeklyAmount.IsNegative ? "ft-sticky-total--negative" : "ft-sticky-total--positive") @(stickyExpanded ? "ft-sticky-total--expanded" : "")"
+         @onclick="ToggleStickyExpand">
+        <div id="totalHeading" class="ft-sticky-total__summary @MonetaryAmount.AmountSensitiveCssClass">
+            <span class="ft-sticky-total__label">Net Total</span>
+            <span class="ft-sticky-total__amount">
+                <MonetaryAmountDisplay Amount=@NetTotalWeeklyAmount /> / Week
+            </span>
+            <span class="ft-sticky-total__chevron" aria-hidden="true">@(stickyExpanded ? "\u25BC" : "\u25B2")</span>
+        </div>
+        @if (stickyExpanded)
+        {
+            <div class="ft-sticky-total__detail">
+                @if (this.NetTotalWeeklyAmount.IsNegative)
+                {
+                    <h5>Time to roll up your sleeves</h5>
+                    <p>
+                        It's a good time to take a hard look at your expenses. It's no fun, but with hard work, you can pull yourself back into the
+                        net positive territory!
+                    </p>
+                }
+                else
+                {
+                    <h5>You're looking good so far</h5>
+                    <p>
+                        This could always change as you notice new expenses that you aren't yet tracking and as unexpected expenses
+                        appear. It's a good idea to stash your extra money somewhere where it will earn interest.
+                    </p>
+                }
+            </div>
+        }
+    </div>
+}
+else
+{
+    <div id="moneyFlows" class="ft-compact-summary">
+        <div class="ft-privacy-banner">
+            <span class="ft-privacy-banner__icon" aria-hidden="true">&#x1F512;</span>
+            <em>
+                Nothing you put in here will be sent to our servers. It will be saved to your local computer; however, you may
+                <a href="" @onclick=ClearLocalStorage @onclick:preventDefault>clear</a>
+                it at any time.
+            </em>
+            <button type="button" class="btn ft-clear-btn" @onclick=ClearLocalStorage>Clear my data</button>
+        </div>
+
+        <MoneyFlowCard @bind-MoneyFlows=this.FootingAnalysis.Inflows
+                       Name="income"
+                       Label="Income"
+                       FormPrompt="@IncomesFormPrompt"
+                       FormAmountDescriptionConnectorWord="from"
+                       GuidingSentence=""
+                       CompactMode="true"
+                       IsOpen="false" />
+        <MoneyFlowCard @bind-MoneyFlows=this.FootingAnalysis.RecurringBills
+                       Name="recurringBills"
+                       Label="Recurring Bill"
+                       FormPrompt="@RecurringBillsFormPrompt"
+                       FormAmountDescriptionConnectorWord="for"
+                       GuidingSentence=""
+                       CompactMode="true"
+                       IsOpen="false" />
+        <MoneyFlowCard @bind-MoneyFlows=this.FootingAnalysis.HouseholdBudgets
+                       Name="householdBudgets"
+                       Label="Household Budget"
+                       FormPrompt="@HouseholdBudgetsFormPrompt"
+                       FormAmountDescriptionConnectorWord="for"
+                       GuidingSentence=""
+                       CompactMode="true"
+                       IsOpen="false" />
+        <MoneyFlowCard @bind-MoneyFlows=this.FootingAnalysis.PersonalBudgets
+                       Name="personalBudgets"
+                       Label="Personal Budget"
+                       FormPrompt="@PersonalBudgetsFormPrompt"
+                       FormAmountDescriptionConnectorWord="for"
+                       GuidingSentence=""
+                       CompactMode="true"
+                       IsOpen="false" />
+        <MoneyFlowCard @bind-MoneyFlows=this.FootingAnalysis.EventBudgets
+                       Name="eventBudgets"
+                       Label="Event Budget"
+                       FormPrompt="@EventBudgetsFormPrompt"
+                       FormAmountDescriptionConnectorWord="for"
+                       GuidingSentence=""
+                       CompactMode="true"
+                       IsOpen="false" />
+        <div class="ft-compact-actions">
+            <input type="button" class="btn btn-accent ft-export-btn" value="Download Excel Spreadsheet" @onclick="ExportToExcel" />
+            <button type="button" class="ft-switch-flow" @onclick="SwitchToGuidedFlow">Switch to guided flow</button>
+        </div>
+    </div>
+
+    <div class="ft-sticky-total @(NetTotalWeeklyAmount.IsNegative ? "ft-sticky-total--negative" : "ft-sticky-total--positive") @(stickyExpanded ? "ft-sticky-total--expanded" : "")"
+         @onclick="ToggleStickyExpand">
+        <div id="totalHeading" class="ft-sticky-total__summary @MonetaryAmount.AmountSensitiveCssClass">
+            <span class="ft-sticky-total__label">Net Total</span>
+            <span class="ft-sticky-total__amount">
+                <MonetaryAmountDisplay Amount=@NetTotalWeeklyAmount /> / Week
+            </span>
+            <span class="ft-sticky-total__chevron" aria-hidden="true">@(stickyExpanded ? "\u25BC" : "\u25B2")</span>
+        </div>
+        @if (stickyExpanded)
+        {
+            <div class="ft-sticky-total__detail">
+                @if (this.NetTotalWeeklyAmount.IsNegative)
+                {
+                    <h5>Time to roll up your sleeves</h5>
+                    <p>
+                        It's a good time to take a hard look at your expenses. It's no fun, but with hard work, you can pull yourself back into the
+                        net positive territory!
+                    </p>
+                }
+                else
+                {
+                    <h5>You're looking good so far</h5>
+                    <p>
+                        This could always change as you notice new expenses that you aren't yet tracking and as unexpected expenses
+                        appear. It's a good idea to stash your extra money somewhere where it will earn interest.
+                    </p>
+                }
+            </div>
+        }
+    </div>
+}
+
+@code {
+    private static string FootingAnalysisStorageKey = "3794bdc6-f064-43e6-9a1e-8bb2c03d16cb";
+    private bool stickyExpanded;
+
+    public FootingAnalysis FootingAnalysis { get; set; } = null!;
+
+    private bool IsFirstTimeUser { get; set; }
+
+    private int _revealedSections = 1;
+    private int? _activatedSection;
+
+    private bool IsSectionVisible(int index) => index < _revealedSections;
+    private bool IsSectionOpen(int index) => index == _activatedSection;
+
+    private void RevealNextSection(int currentIndex)
+    {
+        if (currentIndex + 1 >= _revealedSections)
+        {
+            _revealedSections = currentIndex + 2;
+            StateHasChanged();
+        }
+    }
+
+    private void AdvanceToNextSection(int currentIndex)
+    {
+        RevealNextSection(currentIndex);
+        _activatedSection = currentIndex + 1;
+        StateHasChanged();
+    }
+
+    public void UpdateLocalStorage()
+    {
+        this.LocalStore.SetItem(FootingAnalysisStorageKey, this.FootingAnalysis);
+    }
+
+    public async Task ClearLocalStorage()
+    {
+        if (await this.JSInterop.Confirm("This will clear all information that you have entered so far. Proceed?"))
+        {
+            this.FootingAnalysis = new FootingAnalysis();
+            this.LocalStore.Clear();
+            this.IsFirstTimeUser = true;
+            _revealedSections = 1;
+            _activatedSection = null;
+        }
+    }
+
+    private void SwitchToGuidedFlow()
+    {
+        this.IsFirstTimeUser = true;
+        _revealedSections = 5;
+    }
+
+    private MonetaryAmount NetTotalWeeklyAmount => this.FootingAnalysis.WeeklyTotalMoneyFlow;
+
+    private void ToggleStickyExpand() => stickyExpanded = !stickyExpanded;
+
+    private string IncomesFormPrompt { get; } =
+    @"I receive a
+<span class=""ft-tooltip"" data-tip=""Final amount deposited into your account after taxes and other garnishments"">
+net amount
+</span>
+of";
+
+    private string RecurringBillsFormPrompt { get; } =
+    @"I pay a
+<span class=""ft-tooltip"" data-tip=""Same amount every month/year/etc, e.g. phone, internet, auto insurance, groceries, etc"">
+predictable recurring
+</span>
+bill of";
+
+    private string HouseholdBudgetsFormPrompt { get; } =
+    @"I estimate that I need to budget a
+<span class=""ft-tooltip"" data-tip=""Differing amounts on hard to predict time periods, e.g. $150/quarter for auto maintenance, $100/month for family outings, etc"">
+less predictable shared amount
+</span>
+of";
+
+    private string PersonalBudgetsFormPrompt { get; } =
+    @"I estimate that someone in my household needs to budget a
+<span class=""ft-tooltip"" data-tip=""For a personal spending allowance, haircut, eating lunch at work, etc"">
+personally available
+</span>
+amount of";
+
+    private string EventBudgetsFormPrompt { get; } =
+    @"I estimate that I need a
+<span class=""ft-tooltip"" data-tip=""Differing amounts on strictly or loosely occurring time periods, e.g. Christmas, Birthdays, vacations, etc"">
+recurring event
+</span>
+budget of";
+
+    private async Task ExportToExcel()
+    {
+        using var stream = new MemoryStream();
+
+        await new SimplexcelExporter(this.FootingAnalysis).ExportTo(stream);
+
+        await this.JSInterop.DownloadAs(stream, "Footing.xlsx", MimeType.ExcelXlsxFile);
+    }
+
+    protected override void OnInitialized()
+    {
+        var stored = this.LocalStore.GetItem<FootingAnalysis>(FootingAnalysisStorageKey);
+        this.FootingAnalysis = stored ?? new FootingAnalysis();
+        this.IsFirstTimeUser = stored?.HasAnyEntries != true;
+
+        if (IsFirstTimeUser)
+        {
+            _revealedSections = 1;
+        }
+    }
+
+    protected async override Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender)
+        {
+            this.UpdateLocalStorage();
+        }
+        await base.OnAfterRenderAsync(firstRender);
+    }
+}
