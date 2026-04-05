@@ -1,0 +1,29 @@
+name: CI
+
+on:
+  pull_request:
+    branches: [main]
+  merge_group:
+    branches: [main]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Build
+        run: dotnet build src/Footing.slnx
+
+      - name: Unit tests
+        run: dotnet test src/Footing.Tests.Unit --no-build
+
+      - name: Functional tests
+        run: dotnet test src/Footing.Tests.Functional --no-build
+
+      - name: Integration tests
+        run: dotnet test src/Footing.Tests.Integration --no-build
