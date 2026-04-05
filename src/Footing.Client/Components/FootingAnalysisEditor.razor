@@ -2,7 +2,7 @@
 @using Footing.Client.Library
 
 @inject IFootingJSInterop JSInterop
-@inject ISyncLocalStorageService LocalStore
+@inject ILocalStorageService LocalStore
 
 @if (IsFirstTimeUser)
 {
@@ -231,9 +231,9 @@ else
         StateHasChanged();
     }
 
-    public void UpdateLocalStorage()
+    public async Task UpdateLocalStorageAsync()
     {
-        this.LocalStore.SetItem(FootingAnalysisStorageKey, this.FootingAnalysis);
+        await this.LocalStore.SetItemAsync(FootingAnalysisStorageKey, this.FootingAnalysis);
     }
 
     public async Task ClearLocalStorage()
@@ -241,7 +241,7 @@ else
         if (await this.JSInterop.Confirm("This will clear all information that you have entered so far. Proceed?"))
         {
             this.FootingAnalysis = new FootingAnalysis();
-            this.LocalStore.Clear();
+            await this.LocalStore.ClearAsync();
             this.IsFirstTimeUser = true;
             _revealedSections = 1;
             _activatedSection = null;
@@ -302,9 +302,9 @@ budget of";
         await this.JSInterop.DownloadAs(stream, "Footing.xlsx", MimeType.ExcelXlsxFile);
     }
 
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
-        var stored = this.LocalStore.GetItem<FootingAnalysis>(FootingAnalysisStorageKey);
+        var stored = await this.LocalStore.GetItemAsync<FootingAnalysis>(FootingAnalysisStorageKey);
         this.FootingAnalysis = stored ?? new FootingAnalysis();
         this.IsFirstTimeUser = stored?.HasAnyEntries != true;
 
@@ -318,7 +318,7 @@ budget of";
     {
         if (!firstRender)
         {
-            this.UpdateLocalStorage();
+            await this.UpdateLocalStorageAsync();
         }
         await base.OnAfterRenderAsync(firstRender);
     }
