@@ -83,4 +83,56 @@ public class HomePageTests
         thirdParty.Should().BeEmpty($"no third-party requests should be issued, but saw: {string.Join(", ", thirdParty)}");
         await page.CloseAsync();
     }
+
+    [SkippableFact]
+    public async Task PageLoad_RendersSelfHostedRubik()
+    {
+        SkipIfUnavailable();
+        var page = await _fixture.Browser.NewPageAsync();
+        var requestUrls = new List<string>();
+        page.Request += (_, request) => requestUrls.Add(request.Url);
+
+        await page.GotoAsync(_fixture.BaseUrl, new PageGotoOptions { WaitUntil = WaitUntilState.NetworkIdle });
+        await page.EvaluateAsync<bool>("() => document.fonts.ready.then(() => true)");
+
+        var rubikRequests = requestUrls
+            .Where(url => url.Contains("rubik", StringComparison.OrdinalIgnoreCase)
+                && url.EndsWith(".woff2", StringComparison.OrdinalIgnoreCase))
+            .ToList();
+
+        rubikRequests.Should().NotBeEmpty(
+            "the self-hosted Rubik woff2 must actually be fetched -- a font that silently fails to "
+            + "load issues no request at all, which passes PageLoad_IssuesNoThirdPartyRequests vacuously");
+
+        // Not getComputedStyle: that returns the declared stack whether or not Rubik ever loaded.
+        // Not document.fonts.check(): it reports true even for a face the browser skipped.
+        var faceLoaded = await page.EvaluateAsync<bool>(
+            "() => Array.from(document.fonts).some(f => f.family.includes('Rubik') && f.status === 'loaded')");
+
+        faceLoaded.Should().BeTrue("a Rubik @font-face must reach status 'loaded'");
+
+        // An unsupported format() keyword makes the browser skip the src and fall back silently,
+        // so compare against the same stack with Rubik removed.
+        var widthDelta = await page.EvaluateAsync<double>("""
+            () => {
+                const probe = (family) => {
+                    const el = document.createElement('div');
+                    el.style.cssText = 'position:absolute;left:-9999px;top:-9999px;'
+                        + 'white-space:nowrap;font-size:100px;font-family:' + family;
+                    el.textContent = 'Handgloves 123';
+                    document.body.appendChild(el);
+                    const width = el.getBoundingClientRect().width;
+                    el.remove();
+                    return width;
+                };
+                const fallback = "-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif";
+                return Math.abs(probe("'Rubik', " + fallback) - probe(fallback));
+            }
+            """);
+
+        widthDelta.Should().BeGreaterThan(0.5,
+            "text must render in Rubik, not in the fallback stack");
+
+        await page.CloseAsync();
+    }
 }
