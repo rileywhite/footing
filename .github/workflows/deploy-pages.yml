@@ -34,15 +34,6 @@ jobs:
         run: |
           publish_dir=src/Footing.Client/bin/Release/net10.0/publish/wwwroot
 
-          # Copy server static assets (CSS, icons, JS, manifest) into publish output
-          cp src/Footing/wwwroot/app.css "$publish_dir/"
-          cp src/Footing/wwwroot/favicon.svg "$publish_dir/"
-          cp src/Footing/wwwroot/favicon.png "$publish_dir/"
-          cp src/Footing/wwwroot/apple-touch-icon.svg "$publish_dir/"
-          cp src/Footing/wwwroot/manifest.json "$publish_dir/"
-          mkdir -p "$publish_dir/js"
-          cp src/Footing/wwwroot/js/footing.js "$publish_dir/js/"
-
           # Prevent Jekyll processing (_framework would be ignored otherwise)
           touch "$publish_dir/.nojekyll"
 

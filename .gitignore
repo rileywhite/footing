@@ -5,7 +5,6 @@
 .claude/commands/*
 !.claude/commands/review.md
 .logs/
-.beads/
 __pycache__/
 *.secrets.local
 src/README.md
@@ -21,3 +20,7 @@ scripts/
 .dolt/
 *.db
 .beads-credential-key
+
+# Gas City
+.beads/*
+!.beads/identity.toml
