@@ -46,4 +46,41 @@ public class HomePageTests
         page.Url.Should().Contain("find-my-footing");
         await page.CloseAsync();
     }
+
+    [SkippableFact]
+    public async Task ErrorUi_IsSingleAndHidden()
+    {
+        SkipIfUnavailable();
+        foreach (var path in new[] { "", "find-my-footing" })
+        {
+            var page = await _fixture.Browser.NewPageAsync();
+            await page.GotoAsync($"{_fixture.BaseUrl}/{path}");
+            var errorUi = page.Locator("#blazor-error-ui");
+            (await errorUi.CountAsync()).Should().Be(1);
+            (await errorUi.EvaluateAsync<string>("el => getComputedStyle(el).display"))
+                .Should().Be("none");
+            await page.CloseAsync();
+        }
+    }
+
+    [SkippableFact]
+    public async Task PageLoad_IssuesNoThirdPartyRequests()
+    {
+        SkipIfUnavailable();
+        var page = await _fixture.Browser.NewPageAsync();
+        var requestUrls = new List<string>();
+        page.Request += (_, request) => requestUrls.Add(request.Url);
+
+        await page.GotoAsync(_fixture.BaseUrl, new PageGotoOptions { WaitUntil = WaitUntilState.NetworkIdle });
+
+        var baseOrigin = new Uri(_fixture.BaseUrl).GetLeftPart(UriPartial.Authority);
+        var thirdParty = requestUrls
+            .Where(url => url.StartsWith("http:", StringComparison.OrdinalIgnoreCase)
+                || url.StartsWith("https:", StringComparison.OrdinalIgnoreCase))
+            .Where(url => new Uri(url).GetLeftPart(UriPartial.Authority) != baseOrigin)
+            .ToList();
+
+        thirdParty.Should().BeEmpty($"no third-party requests should be issued, but saw: {string.Join(", ", thirdParty)}");
+        await page.CloseAsync();
+    }
 }

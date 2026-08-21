@@ -1,6 +1,10 @@
 using System.Diagnostics;
 using System.Net;
 using System.Net.Sockets;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.StaticFiles;
+using Microsoft.Extensions.FileProviders;
 using Microsoft.Playwright;
 using Xunit;
 
@@ -8,7 +12,7 @@ namespace Footing.Tests.E2E;
 
 public class PlaywrightFixture : IAsyncLifetime
 {
-    private Process? _serverProcess;
+    private WebApplication? _app;
 
     public IPlaywright Playwright { get; private set; } = null!;
     public IBrowser Browser { get; private set; } = null!;
@@ -29,45 +33,54 @@ public class PlaywrightFixture : IAsyncLifetime
         var port = FindFreePort();
         BaseUrl = $"http://localhost:{port}";
 
-        var projectPath = FindServerProject();
-        _serverProcess = new Process
+        var clientProjectPath = FindClientProject();
+        if (!await PublishAsync(clientProjectPath))
         {
-            StartInfo = new ProcessStartInfo
-            {
-                FileName = "dotnet",
-                Arguments = $"run --project \"{projectPath}\" --urls \"{BaseUrl}\"",
-                UseShellExecute = false,
-                RedirectStandardOutput = true,
-                RedirectStandardError = true,
-                Environment =
-                {
-                    ["ASPNETCORE_ENVIRONMENT"] = "Development",
-                    ["ASPNETCORE_URLS"] = BaseUrl,
-                },
-            },
-        };
-        _serverProcess.Start();
-
-        using var client = new HttpClient();
-        var sw = Stopwatch.StartNew();
-        while (sw.Elapsed < TimeSpan.FromSeconds(60))
-        {
-            if (_serverProcess.HasExited)
-                break;
-            try
-            {
-                var response = await client.GetAsync(BaseUrl);
-                if (response.IsSuccessStatusCode)
-                {
-                    ServerAvailable = true;
-                    break;
-                }
-            }
-            catch { }
-            await Task.Delay(500);
+            ServerAvailable = false;
+            return;
         }
 
-        if (!ServerAvailable) return;
+        var publishRoot = Path.Combine(
+            Path.GetDirectoryName(clientProjectPath)!,
+            "bin", "Release", "net10.0", "publish", "wwwroot");
+        if (!Directory.Exists(publishRoot))
+        {
+            ServerAvailable = false;
+            return;
+        }
+
+        var builder = WebApplication.CreateBuilder();
+        builder.WebHost.UseUrls(BaseUrl);
+        _app = builder.Build();
+
+        var contentTypeProvider = new FileExtensionContentTypeProvider();
+        contentTypeProvider.Mappings[".wasm"] = "application/wasm";
+        contentTypeProvider.Mappings[".dat"] = "application/octet-stream";
+        contentTypeProvider.Mappings[".blat"] = "application/octet-stream";
+        contentTypeProvider.Mappings[".woff2"] = "font/woff2";
+
+        var fileProvider = new PhysicalFileProvider(publishRoot);
+        _app.UseStaticFiles(new StaticFileOptions
+        {
+            FileProvider = fileProvider,
+            ContentTypeProvider = contentTypeProvider,
+        });
+        _app.MapFallbackToFile("index.html", new StaticFileOptions
+        {
+            FileProvider = fileProvider,
+            ContentTypeProvider = contentTypeProvider,
+        });
+
+        try
+        {
+            await _app.StartAsync();
+            ServerAvailable = true;
+        }
+        catch
+        {
+            ServerAvailable = false;
+            return;
+        }
 
         try
         {
@@ -80,29 +93,57 @@ public class PlaywrightFixture : IAsyncLifetime
         }
     }
 
-    private static string FindServerProject()
+    private static async Task<bool> PublishAsync(string clientProjectPath)
+    {
+        using var process = new Process
+        {
+            StartInfo = new ProcessStartInfo
+            {
+                FileName = "dotnet",
+                Arguments = $"publish \"{clientProjectPath}\" -c Release",
+                UseShellExecute = false,
+                RedirectStandardOutput = true,
+                RedirectStandardError = true,
+            },
+        };
+        process.Start();
+        var stdoutTask = process.StandardOutput.ReadToEndAsync();
+        var stderrTask = process.StandardError.ReadToEndAsync();
+
+        using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(300));
+        try
+        {
+            await process.WaitForExitAsync(cts.Token);
+        }
+        catch (OperationCanceledException)
+        {
+            try { process.Kill(entireProcessTree: true); } catch { }
+            return false;
+        }
+
+        await Task.WhenAll(stdoutTask, stderrTask);
+        return process.ExitCode == 0;
+    }
+
+    private static string FindClientProject()
     {
         var dir = AppContext.BaseDirectory;
         while (dir != null)
         {
-            var candidate = Path.Combine(dir, "Footing", "Footing.csproj");
+            var candidate = Path.Combine(dir, "Footing.Client", "Footing.Client.csproj");
             if (File.Exists(candidate)) return candidate;
-            candidate = Path.Combine(dir, "src", "Footing", "Footing.csproj");
+            candidate = Path.Combine(dir, "src", "Footing.Client", "Footing.Client.csproj");
             if (File.Exists(candidate)) return candidate;
             dir = Path.GetDirectoryName(dir);
         }
-        throw new InvalidOperationException("Could not find Footing.csproj");
+        throw new InvalidOperationException("Could not find Footing.Client.csproj");
     }
 
     public async Task DisposeAsync()
     {
         if (Browser != null) await Browser.DisposeAsync();
         Playwright?.Dispose();
-        if (_serverProcess is { HasExited: false })
-        {
-            _serverProcess.Kill(entireProcessTree: true);
-            _serverProcess.Dispose();
-        }
+        if (_app != null) await _app.DisposeAsync();
     }
 }
 
