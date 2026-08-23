@@ -40,9 +40,6 @@ jobs:
           # Custom domain
           echo 'footing.app' > "$publish_dir/CNAME"
 
-          # 404.html for client-side routing — redirects to index.html
-          cp src/Footing.Client/wwwroot/404.html "$publish_dir/404.html"
-
       - uses: actions/configure-pages@v5
 
       - uses: actions/upload-pages-artifact@v3

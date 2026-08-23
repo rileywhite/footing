@@ -28,6 +28,11 @@ public class PlaywrightFixture : IAsyncLifetime
         return port;
     }
 
+    private static bool PlaywrightRequired =>
+        Environment.GetEnvironmentVariable("PLAYWRIGHT_REQUIRED") is { Length: > 0 } value
+        && value != "0"
+        && !string.Equals(value, "false", StringComparison.OrdinalIgnoreCase);
+
     public async Task InitializeAsync()
     {
         var port = FindFreePort();
@@ -36,6 +41,8 @@ public class PlaywrightFixture : IAsyncLifetime
         var clientProjectPath = FindClientProject();
         if (!await PublishAsync(clientProjectPath))
         {
+            if (PlaywrightRequired)
+                throw new InvalidOperationException("PLAYWRIGHT_REQUIRED is set but publishing Footing.Client failed.");
             ServerAvailable = false;
             return;
         }
@@ -45,6 +52,8 @@ public class PlaywrightFixture : IAsyncLifetime
             "bin", "Release", "net10.0", "publish", "wwwroot");
         if (!Directory.Exists(publishRoot))
         {
+            if (PlaywrightRequired)
+                throw new InvalidOperationException($"PLAYWRIGHT_REQUIRED is set but the publish output was not found at '{publishRoot}'.");
             ServerAvailable = false;
             return;
         }
@@ -76,9 +85,11 @@ public class PlaywrightFixture : IAsyncLifetime
             await _app.StartAsync();
             ServerAvailable = true;
         }
-        catch
+        catch (Exception ex)
         {
             ServerAvailable = false;
+            if (PlaywrightRequired)
+                throw new InvalidOperationException("PLAYWRIGHT_REQUIRED is set but the test server failed to start.", ex);
             return;
         }
 
@@ -87,9 +98,11 @@ public class PlaywrightFixture : IAsyncLifetime
             Playwright = await Microsoft.Playwright.Playwright.CreateAsync();
             Browser = await Playwright.Chromium.LaunchAsync(new BrowserTypeLaunchOptions { Headless = true });
         }
-        catch
+        catch (Exception ex)
         {
             ServerAvailable = false;
+            if (PlaywrightRequired)
+                throw new InvalidOperationException("PLAYWRIGHT_REQUIRED is set but launching Chromium failed (is it installed?).", ex);
         }
     }
 
