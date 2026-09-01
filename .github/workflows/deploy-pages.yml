@@ -42,13 +42,12 @@ jobs:
 
       - uses: actions/configure-pages@v6
 
-      # NOT bumped to v4/v5: those versions exclude dotfiles from the artifact
-      # by default, which would silently drop .nojekyll above and re-enable
-      # Jekyll processing on Pages (breaking the _framework directory).
-      # See bead fo-1fs for details; needs a decision before bumping further.
-      - uses: actions/upload-pages-artifact@v3
+      - uses: actions/upload-pages-artifact@v5
         with:
           path: src/Footing.Client/bin/Release/net10.0/publish/wwwroot
+          # Required: v5 excludes dotfiles by default, which would drop the
+          # .nojekyll written above and let Jekyll ignore _framework/.
+          include-hidden-files: true
 
       - name: Deploy to GitHub Pages
         id: deployment
