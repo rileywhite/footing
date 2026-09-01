@@ -21,9 +21,9 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
-      - uses: actions/setup-dotnet@v4
+      - uses: actions/setup-dotnet@v6
         with:
           dotnet-version: '10.0.x'
 
@@ -40,12 +40,16 @@ jobs:
           # Custom domain
           echo 'footing.app' > "$publish_dir/CNAME"
 
-      - uses: actions/configure-pages@v5
+      - uses: actions/configure-pages@v6
 
+      # NOT bumped to v4/v5: those versions exclude dotfiles from the artifact
+      # by default, which would silently drop .nojekyll above and re-enable
+      # Jekyll processing on Pages (breaking the _framework directory).
+      # See bead fo-1fs for details; needs a decision before bumping further.
       - uses: actions/upload-pages-artifact@v3
         with:
           path: src/Footing.Client/bin/Release/net10.0/publish/wwwroot
 
       - name: Deploy to GitHub Pages
         id: deployment
-        uses: actions/deploy-pages@v4
+        uses: actions/deploy-pages@v5
