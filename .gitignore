@@ -25,3 +25,4 @@ scripts/
 # Gas City
 .beads/*
 !.beads/identity.toml
+!.beads/.gitignore
