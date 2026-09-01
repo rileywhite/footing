@@ -27,3 +27,14 @@ jobs:
 
       - name: Integration tests
         run: dotnet test src/Footing.Tests.Integration --no-build
+
+      - name: Build E2E tests
+        run: dotnet build src/Footing.Tests.E2E
+
+      - name: Install Playwright browsers
+        run: pwsh src/Footing.Tests.E2E/bin/Debug/net10.0/playwright.ps1 install --with-deps chromium
+
+      - name: E2E tests
+        run: dotnet test src/Footing.Tests.E2E --no-build
+        env:
+          PLAYWRIGHT_REQUIRED: '1'
