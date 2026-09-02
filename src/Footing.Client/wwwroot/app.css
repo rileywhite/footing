@@ -271,6 +271,70 @@ button, input, select, textarea {
 }
 
 /* ============================================================
+   Page Chrome — Header, Nav, Main
+   (Promoted from MainLayout.razor.css / NavMenu.razor.css so the
+   static landing page, which cannot use Blazor scoped CSS, shares
+   the same rules as the Blazor app.)
+   ============================================================ */
+
+.site-header {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background-color: var(--ft-bg-topbar);
+    border-bottom: 1px solid var(--ft-bg-topbar-border);
+}
+
+main {
+    width: 100%;
+    max-width: 54rem;
+    margin: 0 auto;
+    padding: 0 1rem;
+}
+
+.site-nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 3.5rem;
+    padding: 0 1rem;
+    max-width: 54rem;
+    margin: 0 auto;
+}
+
+.site-wordmark {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--ft-text);
+    text-decoration: none;
+}
+
+.site-wordmark:hover {
+    color: var(--ft-primary);
+}
+
+.site-nav-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.site-nav-link {
+    font-size: 0.9rem;
+    color: var(--ft-text-muted);
+    text-decoration: none;
+    padding: 0.25rem 0.75rem;
+    border-radius: 0.25rem;
+    transition: color 0.15s, background-color 0.15s;
+}
+
+.site-nav-link:hover,
+.site-nav-link.active {
+    color: var(--ft-primary);
+    background-color: var(--ft-sidebar-hover-bg);
+}
+
+/* ============================================================
    Layout Utilities (replacing Bootstrap utilities)
    ============================================================ */
 
@@ -471,7 +535,7 @@ a:hover, .btn-link:hover {
 }
 
 .content {
-    padding-top: var(--ft-space-md);
+    padding: 1.5rem 0 4rem;
 }
 
 h1:focus {
