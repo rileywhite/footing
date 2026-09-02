@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Footing</title>
+    <meta name="description"
+        content="Footing — personal finance tracking. Privacy-first budgeting and expense management that keeps your data in the browser." />
+    <meta name="theme-color" content="#5a7a6a" />
+    <link rel="canonical" href="https://footing.app/" />
+    <meta property="og:title" content="Footing" />
+    <meta property="og:description"
+        content="Footing — personal finance tracking. Privacy-first budgeting and expense management that keeps your data in the browser." />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://footing.app/" />
+    <meta property="og:site_name" content="Footing" />
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content="Footing" />
+    <meta name="twitter:description"
+        content="Footing — personal finance tracking. Privacy-first budgeting and expense management that keeps your data in the browser." />
+    <base href="/" />
+    <link rel="preload" href="app/fonts/rubik-latin.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="stylesheet" href="app/app.css" />
+    <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+    <link rel="icon" type="image/png" href="favicon.png" />
+    <link rel="apple-touch-icon" href="apple-touch-icon.svg" />
+    <link rel="manifest" href="manifest.json" />
+    <script>
+        (function () {
+            var saved = localStorage.getItem('ft-theme');
+            if (saved === 'dark' || saved === 'light') {
+                document.documentElement.setAttribute('data-theme', saved);
+            }
+        })();
+    </script>
+</head>
+
+<body>
+    <header class="site-header">
+        <nav class="site-nav">
+            <a class="site-wordmark" href="/">Footing</a>
+            <div class="site-nav-actions">
+                <a class="site-nav-link" href="app/find-my-footing">
+                    Find My Footing
+                </a>
+                <button class="theme-toggle" onclick="Footing.toggleTheme()" title="Toggle dark mode"
+                    aria-label="Toggle dark mode">
+                    <span class="icon-sun" aria-hidden="true">&#x2600;&#xFE0F;</span>
+                    <span class="icon-moon" aria-hidden="true">&#x1F319;</span>
+                </button>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <article class="content">
+            <div class="ft-hero">
+                <h1>Where Does Your Money Go?</h1>
+                <p class="ft-tagline">
+                    You have it, then you don't. The answers seem easy&mdash;but where
+                    <em>does</em> it all go?
+                </p>
+            </div>
+
+            <div class="ft-narrative">
+                <p>
+                    You've asked yourself these questions long enough. It's finally time to
+                    take action.
+                </p>
+                <p>
+                    What I found isn't anything special or especially difficult.
+                    It's a simple way of thinking about your income and spending that empowers
+                    you to take control.
+                </p>
+                <p><em>You can do this.</em></p>
+            </div>
+
+            <div class="ft-value-section">
+                <h2>Simple. Private. Instant.</h2>
+                <p>
+                    Footing is a free tool for thinking about what you spend, how, and why.
+                    Start training yourself to take control of your money. When you're ready,
+                    export your data to Excel with one click.
+                </p>
+                <p class="ft-privacy-note">
+                    Your data never leaves your browser. No accounts, no tracking, no servers.
+                    Just you and your finances.
+                </p>
+                <a href="app/find-my-footing" class="btn btn-primary">Get Your Footing</a>
+            </div>
+
+            <footer class="ft-landing-footer">
+                <a href="https://www.buymeacoffee.com/rileywhite" target="_blank" rel="noopener noreferrer">Buy Me A Coffee</a>
+            </footer>
+        </article>
+    </main>
+
+    <script src="app/js/footing.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <title>Footing - Page Not Found</title>
+    <meta name="robots" content="noindex" />
+    <script>
+        // GitHub Pages serves exactly one 404.html for the whole site (root-level
+        // only; a per-directory 404.html is not honored). That means this file is
+        // reached both for genuinely missing pages AND for real client-side routes
+        // under /app/ that Blazor owns (e.g. /app/find-my-footing on a hard
+        // refresh). Only redirect the latter; let everything else render as a
+        // real 404 below.
+        //
+        // Based on github.com/rafgraph/spa-github-pages, scoped to the /app
+        // path segment instead of the whole site (pathSegmentsToKeep = 1).
+        (function (l) {
+            var prefix = '/app';
+            if (l.pathname === prefix || l.pathname.indexOf(prefix + '/') === 0) {
+                var segments = l.pathname.split('/');
+                var kept = segments.slice(0, 2).join('/');
+                var remainder = segments.slice(2).join('/');
+                l.replace(
+                    l.protocol + '//' + l.hostname + (l.port ? ':' + l.port : '') +
+                    kept + '/?/' +
+                    remainder.replace(/&/g, '~and~') +
+                    (l.search ? '&' + l.search.slice(1).replace(/&/g, '~and~') : '') +
+                    l.hash
+                );
+            }
+        }(window.location));
+    </script>
+</head>
+
+<body>
+    <h1>Page not found</h1>
+    <p>Sorry, we couldn't find that page.</p>
+    <p><a href="/">Return to Footing</a></p>
+</body>
+
+</html>

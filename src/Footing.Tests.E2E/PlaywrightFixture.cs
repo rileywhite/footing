@@ -3,6 +3,7 @@ using System.Net;
 using System.Net.Sockets;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Playwright;
@@ -58,6 +59,17 @@ public class PlaywrightFixture : IAsyncLifetime
             return;
         }
 
+        // Mirrors deploy-pages.yml's "Prepare GitHub Pages output" step: the Blazor
+        // publish only produces app/ (StaticWebAssetBasePath), so the checked-in static
+        // site shell has to be composed in on top before serving, or / and the 404 shim
+        // don't exist in this harness at all. Keep this in sync with that workflow step
+        // by hand -- there are only two copies of this sequence and each names the other.
+        var siteDir = FindSiteDirectory(clientProjectPath);
+        foreach (var file in Directory.GetFiles(siteDir))
+        {
+            File.Copy(file, Path.Combine(publishRoot, Path.GetFileName(file)), overwrite: true);
+        }
+
         var builder = WebApplication.CreateBuilder();
         builder.WebHost.UseUrls(BaseUrl);
         _app = builder.Build();
@@ -69,15 +81,39 @@ public class PlaywrightFixture : IAsyncLifetime
         contentTypeProvider.Mappings[".woff2"] = "font/woff2";
 
         var fileProvider = new PhysicalFileProvider(publishRoot);
+        _app.UseDefaultFiles(new DefaultFilesOptions
+        {
+            FileProvider = fileProvider,
+        });
         _app.UseStaticFiles(new StaticFileOptions
         {
             FileProvider = fileProvider,
             ContentTypeProvider = contentTypeProvider,
         });
-        _app.MapFallbackToFile("index.html", new StaticFileOptions
+
+        // GitHub Pages serves exactly one 404.html, at the site root, for ANY missing
+        // path (with a real 404 status) -- ASP.NET's MapFallbackToFile is a SPA
+        // fallback (200, always index.html) and does not model that. Reproducing the
+        // real shape matters here because production has no other coverage of this
+        // seam: a deep link under /app/ (e.g. /app/find-my-footing) must hit the same
+        // 404.html, whose own script (src/Footing.Site/404.html) then redirects the
+        // browser to /app/?/find-my-footing, which UseDefaultFiles above resolves to
+        // app/index.html. The redirect script's own logic is intentionally not
+        // re-verified here -- that's covered by the standalone Node script described in
+        // docs/spike-static-landing-page.md -- this just exercises it as production
+        // plumbing, the same way a real deep link does.
+        // A plain terminal middleware, not MapFallback/an endpoint: registering any
+        // routing endpoint implicitly moves endpoint selection to the front of the
+        // pipeline, which makes the static-file middleware above skip real files too
+        // (it defers to an already-selected endpoint) -- verified by hand against a
+        // minimal repro, not assumed.
+        _app.Run(async context =>
         {
-            FileProvider = fileProvider,
-            ContentTypeProvider = contentTypeProvider,
+            var notFoundFile = fileProvider.GetFileInfo("404.html");
+            context.Response.StatusCode = StatusCodes.Status404NotFound;
+            context.Response.ContentType = "text/html";
+            await using var stream = notFoundFile.CreateReadStream();
+            await stream.CopyToAsync(context.Response.Body);
         });
 
         try
@@ -150,6 +186,15 @@ public class PlaywrightFixture : IAsyncLifetime
             dir = Path.GetDirectoryName(dir);
         }
         throw new InvalidOperationException("Could not find Footing.Client.csproj");
+    }
+
+    private static string FindSiteDirectory(string clientProjectPath)
+    {
+        // Footing.Site is a sibling of Footing.Client under src/.
+        var srcDir = Path.GetDirectoryName(Path.GetDirectoryName(clientProjectPath))!;
+        var candidate = Path.Combine(srcDir, "Footing.Site");
+        if (Directory.Exists(candidate)) return candidate;
+        throw new InvalidOperationException($"Could not find Footing.Site directory at '{candidate}'");
     }
 
     public async Task DisposeAsync()

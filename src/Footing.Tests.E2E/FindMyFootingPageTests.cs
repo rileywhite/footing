@@ -33,7 +33,7 @@ public class FindMyFootingPageTests
             ");
         }
 
-        await page.GotoAsync($"{_fixture.BaseUrl}/find-my-footing");
+        await page.GotoAsync($"{_fixture.BaseUrl}/app/find-my-footing");
         // WASM interactive component needs time to download and initialize
         await page.WaitForSelectorAsync("#moneyFlows", new() { Timeout = 60000, State = WaitForSelectorState.Attached });
         return page;
