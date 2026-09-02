@@ -1,0 +1,4 @@
+This file exists solely so Footing.Tests.E2E/StaticSiteCompositionTests.cs has a
+real nested path under src/Footing.Site/ to prove the E2E fixture's static-site
+copy is recursive. It carries no meaningful content and is not linked from any
+page. Do not remove it without updating that test.
