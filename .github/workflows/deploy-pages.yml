@@ -37,6 +37,9 @@ jobs:
           # Checked-in static site shell (landing page, root 404 shim, favicons,
           # robots.txt, sitemap.xml) lands at the site root alongside the Blazor
           # app, which StaticWebAssetBasePath already publishes under app/.
+          # Footing.Tests.E2E/PlaywrightFixture.cs composes the same way (by hand,
+          # not via a shared script) so the E2E suite exercises the real composed
+          # site -- keep both in sync if this step changes.
           cp -r src/Footing.Site/. "$publish_dir/"
 
           # Prevent Jekyll processing (_framework would be ignored otherwise)
