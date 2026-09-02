@@ -19,6 +19,7 @@ public class PlaywrightFixture : IAsyncLifetime
     public IBrowser Browser { get; private set; } = null!;
     public string BaseUrl { get; private set; } = null!;
     public bool ServerAvailable { get; private set; }
+    public string SiteDirectory { get; private set; } = null!;
 
     private static int FindFreePort()
     {
@@ -62,12 +63,19 @@ public class PlaywrightFixture : IAsyncLifetime
         // Mirrors deploy-pages.yml's "Prepare GitHub Pages output" step: the Blazor
         // publish only produces app/ (StaticWebAssetBasePath), so the checked-in static
         // site shell has to be composed in on top before serving, or / and the 404 shim
-        // don't exist in this harness at all. Keep this in sync with that workflow step
-        // by hand -- there are only two copies of this sequence and each names the other.
+        // don't exist in this harness at all. Semantics being mirrored, exactly:
+        // `cp -r src/Footing.Site/. "$publish_dir/"` -- recursive, contents-of (not the
+        // directory itself), overwrite-on-conflict. Divergence here is caught by
+        // StaticSiteCompositionTests, which serves every file under Footing.Site and
+        // fails if any of them isn't reachable through this composed output.
         var siteDir = FindSiteDirectory(clientProjectPath);
-        foreach (var file in Directory.GetFiles(siteDir))
+        SiteDirectory = siteDir;
+        foreach (var file in Directory.GetFiles(siteDir, "*", SearchOption.AllDirectories))
         {
-            File.Copy(file, Path.Combine(publishRoot, Path.GetFileName(file)), overwrite: true);
+            var relativePath = Path.GetRelativePath(siteDir, file);
+            var destination = Path.Combine(publishRoot, relativePath);
+            Directory.CreateDirectory(Path.GetDirectoryName(destination)!);
+            File.Copy(file, destination, overwrite: true);
         }
 
         var builder = WebApplication.CreateBuilder();
