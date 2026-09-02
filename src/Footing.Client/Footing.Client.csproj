@@ -7,7 +7,7 @@
     <NoDefaultLaunchSettingsFile>true</NoDefaultLaunchSettingsFile>
     <!-- Root: no host project consumes this app's static web assets; it publishes and is served standalone. -->
     <StaticWebAssetProjectMode>Root</StaticWebAssetProjectMode>
-    <StaticWebAssetBasePath>app</StaticWebAssetBasePath>
+    <StaticWebAssetBasePath>find-my-footing</StaticWebAssetBasePath>
     <BlazorDisableThrowNavigationException>true</BlazorDisableThrowNavigationException>
   </PropertyGroup>
 

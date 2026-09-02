@@ -61,7 +61,7 @@ public class PlaywrightFixture : IAsyncLifetime
         }
 
         // Mirrors deploy-pages.yml's "Prepare GitHub Pages output" step: the Blazor
-        // publish only produces app/ (StaticWebAssetBasePath), so the checked-in static
+        // publish only produces find-my-footing/ (StaticWebAssetBasePath), so the checked-in static
         // site shell has to be composed in on top before serving, or / and the 404 shim
         // don't exist in this harness at all. Semantics being mirrored, exactly:
         // `cp -r src/Footing.Site/. "$publish_dir/"` -- recursive, contents-of (not the
@@ -103,10 +103,10 @@ public class PlaywrightFixture : IAsyncLifetime
         // path (with a real 404 status) -- ASP.NET's MapFallbackToFile is a SPA
         // fallback (200, always index.html) and does not model that. Reproducing the
         // real shape matters here because production has no other coverage of this
-        // seam: a deep link under /app/ (e.g. /app/find-my-footing) must hit the same
-        // 404.html, whose own script (src/Footing.Site/404.html) then redirects the
-        // browser to /app/?/find-my-footing, which UseDefaultFiles above resolves to
-        // app/index.html. The redirect script's own logic is intentionally not
+        // seam: a deep link under /find-my-footing/ (e.g. a future sub-route) must hit
+        // the same 404.html, whose own script (src/Footing.Site/404.html) then
+        // redirects the browser to /find-my-footing/?/..., which UseDefaultFiles above
+        // resolves to find-my-footing/index.html. The redirect script's own logic is intentionally not
         // re-verified here -- that's covered by the standalone Node script described in
         // docs/spike-static-landing-page.md -- this just exercises it as production
         // plumbing, the same way a real deep link does.

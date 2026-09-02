@@ -29,7 +29,7 @@ public class HomePageTests
         SkipIfUnavailable();
         var page = await _fixture.Browser.NewPageAsync();
         await page.GotoAsync(_fixture.BaseUrl);
-        var links = page.Locator("a[href='app/find-my-footing']");
+        var links = page.Locator("a[href='find-my-footing/']");
         await links.First.WaitForAsync();
         (await links.CountAsync()).Should().BeGreaterThan(0);
         await page.CloseAsync();
@@ -41,9 +41,9 @@ public class HomePageTests
         SkipIfUnavailable();
         var page = await _fixture.Browser.NewPageAsync();
         await page.GotoAsync(_fixture.BaseUrl);
-        await page.Locator("a[href='app/find-my-footing']").First.ClickAsync();
-        await page.WaitForURLAsync("**/app/find-my-footing");
-        page.Url.Should().Contain("app/find-my-footing");
+        await page.Locator("a[href='find-my-footing/']").First.ClickAsync();
+        await page.WaitForURLAsync("**/find-my-footing/");
+        page.Url.Should().Contain("find-my-footing/");
         await page.CloseAsync();
     }
 
@@ -54,7 +54,7 @@ public class HomePageTests
         // #blazor-error-ui at all, so it's not part of this check anymore.
         SkipIfUnavailable();
         var page = await _fixture.Browser.NewPageAsync();
-        await page.GotoAsync($"{_fixture.BaseUrl}/app/find-my-footing");
+        await page.GotoAsync($"{_fixture.BaseUrl}/find-my-footing/");
         var errorUi = page.Locator("#blazor-error-ui");
         (await errorUi.CountAsync()).Should().Be(1);
         (await errorUi.EvaluateAsync<string>("el => getComputedStyle(el).display"))
