@@ -1,6 +1,7 @@
 using System.Diagnostics;
 using System.Net;
 using System.Net.Sockets;
+using System.Text.Json;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -203,6 +204,35 @@ public class PlaywrightFixture : IAsyncLifetime
         var candidate = Path.Combine(srcDir, "Footing.Site");
         if (Directory.Exists(candidate)) return candidate;
         throw new InvalidOperationException($"Could not find Footing.Site directory at '{candidate}'");
+    }
+
+    // A context, not just a page: it's what makes viewport, colour scheme, download
+    // acceptance and a clean storage partition all settable at once. The localStorage seed
+    // is applied via an init script so it runs before first navigation -- the <head>
+    // theme-restore snippet reads `ft-theme` before first paint, and later items depend on
+    // that ordering.
+    public async Task<PageSession> NewSessionAsync(
+        Viewport viewport,
+        ColorScheme colorScheme = ColorScheme.Light,
+        bool acceptDownloads = false,
+        IDictionary<string, string>? localStorageSeed = null)
+    {
+        var context = await Browser.NewContextAsync(new BrowserNewContextOptions
+        {
+            ViewportSize = new ViewportSize { Width = viewport.Width, Height = viewport.Height },
+            ColorScheme = colorScheme,
+            AcceptDownloads = acceptDownloads,
+        });
+
+        if (localStorageSeed is { Count: > 0 })
+        {
+            var statements = localStorageSeed.Select(kv =>
+                $"window.localStorage.setItem({JsonSerializer.Serialize(kv.Key)}, {JsonSerializer.Serialize(kv.Value)});");
+            await context.AddInitScriptAsync(string.Join("\n", statements));
+        }
+
+        var page = await context.NewPageAsync();
+        return new PageSession(context, page);
     }
 
     public async Task DisposeAsync()
