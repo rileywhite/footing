@@ -18,7 +18,9 @@ public sealed class PageSession : IAsyncDisposable
 
     public async ValueTask DisposeAsync()
     {
-        await Page.CloseAsync();
+        // Close only the context: it owns the page, so closing it tears down the page
+        // too, and closing the context is what actually releases the browser resources.
+        // Closing Page first and letting a throw skip Context.CloseAsync() would leak it.
         await Context.CloseAsync();
     }
 }

@@ -208,29 +208,43 @@ public class PlaywrightFixture : IAsyncLifetime
 
     // A context, not just a page: it's what makes viewport, colour scheme, download
     // acceptance and a clean storage partition all settable at once. The localStorage seed
-    // is applied via an init script so it runs before first navigation -- the <head>
-    // theme-restore snippet reads `ft-theme` before first paint, and later items depend on
-    // that ordering.
+    // is applied via BrowserNewContextOptions.StorageState rather than an init script:
+    // an init script re-runs on every navigation and reverts any writes the app makes
+    // to a seeded key on reload, whereas StorageState only seeds the context once, at
+    // creation. The <head> theme-restore snippet still reads `ft-theme` before first
+    // paint since the seeded value is already in storage before the first navigation.
     public async Task<PageSession> NewSessionAsync(
         Viewport viewport,
         ColorScheme colorScheme = ColorScheme.Light,
         bool acceptDownloads = false,
         IDictionary<string, string>? localStorageSeed = null)
     {
-        var context = await Browser.NewContextAsync(new BrowserNewContextOptions
+        var options = new BrowserNewContextOptions
         {
             ViewportSize = new ViewportSize { Width = viewport.Width, Height = viewport.Height },
             ColorScheme = colorScheme,
             AcceptDownloads = acceptDownloads,
-        });
+        };
 
         if (localStorageSeed is { Count: > 0 })
         {
-            var statements = localStorageSeed.Select(kv =>
-                $"window.localStorage.setItem({JsonSerializer.Serialize(kv.Key)}, {JsonSerializer.Serialize(kv.Value)});");
-            await context.AddInitScriptAsync(string.Join("\n", statements));
+            options.StorageState = JsonSerializer.Serialize(new
+            {
+                cookies = Array.Empty<object>(),
+                origins = new[]
+                {
+                    new
+                    {
+                        origin = BaseUrl,
+                        localStorage = localStorageSeed
+                            .Select(kv => new { name = kv.Key, value = kv.Value })
+                            .ToArray(),
+                    },
+                },
+            });
         }
 
+        var context = await Browser.NewContextAsync(options);
         var page = await context.NewPageAsync();
         return new PageSession(context, page);
     }
