@@ -8,12 +8,6 @@ namespace Footing.Tests.E2E;
 public class FindMyFootingPageTests
 {
     private readonly PlaywrightFixture _fixture;
-    private const string StorageKey = "3794bdc6-f064-43e6-9a1e-8bb2c03d16cb";
-
-    private const string SeededAnalysis = """
-        {"Inflows":[{"Id":"00000000-0000-0000-0000-000000000001","Name":"Salary","Amount":2000,"Period":"Monthly"}],"RecurringBills":[],"HouseholdBudgets":[],"PersonalBudgets":[],"EventBudgets":[]}
-        """;
-
     public FindMyFootingPageTests(PlaywrightFixture fixture) => _fixture = fixture;
 
     private void SkipIfUnavailable() =>
@@ -27,9 +21,7 @@ public class FindMyFootingPageTests
     {
         var session = await _fixture.NewSessionAsync(
             viewport,
-            localStorageSeed: withExistingData
-                ? new Dictionary<string, string> { [StorageKey] = SeededAnalysis }
-                : null);
+            localStorageSeed: withExistingData ? ToolStorage.ReturningUser() : null);
 
         await session.Page.GotoAsync($"{_fixture.BaseUrl}{SitePage.Tool}");
         // WASM interactive component needs time to download and initialize
