@@ -121,20 +121,42 @@ public static class LayoutAssertions
     /// <summary>
     /// Reads computed style property values for the first element matching
     /// <paramref name="selector"/>.
+    ///
+    /// Returns an ARRAY of values from the browser and zips it with the requested property
+    /// names here, rather than building an object in JS and binding it straight to a
+    /// Dictionary. That is not a style preference: Playwright .NET cannot deserialize a JS
+    /// object into Dictionary&lt;string, string&gt; -- it silently yields an EMPTY dictionary,
+    /// with no exception, so every subsequent lookup throws KeyNotFoundException or, worse,
+    /// a caller that iterates the dictionary compares nothing at all and passes. (The wire
+    /// value is fine; asking for JsonElement instead returns
+    /// {"$id":"1","background-color":"rgb(...)",...}.) Found when SharedChromeTests became
+    /// this helper's first caller -- it shipped in W-02 with no consumer to expose it.
     /// </summary>
-    public static Task<Dictionary<string, string>> ReadComputedStylesAsync(
+    public static async Task<Dictionary<string, string>> ReadComputedStylesAsync(
         IPage page, string selector, IReadOnlyList<string> properties)
     {
-        return page.EvalOnSelectorAsync<Dictionary<string, string>>(
+        var values = await page.EvalOnSelectorAsync<string[]>(
             selector,
             """
             (el, props) => {
                 const cs = getComputedStyle(el);
-                const result = {};
-                for (const p of props) result[p] = cs.getPropertyValue(p);
-                return result;
+                return props.map(p => cs.getPropertyValue(p));
             }
             """,
             properties);
+
+        if (values.Length != properties.Count)
+        {
+            throw new InvalidOperationException(
+                $"Expected {properties.Count} computed values for '{selector}' but got {values.Length}.");
+        }
+
+        var result = new Dictionary<string, string>(properties.Count);
+        for (var i = 0; i < properties.Count; i++)
+        {
+            result[properties[i]] = values[i];
+        }
+
+        return result;
     }
 }
