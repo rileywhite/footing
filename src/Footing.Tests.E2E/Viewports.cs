@@ -73,6 +73,14 @@ public static class Viewports
     public static IEnumerable<object[]> AtLeastTablet =>
         new[] { Tablet, Desktop }.Select(viewport => new object[] { viewport });
 
+    /// <summary>
+    /// Desktop and Mobile only. Used where the two layouts genuinely differ but the middle
+    /// of the range adds nothing -- the Excel export button, whose reachability differs
+    /// between the wide and narrow arrangements.
+    /// </summary>
+    public static IEnumerable<object[]> DesktopAndMobile =>
+        new[] { Mobile, Desktop }.Select(viewport => new object[] { viewport });
+
     public static IEnumerable<object[]> AllByPage =>
         from viewport in AllViewports
         from page in Pages
