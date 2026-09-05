@@ -61,6 +61,18 @@ public static class Viewports
     public static IEnumerable<object[]> Full =>
         AllViewports.Where(viewport => viewport.FullAssertions).Select(viewport => new object[] { viewport });
 
+    /// <summary>
+    /// The two narrow viewports. Split out because the tool page has a reproduced overflow
+    /// defect at exactly these widths -- see FindMyFootingPageTests -- which W-05 rules on
+    /// and W-06 fixes. Once it is fixed these fold back into <see cref="All"/>.
+    /// </summary>
+    public static IEnumerable<object[]> AtMostMobile =>
+        new[] { MobileFloor, Mobile }.Select(viewport => new object[] { viewport });
+
+    /// <summary>The complement of <see cref="AtMostMobile"/>.</summary>
+    public static IEnumerable<object[]> AtLeastTablet =>
+        new[] { Tablet, Desktop }.Select(viewport => new object[] { viewport });
+
     public static IEnumerable<object[]> AllByPage =>
         from viewport in AllViewports
         from page in Pages

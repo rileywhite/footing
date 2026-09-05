@@ -19,6 +19,9 @@ public class StaticSiteCompositionTests
     // .e2e-fixture/nested-probe.txt exists purely to give this a nested path to
     // check -- Footing.Site was flat until now, so a non-recursive copy would pass
     // undetected without it.
+    //
+    // D-01 single-viewport exemption: this is a pure HttpClient sweep over the composed
+    // publish output and never opens a browser, so there is no viewport for it to vary.
     [SkippableFact]
     public async Task AllStaticSiteFiles_AreServedAtTheirRelativePath()
     {
