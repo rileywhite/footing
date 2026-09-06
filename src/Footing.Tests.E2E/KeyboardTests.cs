@@ -27,30 +27,35 @@ public class KeyboardTests
         new[] { SitePage.Landing, SitePage.Tool }.Select(page => new object[] { page });
 
     /// <summary>
-    /// The generic ARIA-shaped query, unioned with an explicit allowlist.
+    /// The generic ARIA-shaped query, unioned with an explicit allowlist of controls the
+    /// generic query cannot see.
     ///
-    /// R-02 — the allowlist is load-bearing, not belt-and-braces. `.ft-sticky-total` is a
-    /// plain &lt;div @onclick="ToggleStickyExpand"&gt; with no role and no tabindex
-    /// (FootingAnalysisEditor.razor:80 and :171, duplicated across both trees). It is
-    /// invisible to the generic query PRECISELY BECAUSE it is undeclared -- which is the
-    /// defect. Without this allowlist the enumeration would report "expected set covered",
-    /// this item would pass, and the failing test W-11's repair is gated on would never
-    /// appear; proven-first discipline would then block the fix it exists to justify.
+    /// R-02 — the allowlist was load-bearing, and it did its job. It carried one entry,
+    /// `.ft-sticky-total`: a plain &lt;div @onclick="ToggleStickyExpand"&gt; with no role and
+    /// no tabindex, invisible to the generic query PRECISELY BECAUSE it was undeclared, which
+    /// was the defect (F-05). Without the allowlist this test would have reported "expected
+    /// set covered", and the failure W-11's repair was gated on would never have appeared.
     ///
-    /// The allowlist is a standing maintenance cost: every future undeclared control has to
-    /// be remembered here or it goes unchecked. The right long-term fix is F-05's repair
-    /// making the control self-describing (a real button, or role + tabindex), after which
-    /// it falls out of the generic query naturally and this entry can be deleted.
+    /// **W-11 removed that entry**, which W-10 wrote this comment anticipating: the repair
+    /// made the control self-describing, so it now falls out of the generic query on its own.
+    /// The net-total toggle is a real &lt;button id="totalHeading"&gt; and the entry-chip delete
+    /// is a real &lt;button&gt;; both are matched by `button` in GENERIC above, and the walk
+    /// reaches both. Re-adding either here would assert nothing the generic query does not
+    /// already cover.
     ///
-    /// `.ft-entry-chip__delete` is deliberately NOT listed: it is a &lt;span role="button"&gt;,
-    /// so `[role="button"]` already matches it. It is non-focusable for want of a tabindex,
-    /// which the reachability assertion catches on its own.
+    /// The list is kept, empty, rather than deleted along with its last entry. It is the
+    /// registry for undeclared interactive controls, and its standing cost is unchanged:
+    /// anything clickable that is not a button, link or form control has to be remembered
+    /// here or it goes unchecked. Blazor's @onclick binds through a delegated listener and
+    /// leaves no attribute in the DOM, so there is nothing to detect such a control by --
+    /// which is exactly why the registry has to be hand-maintained, and why the durable fix
+    /// is always to make the control declare itself instead of listing it here.
     /// </summary>
     private const string EnumerateCandidates = """
         () => {
             const GENERIC = 'a[href], button, input:not([type=hidden]), select, textarea, '
                 + '[tabindex]:not([tabindex="-1"]), [role="button"]';
-            const ALLOWLIST = ['.ft-sticky-total'];
+            const ALLOWLIST = [];  // see the comment above before adding to this.
 
             const describe = el => {
                 const id = el.id ? '#' + el.id : '';

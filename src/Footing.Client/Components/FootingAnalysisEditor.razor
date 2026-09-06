@@ -79,16 +79,20 @@
 
     <div class="ft-sticky-total @(NetTotalWeeklyAmount.IsNegative ? "ft-sticky-total--negative" : "ft-sticky-total--positive") @(stickyExpanded ? "ft-sticky-total--expanded" : "")"
          @onclick="ToggleStickyExpand">
-        <div id="totalHeading" class="ft-sticky-total__summary @MonetaryAmount.AmountSensitiveCssClass">
+        <button type="button"
+                id="totalHeading"
+                class="ft-sticky-total__summary @MonetaryAmount.AmountSensitiveCssClass"
+                aria-expanded="@stickyExpanded.ToString().ToLower()"
+                aria-controls="@(stickyExpanded ? "totalDetail" : null)">
             <span class="ft-sticky-total__label">Net Total</span>
             <span class="ft-sticky-total__amount">
                 <MonetaryAmountDisplay Amount=@NetTotalWeeklyAmount /> / Week
             </span>
             <span class="ft-sticky-total__chevron" aria-hidden="true">@(stickyExpanded ? "\u25BC" : "\u25B2")</span>
-        </div>
+        </button>
         @if (stickyExpanded)
         {
-            <div class="ft-sticky-total__detail">
+            <div id="totalDetail" class="ft-sticky-total__detail">
                 @if (this.NetTotalWeeklyAmount.IsNegative)
                 {
                     <h5>Time to roll up your sleeves</h5>
@@ -170,16 +174,20 @@ else
 
     <div class="ft-sticky-total @(NetTotalWeeklyAmount.IsNegative ? "ft-sticky-total--negative" : "ft-sticky-total--positive") @(stickyExpanded ? "ft-sticky-total--expanded" : "")"
          @onclick="ToggleStickyExpand">
-        <div id="totalHeading" class="ft-sticky-total__summary @MonetaryAmount.AmountSensitiveCssClass">
+        <button type="button"
+                id="totalHeading"
+                class="ft-sticky-total__summary @MonetaryAmount.AmountSensitiveCssClass"
+                aria-expanded="@stickyExpanded.ToString().ToLower()"
+                aria-controls="@(stickyExpanded ? "totalDetail" : null)">
             <span class="ft-sticky-total__label">Net Total</span>
             <span class="ft-sticky-total__amount">
                 <MonetaryAmountDisplay Amount=@NetTotalWeeklyAmount /> / Week
             </span>
             <span class="ft-sticky-total__chevron" aria-hidden="true">@(stickyExpanded ? "\u25BC" : "\u25B2")</span>
-        </div>
+        </button>
         @if (stickyExpanded)
         {
-            <div class="ft-sticky-total__detail">
+            <div id="totalDetail" class="ft-sticky-total__detail">
                 @if (this.NetTotalWeeklyAmount.IsNegative)
                 {
                     <h5>Time to roll up your sleeves</h5>
