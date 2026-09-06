@@ -785,6 +785,18 @@ h1:focus {
 }
 
 .ft-sticky-total__summary {
+    /* Button reset -- same reasoning as .ft-entry-chip__delete further down. This row is the toggle
+       for the net-total detail panel, and it is the summary rather than the whole bar that
+       became a button: .ft-sticky-total also contains the expanded panel's <h5> and <p>, which
+       are flow content a <button> may not contain. `width: 100%` because a button does not
+       stretch to its container the way the <div> it replaces did. */
+    appearance: none;
+    background: none;
+    border: none;
+    font: inherit;
+    width: 100%;
+    cursor: pointer;
+
     display: flex;
     align-items: center;
     justify-content: center;
@@ -1130,6 +1142,17 @@ h1:focus {
 }
 
 .ft-entry-chip__delete {
+    /* Button reset. This is a real <button> so a keyboard user can reach it (F-05); it was a
+       <span role="button"> with no tabindex. These five declarations neutralise the UA button
+       styling -- background, border, and the `font` shorthand the UA sets, which would
+       otherwise override the inherited family. `font: inherit` must stay ABOVE font-size and
+       line-height below, which are the values this control actually wants. */
+    appearance: none;
+    background: none;
+    border: none;
+    font: inherit;
+    text-align: inherit;
+
     cursor: pointer;
     color: var(--ft-text-muted);
     font-size: 1.1rem;

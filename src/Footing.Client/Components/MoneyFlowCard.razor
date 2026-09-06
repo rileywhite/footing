@@ -60,7 +60,7 @@
                             <li class="ft-entry-chip">
                                 <span class="ft-entry-chip__name">@moneyFlow.Name</span>
                                 <span class="ft-entry-chip__amount"><MonetaryAmountDisplay Amount="@moneyFlow.Amount" /> / @GetPeriodShortLabel(moneyFlow.Period)</span>
-                                <span class="bi bi-x ft-entry-chip__delete" role="button" aria-label="Remove @moneyFlow.Name" @onclick="@(() => this.RemoveMoneyFlow(moneyFlow.Id))"></span>
+                                <button type="button" class="bi bi-x ft-entry-chip__delete" aria-label="Remove @moneyFlow.Name" @onclick="@(() => this.RemoveMoneyFlow(moneyFlow.Id))"></button>
                             </li>
                         }
                     </ul>
