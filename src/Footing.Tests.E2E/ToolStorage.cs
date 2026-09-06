@@ -82,6 +82,15 @@ internal static class ToolStorage
         [AnalysisKey] = EntryInEveryCategory,
     };
 
+    /// <summary>
+    /// Just the theme, with no analysis data -- the landing page has no analysis to seed, and
+    /// W-14 drives the dark scheme on BOTH pages through this key alone.
+    /// </summary>
+    public static Dictionary<string, string> ThemeOnly(string theme) => new()
+    {
+        [ThemeKey] = theme,
+    };
+
     public static Dictionary<string, string> ReturningUserWithTheme(string theme) => new()
     {
         [AnalysisKey] = OneIncomeEntry,
