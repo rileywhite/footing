@@ -63,8 +63,8 @@ public static class Viewports
 
     /// <summary>
     /// The two narrow viewports. Split out because the tool page has a reproduced overflow
-    /// defect at exactly these widths -- see FindMyFootingPageTests -- which W-05 rules on
-    /// and W-06 fixes. Once it is fixed these fold back into <see cref="All"/>.
+    /// defect at exactly these widths -- see NarrowViewportOverflowTests, which carries W-05's
+    /// ruling on it -- and W-06 fixes it. Once it is fixed these fold back into <see cref="All"/>.
     /// </summary>
     public static IEnumerable<object[]> AtMostMobile =>
         new[] { MobileFloor, Mobile }.Select(viewport => new object[] { viewport });

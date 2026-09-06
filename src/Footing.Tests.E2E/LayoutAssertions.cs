@@ -30,6 +30,49 @@ public static class LayoutAssertions
     }
 
     /// <summary>
+    /// How far the document overflows horizontally, in CSS pixels. Zero or negative means
+    /// it does not. Split out from <see cref="AssertNoHorizontalOverflowAsync"/> so a caller
+    /// can measure without asserting -- W-05 rules on OQ-01 by recording this at 320 and 375
+    /// across page/state combinations that are not all expected to be clean.
+    /// </summary>
+    public static async Task<int> MeasureHorizontalOverflowAsync(IPage page)
+    {
+        var metrics = await page.EvaluateAsync<OverflowMetrics>(
+            "() => ({ scrollWidth: document.documentElement.scrollWidth, clientWidth: document.documentElement.clientWidth })");
+
+        return metrics.ScrollWidth - metrics.ClientWidth;
+    }
+
+    /// <summary>
+    /// Names every element whose right edge crosses the client width, so an overflow is
+    /// actionable without a debugger. Returns a human-readable sentence, never null.
+    ///
+    /// This is the diagnostic W-06 actually consumes: D-03 says the offending ELEMENT, not
+    /// the hypothesis, is what gets fixed, so the element list has to survive out of the
+    /// browser whether the surrounding assertion passed or failed.
+    /// </summary>
+    public static async Task<string> DescribeHorizontalOverflowAsync(IPage page)
+    {
+        var offenders = await page.EvaluateAsync<OffendingElement[]>(
+            """
+            () => Array.from(document.querySelectorAll('*'))
+                .map(el => ({ el, rect: el.getBoundingClientRect() }))
+                .filter(x => x.rect.right > document.documentElement.clientWidth + 1)
+                .map(x => ({
+                    tag: x.el.tagName.toLowerCase(),
+                    id: x.el.id || '',
+                    classList: Array.from(x.el.classList).join(' '),
+                    right: x.rect.right
+                }))
+            """);
+
+        return offenders.Length == 0
+            ? "no offending element could be identified"
+            : string.Join("; ", offenders.Select(o =>
+                $"<{o.Tag}{(o.Id.Length > 0 ? $" id=\"{o.Id}\"" : "")}{(o.ClassList.Length > 0 ? $" class=\"{o.ClassList}\"" : "")}> right={o.Right}"));
+    }
+
+    /// <summary>
     /// Asserts the document does not overflow horizontally. On failure, names every
     /// element whose right edge crosses the client width so the failure is actionable
     /// without a debugger.
@@ -44,23 +87,7 @@ public static class LayoutAssertions
             return;
         }
 
-        var offenders = await page.EvaluateAsync<OffendingElement[]>(
-            """
-            () => Array.from(document.querySelectorAll('*'))
-                .map(el => ({ el, rect: el.getBoundingClientRect() }))
-                .filter(x => x.rect.right > document.documentElement.clientWidth + 1)
-                .map(x => ({
-                    tag: x.el.tagName.toLowerCase(),
-                    id: x.el.id || '',
-                    classList: Array.from(x.el.classList).join(' '),
-                    right: x.rect.right
-                }))
-            """);
-
-        var description = offenders.Length == 0
-            ? "no offending element could be identified"
-            : string.Join("; ", offenders.Select(o =>
-                $"<{o.Tag}{(o.Id.Length > 0 ? $" id=\"{o.Id}\"" : "")}{(o.ClassList.Length > 0 ? $" class=\"{o.ClassList}\"" : "")}> right={o.Right}"));
+        var description = await DescribeHorizontalOverflowAsync(page);
 
         metrics.ScrollWidth.Should().BeLessThanOrEqualTo(
             metrics.ClientWidth,

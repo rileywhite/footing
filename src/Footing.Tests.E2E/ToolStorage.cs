@@ -40,9 +40,46 @@ internal static class ToolStorage
         {"Inflows":[{"Id":"00000000-0000-0000-0000-000000000001","Name":"Salary","Amount":{"Amount":2000},"Period":4}],"RecurringBills":[],"HouseholdBudgets":[],"PersonalBudgets":[],"EventBudgets":[]}
         """;
 
+    /// <summary>
+    /// The five category names, in the order <c>FootingAnalysisEditor</c> renders them, and
+    /// the ids their card headers carry. Shared so a test cannot assert against four.
+    /// </summary>
+    public static readonly string[] SectionNames =
+        ["income", "recurringBills", "householdBudgets", "personalBudgets", "eventBudgets"];
+
+    /// <summary>
+    /// A returning user with one entry in EVERY category -- the state W-05 needs, because a
+    /// single-category seed leaves four of the five cards summing to $0 and is not the tree a
+    /// real returning user sees.
+    ///
+    /// Built on exactly the shape <see cref="OneIncomeEntry"/> was captured in, for the reason
+    /// F-11 records: `Amount` is an object because `MonetaryAmount` wraps a property of the
+    /// same name, and `Period` is the enum's numeric value (Weekly = 1, Monthly = 4,
+    /// Annually = 7). Getting either wrong is silent -- the tree still renders, the card count
+    /// still passes, and every amount reads $0.
+    ///
+    /// That silence is why <c>NarrowViewportOverflowTests.ReturningUserSeed_PopulatesEveryCategory</c>
+    /// exists: it asserts each of the five headers shows a NON-zero weekly total, so a
+    /// degenerate seed fails loudly here instead of quietly weakening the overflow tests that
+    /// depend on it.
+    ///
+    /// Entry names are deliberately ordinary ("Salary", "Rent"). A long adversarial name would
+    /// overflow a narrow viewport on its own and confound OQ-01's ruling with content the app
+    /// never ships.
+    /// </summary>
+    public const string EntryInEveryCategory = """
+        {"Inflows":[{"Id":"00000000-0000-0000-0000-000000000001","Name":"Salary","Amount":{"Amount":2000},"Period":4}],"RecurringBills":[{"Id":"00000000-0000-0000-0000-000000000002","Name":"Rent","Amount":{"Amount":1200},"Period":4}],"HouseholdBudgets":[{"Id":"00000000-0000-0000-0000-000000000003","Name":"Groceries","Amount":{"Amount":150},"Period":1}],"PersonalBudgets":[{"Id":"00000000-0000-0000-0000-000000000004","Name":"Lunches","Amount":{"Amount":60},"Period":1}],"EventBudgets":[{"Id":"00000000-0000-0000-0000-000000000005","Name":"Christmas","Amount":{"Amount":800},"Period":7}]}
+        """;
+
     public static Dictionary<string, string> ReturningUser() => new()
     {
         [AnalysisKey] = OneIncomeEntry,
+    };
+
+    /// <summary>A returning user carrying <see cref="EntryInEveryCategory"/>.</summary>
+    public static Dictionary<string, string> ReturningUserWithEveryCategory() => new()
+    {
+        [AnalysisKey] = EntryInEveryCategory,
     };
 
     public static Dictionary<string, string> ReturningUserWithTheme(string theme) => new()

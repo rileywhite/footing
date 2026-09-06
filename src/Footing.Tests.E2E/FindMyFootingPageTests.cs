@@ -31,11 +31,10 @@ public class FindMyFootingPageTests
     }
 
     // D-02 on the tool page, at the viewports where the whole contract currently holds.
-    // Runs in the first-time-user state; W-05 takes the returning-user state (all five
-    // categories seeded, which is what produces the compact card tree) to 320 and 375.
     //
-    // The 320 and 375 entries of the matrix are NOT missing -- they are in the two tests
-    // below, split out because the overflow half of the contract does not hold there yet.
+    // The 320 and 375 entries of the matrix are NOT missing. Their gutter half is asserted by
+    // the test below; their overflow half is in NarrowViewportOverflowTests, split out because
+    // it does not hold there yet.
     [SkippableTheory]
     [MemberData(nameof(Viewports.AtLeastTablet), MemberType = typeof(Viewports))]
     public async Task FindMyFooting_LayoutContractHolds(Viewport viewport)
@@ -45,8 +44,9 @@ public class FindMyFootingPageTests
         await SitePage.AssertLayoutContractAsync(session.Page, viewport, SitePage.Tool);
     }
 
-    // D-02(c) at the two narrow viewports. Separated from the overflow assertion below so
-    // that the known overflow defect does not mask the gutter, which does hold at 320 and 375.
+    // D-02(c) at the two narrow viewports. Separated from the overflow assertion (now in
+    // NarrowViewportOverflowTests) so the known overflow defect does not mask the gutter,
+    // which does hold at 320 and 375.
     [SkippableTheory]
     [MemberData(nameof(Viewports.AtMostMobile), MemberType = typeof(Viewports))]
     public async Task FindMyFooting_ContentGutterHolds_AtNarrowViewports(Viewport viewport)
@@ -57,49 +57,11 @@ public class FindMyFootingPageTests
             session.Page, SitePage.ContentSelector, SitePage.MinGutterPx, SitePage.TolerancePx);
     }
 
-    // QUARANTINE -- DELETE THIS TEST AS PART OF W-06.
-    //
-    // W-04 put the overflow assertion on the full matrix and it FAILED here, reproducing
-    // hypothesis 1 of OQ-01 (`#moneyFlows dl { grid-template-columns: auto 1fr }`,
-    // app.css:623) on the tool page at both 320 and 375. The named offending elements were
-    // `<dd>` right=463, `<select class="ft-period-select">` right=449 and `<input class="valid">`
-    // right=463 -- a 463px-wide row that does not shrink, i.e. 88px of overflow at 375 and
-    // 143px at 320. Hypothesis 2 (`.ft-hero h1`, app.css:654) did NOT reproduce: the landing
-    // page, which is where .ft-hero lives, passes the overflow assertion at both widths.
-    //
-    // Two probes run while quarantining this, recorded here so W-05/W-06 do not repeat them.
-    // Both were applied to app.css locally and reverted -- W-04 changed no production CSS:
-    //   * `grid-template-columns: minmax(0, auto) 1fr` alone does NOT fix it. The overflow
-    //     survives unchanged, so the `auto` track is not the whole story and hypothesis 1 as
-    //     written is incomplete.
-    //   * Adding `min-width: 0` (with `max-width: 100%`) to the `input` and `select` inside
-    //     `#moneyFlows dd` DOES fix it, at both widths. The real cause is the intrinsic
-    //     minimum width of those form controls, which the auto track then has to honour.
-    // That is a finding, not a fix: which of those W-06 ships, and whether it counts as a
-    // repair or a redesign under D-10, is W-06's call on W-05's verdict.
-    //
-    // Ruling on that reproduction is W-05's output and repairing it is W-06's; W-04 neither
-    // fixes production CSS it does not own nor leaves the protected-branch gate red (CR-01).
-    // So the defect is pinned rather than skipped: this asserts the overflow is STILL THERE,
-    // which keeps AC-01's no-skips promise, keeps the failure visible in the test name, and
-    // turns red the moment W-06 fixes the CSS -- at which point delete this test and move
-    // Viewports.AtMostMobile back into FindMyFooting_LayoutContractHolds above.
-    [SkippableTheory]
-    [MemberData(nameof(Viewports.AtMostMobile), MemberType = typeof(Viewports))]
-    public async Task FindMyFooting_NarrowViewportOverflow_IsStillTheKnownDefect(Viewport viewport)
-    {
-        SkipIfUnavailable();
-        await using var session = await OpenToolPageAsync(viewport);
-
-        var overflow = await session.Page.EvaluateAsync<int>(
-            "() => document.documentElement.scrollWidth - document.documentElement.clientWidth");
-
-        overflow.Should().BeGreaterThan(
-            0,
-            $"the known #moneyFlows dl overflow at {viewport} is quarantined here pending W-05/W-06 "
-            + "-- if this now passes without overflow the defect is fixed, so delete this test and "
-            + "fold Viewports.AtMostMobile back into FindMyFooting_LayoutContractHolds");
-    }
+    // The narrow-viewport overflow that W-04 reproduced and quarantined here now lives in
+    // NarrowViewportOverflowTests, together with W-05's ruling on both OQ-01 hypotheses and
+    // the returning-user coverage W-04 could not reach. It was moved rather than duplicated so
+    // W-06 has one file to delete; when it does, fold Viewports.AtMostMobile back into
+    // FindMyFooting_LayoutContractHolds above.
 
     [SkippableTheory]
     [MemberData(nameof(Viewports.Full), MemberType = typeof(Viewports))]
