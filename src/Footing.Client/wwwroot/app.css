@@ -601,8 +601,16 @@ h1:focus {
    Money Flow Section — Header and Form
    ============================================================ */
 
-.card-header h5 {
+.card-header h2 {
     margin: 0;
+
+    /* The heading carries no visible text of its own -- the nested .btn-link below does, and
+       pins its own size in rem -- so the level is free to be whatever the document outline
+       needs (F-03 moved it from h5 to h2). This line keeps the UA's heading size from leaking
+       in behind that: without it the element computes the h2 default (24px), and the first
+       descendant sized in `em` would silently inherit it. Matching .btn-link's size means the
+       whole subtree agrees on one number. */
+    font-size: var(--ft-text-sm);
 }
 
 .card-header .btn-link {
@@ -787,7 +795,7 @@ h1:focus {
 .ft-sticky-total__summary {
     /* Button reset -- same reasoning as .ft-entry-chip__delete further down. This row is the toggle
        for the net-total detail panel, and it is the summary rather than the whole bar that
-       became a button: .ft-sticky-total also contains the expanded panel's <h5> and <p>, which
+       became a button: .ft-sticky-total also contains the expanded panel's <h2> and <p>, which
        are flow content a <button> may not contain. `width: 100%` because a button does not
        stretch to its container the way the <div> it replaces did. */
     appearance: none;
@@ -831,7 +839,7 @@ h1:focus {
     margin: 0 auto;
 }
 
-.ft-sticky-total__detail h5 {
+.ft-sticky-total__detail h2 {
     font-size: var(--ft-text-base);
     font-weight: var(--ft-weight-heading);
     margin-bottom: var(--ft-space-xs);

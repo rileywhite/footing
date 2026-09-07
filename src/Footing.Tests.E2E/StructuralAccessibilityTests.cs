@@ -10,30 +10,39 @@ namespace Footing.Tests.E2E;
 /// BR-21..BR-25: the structural accessibility invariants, on both pages, at every full
 /// viewport, using the engine W-12 selected.
 ///
-/// Three of these are known to fail today, and the tests are written to CATCH them rather than
-/// around them. As with F-12 and F-16, each known failure is PINNED to its exact offending
-/// elements rather than asserted away or skipped: CR-01 means a permanently red assertion
-/// blocks every merge on a protected branch, and AC-01 forbids skipping. A pin fails in both
-/// directions -- a new violation is a regression, and a violation that disappears means the
-/// baseline is stale and must be updated by whoever repaired it.
+/// Three of these were failing when W-13 wrote them, and the tests were written to CATCH them
+/// rather than around them. W-15 has since repaired two, so their pins are gone and the
+/// invariant is now asserted positively. The one that remains is PINNED to its exact state
+/// rather than asserted away or skipped: CR-01 means a permanently red assertion blocks every
+/// merge on a protected branch, and AC-01 forbids skipping. A pin fails in both directions --
+/// a new violation is a regression, and a violation that disappears means the baseline is
+/// stale and must be updated by whoever repaired it.
 ///
-///   * F-01 -- no `contentinfo` landmark on either page. REPORTED, not repaired: the tool page
-///     has no footer at all, and the landing page's `footer.ft-landing-footer` sits inside
-///     `article.content` inside `main`, where a `footer` element does not expose the landmark
-///     role. Adding one is a redesign under D-10, so it is Riley's, not W-15's.
-///   * F-03 -- the tool page skips heading levels: `h1` "Manage My Money" straight to the `h5`
-///     card headers. W-15 repairs this. The LANDING page does NOT skip (h1 then h2) -- it is
-///     only the tool page, which is worth knowing before anyone "fixes" the landing page.
-///   * F-04 -- three entry-form controls have no programmatic label. W-15 repairs this.
+///   * F-01 -- no `contentinfo` landmark on either page. STILL REPORTED, not repaired: the
+///     tool page has no footer at all, and the landing page's `footer.ft-landing-footer` sits
+///     inside `article.content` inside `main`, where a `footer` element does not expose the
+///     landmark role. Adding one is a redesign under D-10, so it is Riley's, not W-15's. W-15
+///     measured the obvious repair -- promoting the landing footer to a sibling of `main` --
+///     and it moves the page at every viewport: the footer loses `main`'s 54rem cap and 1rem
+///     gutter, so its `border-top` rule spans the full viewport (832px -> 1280px at desktop)
+///     and the block drops 64px down past `.content`'s bottom padding. Still a redesign.
+///   * F-03 -- REPAIRED by W-15. The tool page went `h1` straight to the `h5` card headers.
+///     The card headers are now `h2` and the sticky net-total detail heading with them, so
+///     both pages descend without a skip and this asserts that positively. The LANDING page
+///     never skipped (h1 then h2), which is worth knowing before anyone "fixes" it.
+///   * F-04 -- REPAIRED by W-15. The three entry-form controls in `MoneyFlowCard.razor` now
+///     carry an `aria-label` naming which card they belong to; the placeholders stayed.
 ///
-/// A NOTE ON WHY BR-23 IS HAND-WRITTEN AND NOT DELEGATED TO AXE. axe's `label` rule **passes**
-/// on the tool page as it stands. That is not an axe bug: `placeholder` genuinely does
-/// contribute to the accessible name as a last resort, so by axe's reckoning the money input
-/// and the description input are named. BR-23 is deliberately stricter -- "a `dt` prompt
-/// sitting next to an input is not a label", and neither is a placeholder, which vanishes as
-/// soon as the user types. Delegating BR-23 to axe would have reported the tool page as
-/// passing and F-04 would never have surfaced. Only the `select` has no placeholder to hide
-/// behind, which is why axe catches that one alone.
+/// A NOTE ON WHY BR-23 IS HAND-WRITTEN AND NOT DELEGATED TO AXE. **Do not collapse
+/// FormControls_HaveProgrammaticLabels onto axe's `label` rule now that both pass.** Before
+/// W-15's repair, axe's `label` rule PASSED on the tool page while two of the three controls
+/// had no label at all: `placeholder` genuinely does contribute to the accessible name as a
+/// last resort, so by axe's reckoning they were named. BR-23 is deliberately stricter -- "a
+/// `dt` prompt sitting next to an input is not a label", and neither is a placeholder, which
+/// vanishes as soon as the user types. Delegating BR-23 to axe would have reported the tool
+/// page as passing and two thirds of F-04 would never have surfaced. The two rules agree today
+/// only because the real labels are there; delete the hand-written one and the next control
+/// that ships with nothing but a placeholder passes silently.
 /// </summary>
 [Collection("Playwright")]
 public class StructuralAccessibilityTests
@@ -183,32 +192,60 @@ public class StructuralAccessibilityTests
             }
         }
 
-        if (path == SitePage.Landing)
+        // F-03, REPAIRED by W-15 and now asserted positively on BOTH pages. The landing page
+        // was always correct (h1 then h2); the tool page went h1 straight to the h5 card
+        // headers, and MoneyFlowCard now renders them as h2. Asserted for the landing page too
+        // rather than assumed, because "the site skips heading levels" is the natural way to
+        // summarise F-03 when only one page ever did, and a repair aimed at both would have
+        // changed a page that was already right.
+        skips.Should().BeEmpty(
+            $"{where} should not skip heading levels; found: {string.Join("; ", skips)}");
+
+        if (path != SitePage.Tool)
         {
-            // The landing page is CORRECT: h1 then h2. Asserted rather than assumed, because
-            // F-03 is easy to read as "the site skips heading levels" when only one page does,
-            // and a repair aimed at both would change a page that is already right.
-            skips.Should().BeEmpty($"{where} should not skip heading levels; found: {string.Join("; ", skips)}");
             return;
         }
 
-        // F-03, PINNED. The tool page jumps h1 -> h5: MoneyFlowCard renders its card header in
-        // an <h5>, and so does the sticky net-total detail. W-15 repairs this by choosing
-        // levels that descend properly. Exactly one skip is expected -- the first card header
-        // after the h1; the four card headers after it are all h5 and so are level-flat, which
-        // is legal.
-        skips.Should().HaveCount(
-            1,
-            $"{where}: F-03 -- exactly one known heading-level skip is expected here, from the h1 "
-            + $"to the first h5 card header. Found: {string.Join("; ", skips)}");
-        skips[0].Should().StartWith(
-            "h1 ",
-            $"{where}: F-03 -- the known skip runs from the page h1; found {skips[0]}");
-        skips[0].Should().Contain(
-            "-> h5",
-            $"{where}: F-03 -- the known skip lands on an h5 card header; found {skips[0]}. IF THIS "
-            + "FAILS BECAUSE THERE IS NO SKIP, W-15 repaired it: delete this pin and assert "
-            + "skips.Should().BeEmpty() for both pages");
+        // The sticky net-total detail panel is the other half of the F-03 repair, and it is not
+        // in the DOM until the bar is expanded -- it renders only under `@if (stickyExpanded)`
+        // -- so nothing above reaches it. Its heading holds visible text of its own, unlike the
+        // card headers, so it is the one that could regress unnoticed: leaving it at h5 while
+        // the cards moved to h2 would have RELOCATED the skip rather than removed it, and every
+        // assertion above would still have passed. (Verified by doing exactly that: the h5
+        // reappears in the message below, naming the pair, at all three tool viewports.)
+        //
+        // The panel renders one of TWO headings depending on the sign of the net total, and
+        // this seed is net-negative, so it is "Time to roll up your sleeves" that gets checked
+        // here. Both are written at the same level in FootingAnalysisEditor.razor; if they ever
+        // diverge, this reaches only one of them.
+        await session.Page.Locator("#totalHeading").ClickAsync();
+        await session.Page.WaitForSelectorAsync("#totalDetail", new() { Timeout = 15000 });
+        await session.Page.EvaluateAsync(
+            "() => document.activeElement instanceof HTMLElement && document.activeElement.blur()");
+
+        var expanded = (await session.Page.EvaluateAsync<string[]>(ReadHeadingLevels))
+            .Select(entry => entry.Split('|', 2))
+            .Select(parts => (Level: int.Parse(parts[0]), Text: parts[1]))
+            .ToList();
+
+        expanded.Should().HaveCountGreaterThan(
+            headings.Count,
+            $"{where}: expanding the net-total bar should reveal its detail heading, or this is "
+            + "just checking the collapsed page a second time");
+
+        var expandedSkips = new List<string>();
+        for (var i = 1; i < expanded.Count; i++)
+        {
+            if (expanded[i].Level > expanded[i - 1].Level + 1)
+            {
+                expandedSkips.Add(
+                    $"h{expanded[i - 1].Level} \"{expanded[i - 1].Text}\" -> h{expanded[i].Level} \"{expanded[i].Text}\"");
+            }
+        }
+
+        expandedSkips.Should().BeEmpty(
+            $"{where}: the net-total detail heading must descend from the h2 card headers above "
+            + $"it; found: {string.Join("; ", expandedSkips)}");
     }
 
     // ================================================================================
@@ -252,32 +289,40 @@ public class StructuralAccessibilityTests
         var unlabelled = await session.Page.EvaluateAsync<string[]>(FindUnlabelledControls);
         var where = $"{path} at {viewport}";
 
-        if (path == SitePage.Landing)
+        // F-04, REPAIRED by W-15 and now asserted as empty on BOTH pages. The landing page has
+        // no form controls at all; the tool page's three entry-form controls in
+        // MoneyFlowCard.razor each carry a real aria-label. A placeholder is still not accepted
+        // as a label by the probe above -- see the class comment on why this check is
+        // hand-written rather than delegated to axe's `label` rule, which passed all the way
+        // through the defect.
+        unlabelled.Should().BeEmpty(
+            $"{where}: every visible input, select and textarea needs a programmatic label -- "
+            + "aria-label, aria-labelledby, title, a label[for] or a wrapping <label>. A "
+            + "placeholder is not one: it is not exposed as a label to every assistive "
+            + $"technology and it vanishes as soon as the user types. Found: {string.Join("; ", unlabelled)}");
+
+        if (path != SitePage.Tool)
         {
-            unlabelled.Should().BeEmpty(
-                $"{where} has no form controls at all, so none can be unlabelled; found: "
-                + string.Join("; ", unlabelled));
             return;
         }
 
-        // F-04, PINNED -- the three entry-form controls in MoneyFlowCard.razor. Two hide behind
-        // a placeholder (which is why axe's `label` rule passes them); the select has nothing
-        // at all. W-15 repairs all three.
-        var expected = new[]
-        {
-            "input.ft-input-money__field [placeholder=\"xxx.xx\"]",
-            "select.ft-period-select [no placeholder]",
-            "input [placeholder=\"Income Description\"]",
-        };
+        // The names themselves, not merely their presence. Five identical entry forms can sit
+        // on this page at once, so a bare "Amount" three times over would satisfy the check
+        // above and still leave a screen-reader user unable to tell the cards apart. The income
+        // card is the one this fixture expands.
+        var names = await session.Page.EvaluateAsync<string[]>(
+            // InputText renders a bare <input> with no type attribute, so `input[type=text]`
+            // would match nothing -- the description field is "the input that is not the money
+            // field".
+            "() => ['#incomeDetails .ft-input-money__field', '#incomeDetails .ft-period-select', "
+            + "'#incomeDetails input:not(.ft-input-money__field)'].map(sel => { "
+            + "const el = document.querySelector(sel); "
+            + "return el ? (el.getAttribute('aria-label') || '(no aria-label)') : '(missing)'; })");
 
-        unlabelled.Should().BeEquivalentTo(
-            expected,
-            $"{where}: F-04 -- exactly these three entry-form controls lack a programmatic label, "
-            + "and no others. A placeholder is not a label: it is not exposed as one to every "
-            + "assistive technology and it disappears as soon as the user types. This pins the "
-            + "known set so the gate stays green (CR-01) while any NEW unlabelled control fails. "
-            + "IF THIS FAILS BECAUSE THE LIST IS NOW EMPTY, W-15 repaired it: delete this pin and "
-            + "assert unlabelled.Should().BeEmpty() for both pages");
+        names.Should().Equal(
+            ["Income amount", "Income frequency", "Income description"],
+            $"{where}: each entry-form control must name the card it belongs to, because five "
+            + "identical forms share this page");
     }
 
     // ================================================================================
@@ -405,21 +450,15 @@ public class StructuralAccessibilityTests
         var violated = result.Violations.Select(v => v.Id).OrderBy(id => id).ToArray();
         var where = $"{path} at {viewport}";
 
-        // Landing is clean on every structural rule. Tool has exactly two, both already owned:
-        // heading-order is F-03 and select-name is the one third of F-04 that axe can see.
-        var expected = path == SitePage.Landing
-            ? Array.Empty<string>()
-            : ["heading-order", "select-name"];
-
+        // BOTH pages are now clean on every structural rule. The tool page carried two until
+        // W-15: heading-order (F-03) and select-name (the one third of F-04 axe could see --
+        // the other two controls hid behind a placeholder, which is why BR-23 is also checked
+        // by hand above). Anything appearing here is a regression.
         var detail = string.Join("; ", result.Violations.Select(v =>
             $"{v.Id} -> {string.Join(", ", v.Nodes.Select(n => n.Target.ToString()))}"));
 
-        violated.Should().BeEquivalentTo(
-            expected,
-            $"{where}: the structural rule violations should be exactly the known set. On the "
-            + "tool page that is heading-order (F-03) and select-name (the one part of F-04 axe "
-            + "can see -- the other two controls hide behind a placeholder). A rule appearing "
-            + "here is a regression; a rule disappearing means W-15 repaired it and this "
-            + $"baseline needs updating. Observed: {detail}");
+        violated.Should().BeEmpty(
+            $"{where}: no structural rule in this set should be violated on either page. "
+            + $"Observed: {detail}");
     }
 }

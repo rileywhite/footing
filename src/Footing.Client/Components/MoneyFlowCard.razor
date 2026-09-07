@@ -4,7 +4,7 @@
 {
     <div class="card ft-section-card">
         <div id="@(Name)Heading" class="card-header">
-            <h5>
+            <h2>
                 <button class="btn btn-link btn-accordian-header @(CompactMode ? "ft-compact-header" : "")"
                         type="button"
                         @onclick="ToggleOpen"
@@ -13,7 +13,7 @@
                     @Label <MonetaryAmountDisplay Amount="this.MoneyFlows.WeeklyTotalMoneyFlow" /> / Week
                     <span class="ft-chevron" aria-hidden="true">@(_isOpen ? "▼" : "▶")</span>
                 </button>
-            </h5>
+            </h2>
         </div>
     </div>
     @if (_isOpen)
@@ -34,9 +34,9 @@
                         <dd>
                             <div class="ft-input-money">
                                 <span class="ft-input-money__prefix" aria-hidden="true">$</span>
-                                <InputNumber class="ft-input-money__field" placeholder="xxx.xx" @bind-Value="Model.Amount" />
+                                <InputNumber class="ft-input-money__field" aria-label="@($"{Label} amount")" placeholder="xxx.xx" @bind-Value="Model.Amount" />
                             </div>
-                            <InputSelect class="ft-period-select" @bind-Value="Model.Period">
+                            <InputSelect class="ft-period-select" aria-label="@($"{Label} frequency")" @bind-Value="Model.Period">
                                 <option value="">how often?</option>
                                 @foreach (Period period in Enum.GetValues(typeof(Period)))
                                 {
@@ -45,7 +45,7 @@
                             </InputSelect>
                         </dd>
                         <dt>@FormAmountDescriptionConnectorWord</dt>
-                        <dd><InputText size="30" placeholder="@($"{Label} Description")" @bind-Value="Model.Name" /></dd>
+                        <dd><InputText size="30" aria-label="@($"{Label} description")" placeholder="@($"{Label} Description")" @bind-Value="Model.Name" /></dd>
                     </dl>
 
                     <button type="submit" class="btn btn-primary ft-add-btn">Add</button>
