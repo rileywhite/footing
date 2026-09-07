@@ -56,10 +56,10 @@ public class MoneyFlowPersistenceTests
     /// <summary>
     /// True when the stored analysis holds no entries in any of the five categories.
     ///
-    /// Deliberately NOT "the storage key is absent". ClearLocalStorage calls
-    /// LocalStore.ClearAsync(), which does empty the origin -- but the re-render it triggers
-    /// runs OnAfterRenderAsync(firstRender: false), which writes an EMPTY FootingAnalysis
-    /// straight back under the same key. Observed immediately after an accepted clear:
+    /// Deliberately NOT "the storage key is absent". ClearLocalStorage removes the analysis
+    /// key -- but the re-render it triggers runs OnAfterRenderAsync(firstRender: false), which
+    /// writes an EMPTY FootingAnalysis straight back under the same key. Observed immediately
+    /// after an accepted clear:
     ///   {"Inflows":[],"RecurringBills":[],"HouseholdBudgets":[],"PersonalBudgets":[],
     ///    "EventBudgets":[],"WeeklyTotalMoneyFlow":0,"HasAnyEntries":false}
     /// and the same again after a reload. So a key-absence assertion would fail against
@@ -167,17 +167,21 @@ public class MoneyFlowPersistenceTests
             .Should().Be(1, "a dismissed clear should leave the returning-user tree in place");
     }
 
-    // Finding F-02, asserted rather than only written down, so it cannot quietly change
-    // without someone noticing. LocalStore.ClearAsync() empties the WHOLE origin, so the
-    // ft-theme preference dies with the financial data: clearing your finances silently
-    // resets your theme. Confirmed here -- ft-theme is "dark" before the click and null
-    // after, and stays null across a reload.
+    // Finding F-02, repaired and now pinned the other way round. ClearLocalStorage used to
+    // call LocalStore.ClearAsync(), which empties the WHOLE localStorage origin, so the
+    // ft-theme preference died with the financial data: clearing your finances silently reset
+    // your theme. The clear is now scoped to the analysis key alone.
     //
-    // This is reported, not repaired (D-10): scoping the clear to the analysis key alone
-    // would change what a user experiences, which is Riley's call. If that call is ever
-    // made, this test is the one to update -- it pins today's behaviour, not the desired one.
+    // This test previously asserted the defect (ClearMyData_AlsoDiscardsTheThemePreference_F02)
+    // as a deliberate today's-behaviour pin. It was flipped, not deleted -- if the clear ever
+    // widens back to the origin, this goes red and says so.
+    //
+    // Both halves matter. The theme surviving the click alone would still let a wider clear
+    // slip through if the toggle happened to rewrite the key; the reload is the symptom a user
+    // actually feels, because the <head> restore snippet reads ft-theme on every page load and
+    // an absent key falls back to the system scheme.
     [SkippableFact]
-    public async Task ClearMyData_AlsoDiscardsTheThemePreference_F02()
+    public async Task ClearMyData_PreservesTheThemePreference_F02()
     {
         SkipIfUnavailable();
         await using var session = await OpenToolPageAsync(SeededStorage());
@@ -191,8 +195,26 @@ public class MoneyFlowPersistenceTests
         await page.WaitForSelectorAsync("#moneyFlows.ft-conversational", new() { Timeout = 15000 });
 
         (await page.EvaluateAsync<string?>("key => localStorage.getItem(key)", ThemeKey))
-            .Should().BeNull(
-                "F-02: ClearAsync() clears the whole origin, so the theme preference goes with "
-                + "the financial data -- if this now fails, the clear was scoped and F-02 is fixed");
+            .Should().Be(
+                "dark",
+                "F-02: the clear is scoped to the analysis key, so the theme preference must "
+                + "survive it -- if this fails, the clear went back to emptying the whole origin");
+
+        // The clear still has to actually clear. Asserting emptiness rather than key absence
+        // is the F-10 trap: the re-render writes an empty FootingAnalysis straight back.
+        (await StoredAnalysisIsEmptyAsync(page))
+            .Should().BeTrue("scoping the clear must not stop it clearing the entered data");
+
+        await page.ReloadAsync();
+        await page.WaitForSelectorAsync(
+            "#moneyFlows", new() { Timeout = 60000, State = WaitForSelectorState.Attached });
+
+        (await page.EvaluateAsync<string?>("key => localStorage.getItem(key)", ThemeKey))
+            .Should().Be(
+                "dark",
+                "the preserved theme must still be there after a reload -- that is the moment "
+                + "the <head> restore snippet reads it, and the moment a user would notice");
+        (await page.Locator("html[data-theme='dark']").CountAsync())
+            .Should().Be(1, "the restored preference must actually be applied to the document");
     }
 }
