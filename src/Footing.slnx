@@ -6,6 +6,7 @@
   </Configurations>
   <Project Path="Footing.Client/Footing.Client.csproj" />
   <Project Path="Footing.Tests.E2E/Footing.Tests.E2E.csproj" />
+  <Project Path="Footing.Tests.E2E/tools/RenderSweep/RenderSweep.csproj" />
   <Project Path="Footing.Tests.Functional/Footing.Tests.Functional.csproj" />
   <Project Path="Footing.Tests.Integration/Footing.Tests.Integration.csproj" />
   <Project Path="Footing.Tests.Unit/Footing.Tests.Unit.csproj" />
