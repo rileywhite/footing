@@ -249,7 +249,12 @@ else
         if (await this.JSInterop.Confirm("This will clear all information that you have entered so far. Proceed?"))
         {
             this.FootingAnalysis = new FootingAnalysis();
-            await this.LocalStore.ClearAsync();
+
+            // Scoped to the analysis key, deliberately. ClearAsync() empties the whole
+            // localStorage origin, which took the ft-theme preference written by the theme
+            // toggle with it -- so clearing your finances silently reset your theme (F-02).
+            // "Clear my data" means the financial data, not every preference the app holds.
+            await this.LocalStore.RemoveItemAsync(FootingAnalysisStorageKey);
             this.IsFirstTimeUser = true;
             _revealedSections = 1;
             _activatedSection = null;
