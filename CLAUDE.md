@@ -36,9 +36,14 @@ removed; do not reintroduce them.
   Release configuration and deploys the static output directly.
 - Custom domain: `footing.app`. There is no compute in production — Pages serves static
   files only.
-- CI: `.github/workflows/ci.yml` runs the `build-and-test` status check (build +
-  unit/functional/integration tests). `main` is protected and requires this check to
-  pass before merge; nothing is pushed to `main` directly.
+- CI: `.github/workflows/ci.yml` runs the `build-and-test` status check. That one job
+  builds `src/Footing.slnx`, runs the unit, functional and integration suites, then
+  builds `Footing.Tests.E2E`, installs Chromium via `playwright.ps1 install --with-deps`,
+  and runs the E2E suite with `PLAYWRIGHT_REQUIRED=1`. E2E therefore gates merges like
+  every other suite, and under that variable a failed `Footing.Client` publish or a
+  missing browser fails the check rather than quietly skipping the tests. `main` is
+  protected and requires this check to pass before merge; nothing is pushed to `main`
+  directly.
 
 There is no Docker image, no Helm chart, no AKS deployment, and no Azure Pipelines
 CI/CD. Those existed early in the project's history and have been removed; do not
