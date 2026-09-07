@@ -1,0 +1,40 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!--
+    The W-16 render sweep: 2 pages x 4 viewports x 2 colour schemes = 16 full-page PNGs
+    for a HUMAN to look at, plus an independent re-measurement of the numeric claims
+    W-06, W-11 and W-15 closed on.
+
+    This is a console tool, not a test, and deliberately so. Gating it inside the xUnit
+    suite would mean either a skipped test on every CI run (the E2E suite's baseline is
+    0 skipped, and AC-01 wants it kept that way) or 16 screenshots on the protected merge
+    gate for no assertion's benefit (CR-01). Nothing here is ever asserted on and the
+    output is never committed, which is what keeps it clear of OOS-01's ban on golden
+    images.
+
+    It IS in Footing.slnx, so `dotnet build src/Footing.slnx` compiles it and the tool
+    cannot rot silently against the fixture it borrows. It adds no test runtime: CI runs
+    `dotnet test` against the four test projects by path, never this one.
+
+    Run it with:
+        dotnet run, pointed at src/Footing.Tests.E2E/tools/RenderSweep
+  -->
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <IsPackable>false</IsPackable>
+    <RootNamespace>Footing.Tests.E2E.Tools.RenderSweep</RootNamespace>
+    <!-- Footing.Tests.E2E carries Microsoft.NET.Test.Sdk; make sure nothing here is
+         mistaken for a test project and handed a generated entry point. -->
+    <IsTestProject>false</IsTestProject>
+    <GenerateProgramFile>false</GenerateProgramFile>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="../../Footing.Tests.E2E.csproj" />
+  </ItemGroup>
+
+</Project>

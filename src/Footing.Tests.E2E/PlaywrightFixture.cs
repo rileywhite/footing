@@ -1,6 +1,7 @@
 using System.Diagnostics;
 using System.Net;
 using System.Net.Sockets;
+using System.Text.Json;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -203,6 +204,49 @@ public class PlaywrightFixture : IAsyncLifetime
         var candidate = Path.Combine(srcDir, "Footing.Site");
         if (Directory.Exists(candidate)) return candidate;
         throw new InvalidOperationException($"Could not find Footing.Site directory at '{candidate}'");
+    }
+
+    // A context, not just a page: it's what makes viewport, colour scheme, download
+    // acceptance and a clean storage partition all settable at once. The localStorage seed
+    // is applied via BrowserNewContextOptions.StorageState rather than an init script:
+    // an init script re-runs on every navigation and reverts any writes the app makes
+    // to a seeded key on reload, whereas StorageState only seeds the context once, at
+    // creation. The <head> theme-restore snippet still reads `ft-theme` before first
+    // paint since the seeded value is already in storage before the first navigation.
+    public async Task<PageSession> NewSessionAsync(
+        Viewport viewport,
+        ColorScheme colorScheme = ColorScheme.Light,
+        bool acceptDownloads = false,
+        IDictionary<string, string>? localStorageSeed = null)
+    {
+        var options = new BrowserNewContextOptions
+        {
+            ViewportSize = new ViewportSize { Width = viewport.Width, Height = viewport.Height },
+            ColorScheme = colorScheme,
+            AcceptDownloads = acceptDownloads,
+        };
+
+        if (localStorageSeed is { Count: > 0 })
+        {
+            options.StorageState = JsonSerializer.Serialize(new
+            {
+                cookies = Array.Empty<object>(),
+                origins = new[]
+                {
+                    new
+                    {
+                        origin = BaseUrl,
+                        localStorage = localStorageSeed
+                            .Select(kv => new { name = kv.Key, value = kv.Value })
+                            .ToArray(),
+                    },
+                },
+            });
+        }
+
+        var context = await Browser.NewContextAsync(options);
+        var page = await context.NewPageAsync();
+        return new PageSession(context, page);
     }
 
     public async Task DisposeAsync()

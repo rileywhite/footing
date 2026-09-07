@@ -11,7 +11,19 @@
     <FrameworkReference Include="Microsoft.AspNetCore.App" />
   </ItemGroup>
 
+  <!--
+    tools/ holds the RenderSweep console tool, which has its own project file. The SDK's
+    default Compile glob is **/*.cs and does not know that, so without this the tool's
+    Program.cs would be compiled into the test assembly as well and collide with itself.
+  -->
   <ItemGroup>
+    <Compile Remove="tools/**" />
+    <None Remove="tools/**" />
+    <EmbeddedResource Remove="tools/**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Deque.AxeCore.Playwright" Version="4.13.0" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.3.0" />
     <PackageReference Include="xunit" Version="2.9.3" />
     <PackageReference Include="xunit.runner.visualstudio" Version="3.1.5">
