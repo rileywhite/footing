@@ -30,20 +30,32 @@
 
 :root {
     /* --- Brand --- */
-    --ft-primary: #5a7a6a;
-    --ft-primary-hover: #4d6b5c;
-    --ft-primary-border: #436051;
+    --ft-primary: #516d5f;
+    --ft-primary-hover: #445e51;
+    --ft-primary-border: #3a5346;
     --ft-accent: #b89e78;
     --ft-accent-hover: #a88e68;
     --ft-accent-text: #3a2e1e;
+    /* Accent used as FOREGROUND text rather than as the .btn-accent fill. A single tan
+       cannot do both jobs at AA: light enough to carry dark button text (5.16:1 against
+       --ft-accent-text) is far too light to be read on cream (#b89e78 on --ft-bg is 2.29:1).
+       Same hue and saturation as --ft-accent, lower lightness. */
+    --ft-accent-strong: #7b6441;
+    --ft-accent-strong-hover: #635239;
+    /* Text drawn ON a saturated brand fill -- the primary button, the "move on" button, and
+       the sticky net-total bar (which is --ft-primary when positive and --ft-amount-negative
+       when negative). White works on light's dark fills; in dark the same fills are light
+       sages and corals chosen to be read AS text on a dark ground, so white on them is
+       2.66:1. The ink flips with the scheme instead of the fills moving. */
+    --ft-fill-text: #ffffff;
 
     /* --- Monetary --- */
-    --ft-amount-positive: #5a7a6a;
+    --ft-amount-positive: #516d5f;
     --ft-amount-negative: #c0392b;
 
     /* --- Text --- */
     --ft-text: #2c3530;
-    --ft-text-muted: #6e7d72;
+    --ft-text-muted: #5e6a61;
 
     /* --- Backgrounds --- */
     --ft-bg: #f6f2ec;
@@ -67,9 +79,9 @@
     --ft-modal-bg: #ffffff;
     --ft-modal-shadow: rgba(0, 0, 0, 0.3);
     --ft-modal-backdrop: rgba(0, 0, 0, 0.4);
-    --ft-modal-btn-bg: #5a7a6a;
-    --ft-modal-btn-hover: #4d6b5c;
-    --ft-modal-spinner: #5a7a6a;
+    --ft-modal-btn-bg: #516d5f;
+    --ft-modal-btn-hover: #445e51;
+    --ft-modal-spinner: #516d5f;
 
     /* --- Checkbox --- */
     --ft-checkbox-border: #929292;
@@ -117,6 +129,14 @@
     --ft-accent: #d4b88a;
     --ft-accent-hover: #e0c89a;
     --ft-accent-text: #2e2418;
+    /* Dark's accent is already a foreground colour (8.33:1 on --ft-bg), so the text role
+       needs no separate value here; the token exists for light's sake and is mirrored so
+       call sites can use it unconditionally. */
+    --ft-accent-strong: #d4b88a;
+    --ft-accent-strong-hover: #e0c89a;
+    /* See the light block: dark's fills are light, so the ink on them is dark.
+       6.44:1 on --ft-primary, 4.86:1 on --ft-amount-negative. */
+    --ft-fill-text: #171d19;
 
     /* --- Monetary --- */
     --ft-amount-positive: #7da893;
@@ -170,6 +190,14 @@
         --ft-accent: #d4b88a;
         --ft-accent-hover: #e0c89a;
         --ft-accent-text: #2e2418;
+        /* Dark's accent is already a foreground colour (8.33:1 on --ft-bg), so the text role
+           needs no separate value here; the token exists for light's sake and is mirrored so
+           call sites can use it unconditionally. */
+        --ft-accent-strong: #d4b88a;
+        --ft-accent-strong-hover: #e0c89a;
+        /* See the light block: dark's fills are light, so the ink on them is dark.
+           6.44:1 on --ft-primary, 4.86:1 on --ft-amount-negative. */
+        --ft-fill-text: #171d19;
 
         /* --- Monetary --- */
         --ft-amount-positive: #7da893;
@@ -493,7 +521,7 @@ a:hover, .btn-link:hover {
 }
 
 .btn-primary {
-    color: #fff;
+    color: var(--ft-fill-text);
     background-color: var(--ft-primary);
     border-color: var(--ft-primary-border);
 }
@@ -708,7 +736,7 @@ h1:focus {
 }
 
 .ft-narrative p em {
-    color: var(--ft-accent);
+    color: var(--ft-accent-strong);
     font-style: italic;
 }
 
@@ -831,13 +859,13 @@ h1:focus {
     gap: 0.5rem;
     height: 3rem;
     padding: 0 1rem;
-    color: #fff;
+    color: var(--ft-fill-text);
     font-weight: var(--ft-weight-heading);
 }
 
 .ft-sticky-total__summary .monetary-amount-highlight-positive,
 .ft-sticky-total__summary .monetary-amount-highlight-negative {
-    color: #fff;
+    color: var(--ft-fill-text);
 }
 
 .ft-sticky-total__amount {
@@ -902,7 +930,7 @@ h1:focus {
     border: none;
     padding: 0;
     font-size: var(--ft-text-sm);
-    color: var(--ft-accent);
+    color: var(--ft-accent-strong);
     text-decoration: none;
     cursor: pointer;
 }
@@ -965,12 +993,12 @@ h1:focus {
 
 .ft-move-on__btn:hover {
     background-color: var(--ft-primary) !important;
-    color: #fff !important;
+    color: var(--ft-fill-text) !important;
 }
 
 .ft-move-on__btn--ready {
     background-color: var(--ft-primary) !important;
-    color: #fff !important;
+    color: var(--ft-fill-text) !important;
     animation: ft-move-on-pulse 0.4s ease 0.8s both;
 }
 
@@ -1032,9 +1060,9 @@ h1:focus {
 
 .ft-tooltip {
     position: relative;
-    color: var(--ft-accent);
+    color: var(--ft-accent-strong);
     cursor: help;
-    border-bottom: 1px dashed var(--ft-accent);
+    border-bottom: 1px dashed var(--ft-accent-strong);
     white-space: nowrap;
 }
 
@@ -1257,11 +1285,11 @@ h1:focus {
 }
 
 .text-info {
-    color: var(--ft-accent) !important;
+    color: var(--ft-accent-strong) !important;
 }
 
 a.text-info:hover {
-    color: var(--ft-accent-hover) !important;
+    color: var(--ft-accent-strong-hover) !important;
 }
 
 /* ============================================================

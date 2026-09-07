@@ -9,25 +9,22 @@ namespace Footing.Tests.E2E;
 /// <summary>
 /// BR-26: WCAG 2.1 AA text contrast, in BOTH colour schemes, on both pages.
 ///
-/// The site does not currently meet AA. That is not this suite's to fix: every failing pair
-/// below is a `:root` palette token (`--ft-accent`, `--ft-text-muted`, `--ft-primary`,
-/// `--ft-primary-hover`, and white-on-`--ft-primary`/`--ft-amount-negative` in dark), and
-/// changing a brand colour is a redesign under D-10, which belongs to Riley. Full detail is in
-/// the findings ledger as F-16.
+/// This asserts AA outright -- zero `color-contrast` violations across the eight combinations
+/// below. It did not always: F-16 recorded nine failing foreground/background pairs (seven in
+/// light, two in dark) that were all `:root` palette tokens, and because changing a brand
+/// colour is a redesign under D-10 this suite PINNED that set rather than asserting zero, so
+/// CR-01 would not leave a protected branch permanently red. Riley authorised the palette
+/// repair, the tokens moved, and the pin is gone: tolerating the old failures after they were
+/// fixed would be strictly worse than asserting the real requirement.
 ///
-/// So these tests PIN the known failures rather than asserting zero, for the same reason
-/// F-12's overflow is pinned: CR-01 means a permanently red assertion here blocks every merge
-/// on a protected branch, and skipping would forfeit AC-01's no-skips promise. What is pinned
-/// is deliberately NOT the violation count or the element selectors -- it is the set of
-/// distinct FOREGROUND/BACKGROUND COLOUR PAIRS. The defect is a palette defect, so the colour
-/// pairs are the finding; selectors churn with markup and counts churn with content, while a
-/// colour pair changes only when the palette does. Concretely, 60 violation nodes across the
-/// eight runs reduce to 7 distinct pairs in light and 2 in dark.
-///
-/// The pin cuts both ways, which is the point:
-///   * a NEW colour pair fails -- that is a real regression, and the ongoing value here;
-///   * a pair that stops failing also fails, so a palette fix cannot leave this baseline
-///     silently stale. When Riley fixes the palette, delete the pairs that now pass.
+/// What the repair changed, for anyone reading a future regression here: light's green ramp
+/// and `--ft-text-muted` were darkened in place (hue and saturation held, lightness lowered);
+/// `--ft-accent` kept its value as the `.btn-accent` fill and gained `--ft-accent-strong` for
+/// its foreground-text role, because one tan cannot be both AA-legible on cream and light
+/// enough to carry dark button text; and the hard-coded `#fff` on the brand fills became
+/// `--ft-fill-text`, which is white in light and a dark ink in dark, because dark's
+/// `--ft-primary` and `--ft-amount-negative` are chosen to be read AS text on a dark ground
+/// and so cannot also sit under white.
 /// </summary>
 [Collection("Playwright")]
 public class ContrastTests
@@ -38,40 +35,11 @@ public class ContrastTests
     private void SkipIfUnavailable() =>
         Skip.If(!_fixture.ServerAvailable, "Server not available");
 
-    /// <summary>A failing foreground/background pair, with the palette token behind it.</summary>
+    /// <summary>A foreground/background pair axe judged to fail, as it resolved them.</summary>
     private sealed record ColourPair(string Foreground, string Background)
     {
         public override string ToString() => $"fg={Foreground} on bg={Background}";
     }
-
-    /// <summary>
-    /// Known-failing pairs in the LIGHT scheme, measured at AA (4.5:1 for body text, 3:1 for
-    /// large). Ratios are recorded in the comments rather than asserted: they are a
-    /// deterministic function of the two colours, so pinning the pair pins the ratio, and
-    /// pinning a formatted decimal as well would only add a way to break on rounding.
-    /// </summary>
-    private static readonly Dictionary<ColourPair, string> KnownLightFailures = new()
-    {
-        [new("#b89e78", "#f6f2ec")] = "2.29 -- --ft-accent on --ft-bg",
-        [new("#b89e78", "#ffffff")] = "2.56 -- --ft-accent on a white surface",
-        [new("#6e7d72", "#ede8e0")] = "3.55 -- --ft-text-muted on --ft-bg-topbar",
-        [new("#5a7a6a", "#ede8e0")] = "3.89 -- --ft-primary on --ft-bg-topbar",
-        [new("#6e7d72", "#f6f2ec")] = "3.89 -- --ft-text-muted on --ft-bg",
-        [new("#4d6b5c", "#dfd8cc")] = "4.15 -- --ft-primary-hover on --ft-bg-topbar-border",
-        [new("#6e7d72", "#ffffff")] = "4.33 -- --ft-text-muted on a white surface",
-    };
-
-    /// <summary>
-    /// Known-failing pairs in the DARK scheme. Both are white text on a saturated fill -- the
-    /// net-total bar, which is `--ft-primary` when positive and `--ft-amount-negative` when
-    /// negative. Dark fails far less than light because dark's `--ft-text-muted` (#9a9690) is
-    /// light enough against its backgrounds; light's (#6e7d72) is not.
-    /// </summary>
-    private static readonly Dictionary<ColourPair, string> KnownDarkFailures = new()
-    {
-        [new("#ffffff", "#7da893")] = "2.66 -- white on --ft-primary (the positive net-total bar)",
-        [new("#ffffff", "#e06050")] = "3.52 -- white on --ft-amount-negative (the negative bar)",
-    };
 
     /// <summary>
     /// The page states scanned. Both pages, and all three tool-page states, because each
@@ -90,7 +58,7 @@ public class ContrastTests
     private sealed record ScanResult(
         string BodyBackground,
         string? ThemeAttribute,
-        HashSet<ColourPair> FailingPairs,
+        List<string> Violations,
         List<string> IncompleteReasons,
         List<string> IncompleteHtml);
 
@@ -163,15 +131,15 @@ public class ContrastTests
             ResultTypes = [ResultType.Violations, ResultType.Incomplete],
         });
 
-        var failing = new HashSet<ColourPair>();
-        foreach (var node in result.Violations.SelectMany(violation => violation.Nodes))
-        {
-            var pair = ParseColourPair(node);
-            if (pair is not null)
-            {
-                failing.Add(pair);
-            }
-        }
+        // One entry per violating NODE rather than per distinct colour pair. The pair is the
+        // useful part of the report -- it names the palette token -- but the assertion is on the
+        // nodes, so a violation whose message axe reformats one day still fails loudly instead of
+        // parsing to null and disappearing out of a deduplicated set.
+        var violations = result.Violations
+            .SelectMany(violation => violation.Nodes)
+            .Select(node => $"{ParseColourPair(node)?.ToString() ?? "unparsed"} -- {Squash(node.Html)}")
+            .Distinct()
+            .ToList();
 
         // Violations and incompletes are kept apart all the way through, never merged into one
         // "problems" list: an incomplete is axe declining to judge, and D-09 says that is
@@ -181,7 +149,7 @@ public class ContrastTests
         return new ScanResult(
             bodyBackground,
             themeAttribute,
-            failing,
+            violations,
             incompleteNodes.SelectMany(n => n.Any.Select(check => check.Message ?? "")).Distinct().ToList(),
             incompleteNodes.Select(n => Squash(n.Html)).ToList());
     }
@@ -189,9 +157,9 @@ public class ContrastTests
     /// <summary>
     /// Pulls the two colours out of axe's own message, which is the only place the resolved
     /// pair appears in a stable form -- the check's `Data` is an untyped object over the wire.
-    /// Returns null rather than throwing if the shape ever changes; a pair that cannot be read
-    /// is then simply not in the observed set, which surfaces as a MISSING known pair (a loud,
-    /// named failure) rather than as a silently empty result that passes.
+    /// Returns null rather than throwing if the shape ever changes. Nothing is lost when it
+    /// does: the assertion counts violation NODES, so an unreadable message still fails -- it
+    /// just reports as `unparsed` alongside the offending element's HTML.
     /// </summary>
     private static ColourPair? ParseColourPair(AxeResultNode node)
     {
@@ -237,18 +205,22 @@ public class ContrastTests
             + $"is just the light one measured twice (light={light.BodyBackground}, dark={dark.BodyBackground})");
     }
 
+    /// <summary>
+    /// Zero `color-contrast` violations, in one scheme, across all four page states.
+    ///
+    /// Failures are collected across every context before asserting rather than asserted per
+    /// context, so a palette change that breaks three states reports all three in one run
+    /// instead of hiding two behind the first failure.
+    /// </summary>
     [SkippableTheory]
     [InlineData(false)]
     [InlineData(true)]
-    public async Task Contrast_MatchesTheKnownPaletteBaseline(bool dark)
+    public async Task Contrast_MeetsAa(bool dark)
     {
         SkipIfUnavailable();
 
         var scheme = dark ? "dark" : "light";
-        var known = dark ? KnownDarkFailures : KnownLightFailures;
-
-        var observed = new HashSet<ColourPair>();
-        var unknownByContext = new List<string>();
+        var violations = new List<string>();
         var unexpectedIncompletes = new List<string>();
 
         foreach (var (label, path, toolState) in Contexts)
@@ -259,12 +231,7 @@ public class ContrastTests
                 dark ? "dark" : null,
                 $"{label} ({scheme}): the scheme must be driven, not inherited (D-04)");
 
-            observed.UnionWith(scan.FailingPairs);
-
-            foreach (var pair in scan.FailingPairs.Where(pair => !known.ContainsKey(pair)))
-            {
-                unknownByContext.Add($"{label}: {pair}");
-            }
+            violations.AddRange(scan.Violations.Select(violation => $"{label}: {violation}"));
 
             // D-09: incompletes are reported, not asserted -- but a NEW KIND of incomplete is
             // worth knowing about, so the REASON is pinned even though the finding is not. The
@@ -279,27 +246,15 @@ public class ContrastTests
             }
         }
 
-        unknownByContext.Should().BeEmpty(
-            $"no contrast failure outside the known {scheme} palette baseline is allowed -- a new "
-            + "foreground/background pair here is a real regression. The baseline is a palette "
-            + "problem recorded as F-16 for Riley (D-10 redesign), not something this suite fixes; "
-            + $"unknown pairs: {string.Join("; ", unknownByContext)}");
+        violations.Should().BeEmpty(
+            $"every text/background pair the {scheme} palette produces must meet WCAG AA (4.5:1 "
+            + "for body text, 3:1 for large text and UI components). Each failure below names the "
+            + "colours axe resolved; both are almost always :root tokens in app.css, so fix them "
+            + $"there rather than at the call site: {string.Join("; ", violations)}");
 
         unexpectedIncompletes.Should().BeEmpty(
             "the only contrast incompletes today are decorative glyphs with no text content; a "
             + "different incomplete reason means axe could not resolve a background (D-09) and "
             + $"belongs in the findings ledger: {string.Join("; ", unexpectedIncompletes)}");
-
-        // The other half of the pin: if a known failure stops failing, the palette was fixed and
-        // this baseline is stale. That is good news, and it still has to fail here so the
-        // baseline is updated rather than quietly over-reporting for ever.
-        var repaired = known.Keys.Where(pair => !observed.Contains(pair))
-            .Select(pair => $"{pair} ({known[pair]})")
-            .ToList();
-
-        repaired.Should().BeEmpty(
-            $"every known {scheme} contrast failure should still be present, or this baseline is "
-            + "stale. If the palette was deliberately fixed, DELETE these entries from "
-            + $"Known{(dark ? "Dark" : "Light")}Failures and update F-16: {string.Join("; ", repaired)}");
     }
 }
