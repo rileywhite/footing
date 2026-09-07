@@ -18,9 +18,14 @@ namespace Footing.Tests.E2E;
 ///   tool, returning-user tree, collapsed clean    clean   no `dl` exists to overflow
 ///   tool, returning-user tree, expanded  +142px   +87px   hypothesis 1 REPRODUCED
 ///
-/// Full verdicts, offending elements and the probe results behind the recommended repair are
-/// in `.gc/artifacts/e2e-responsive-a11y/findings.md` under F-12 (revised by W-05), F-14 and
-/// F-15. The quarantine tests at the bottom are the ones W-06 deletes.
+/// Full verdicts, offending elements and the probe results behind the repair are in
+/// `.gc/artifacts/e2e-responsive-a11y/findings.md` under F-12 (revised by W-05), F-14 and F-15.
+///
+/// **W-06 has since repaired the reproduced defect** (`grid-template-columns: auto minmax(0,
+/// 1fr)` on `#moneyFlows dl`, plus `min-width: 0; max-width: 100%` on the `dd`'s controls), so
+/// the two quarantine tests that asserted it was STILL PRESENT are gone and the two states they
+/// covered are asserted clean instead. The table above is left as written: it is the record of
+/// what was measured before the repair, and the numbers in it are what the fix had to close.
 /// </summary>
 [Collection("Playwright")]
 public class NarrowViewportOverflowTests
@@ -156,76 +161,46 @@ public class NarrowViewportOverflowTests
     }
 
     // ================================================================================
-    // QUARANTINE -- DELETE BOTH TESTS BELOW AS PART OF W-06.
+    // The state the repair had to reach, now asserted positively.
     //
-    // These assert the defect is STILL PRESENT. That is deliberate: W-05 rules, W-06 repairs,
-    // and CR-01 means a red assertion here would block merges on a protected branch for
-    // however long W-06 takes. Pinning rather than skipping keeps AC-01's no-skips promise,
-    // keeps the defect named in the test list, and turns red the moment the CSS is fixed.
+    // Two quarantine tests lived here until W-06: they asserted the overflow was STILL PRESENT,
+    // so a reproduced defect could sit on a protected branch without skipping anything (CR-01,
+    // AC-01) and would turn red the moment the CSS was fixed. It did -- all four cases failed
+    // with "found 0" -- and they are deleted rather than inverted.
     //
-    // When W-06 lands: delete both, and fold Viewports.AtMostMobile back into
-    // FindMyFootingPageTests.FindMyFooting_LayoutContractHolds.
+    // The first-time-user tree's clean state is asserted by
+    // FindMyFootingPageTests.FindMyFooting_LayoutContractHolds, which W-06 folded back to the
+    // full viewport set. The returning-user EXPANDED state has no other home, so it is below.
     // ================================================================================
 
     /// <summary>
-    /// OQ-01 hypothesis 1 -- REPRODUCED, in the first-time-user tree. Measured overflow was
-    /// +143px at 320 and +88px at 375. Moved here from FindMyFootingPageTests (where W-04 left
-    /// it, ahead of this ruling) so W-06 has one file to delete rather than two.
-    /// </summary>
-    [SkippableTheory]
-    [MemberData(nameof(Viewports.AtMostMobile), MemberType = typeof(Viewports))]
-    public async Task ToolPage_FirstTimeUser_OverflowIsStillTheKnownDefect(Viewport viewport)
-    {
-        SkipIfUnavailable();
-        await using var session = await OpenToolPageAsync(viewport, returningUser: false);
-        await AssertKnownOverflowStillPresentAsync(session.Page, viewport, "first-time-user");
-    }
-
-    /// <summary>
-    /// OQ-01 hypothesis 1 -- REPRODUCED in the returning-user tree too, once a card is
-    /// expanded. Measured overflow was +142px at 320 and +87px at 375.
+    /// The returning-user tree, with a card expanded, at the two narrow viewports.
     ///
-    /// Expanding a card is what the plan's premise was reaching for: it is the only way the
-    /// returning-user state renders a `dl`, and without this step that state is clean. So the
-    /// defect is not specific to the first-time-user tree -- it belongs to the entry form,
-    /// which both trees share via MoneyFlowCard -- and W-06 fixing only one tree would leave
-    /// the other broken.
+    /// This is the state that made the defect's real shape visible: the overflow does not
+    /// belong to the first-time-user tree, it belongs to the entry form both trees share via
+    /// MoneyFlowCard, and it is only reachable here by expanding a card -- collapsed, this tree
+    /// renders no `dl` at all (see the sibling test above). A repair validated against the
+    /// first-time-user tree alone would have been half a repair, and this is what says so.
+    ///
+    /// The `dl` count assertion is load-bearing for the same reason it is in the collapsed
+    /// test, inverted: if expanding ever stopped rendering the entry form, the overflow
+    /// assertion below would pass while checking nothing.
     /// </summary>
     [SkippableTheory]
     [MemberData(nameof(Viewports.AtMostMobile), MemberType = typeof(Viewports))]
-    public async Task ToolPage_ReturningUser_ExpandedSection_OverflowIsStillTheKnownDefect(Viewport viewport)
+    public async Task ToolPage_ReturningUser_ExpandedSection_DoesNotOverflow(Viewport viewport)
     {
         SkipIfUnavailable();
         await using var session = await OpenToolPageAsync(viewport, returningUser: true);
         await ExpandAsync(session.Page, "income");
-        await AssertKnownOverflowStillPresentAsync(session.Page, viewport, "returning-user, income expanded");
-    }
 
-    /// <summary>
-    /// Pins the defect by its OFFENDING ELEMENT as well as its presence, because D-03 says the
-    /// element -- not the hypothesis -- is what W-06 fixes. If a change makes something else
-    /// overflow instead, "still broken" is the wrong report and this says so.
-    ///
-    /// Deliberately asserts no pixel magnitude. The row's width comes from the intrinsic size
-    /// of `<input size="30">`, which is font-metric dependent; asserting +143px would make this
-    /// gate merges on the CI image's font rendering. The margin being pinned is large (a 327px
-    /// track floor against 238px of available width), so `> 0` is not a weak assertion here.
-    /// </summary>
-    private static async Task AssertKnownOverflowStillPresentAsync(IPage page, Viewport viewport, string state)
-    {
-        var overflow = await LayoutAssertions.MeasureHorizontalOverflowAsync(page);
-        var offenders = await LayoutAssertions.DescribeHorizontalOverflowAsync(page);
+        (await session.Page.Locator("#moneyFlows dl").CountAsync()).Should().Be(
+            1, "expanding a card renders its entry form -- the thing that used to overflow; if "
+             + "this is ever zero the assertion below is checking an empty page");
 
-        var because =
-            $"the known #moneyFlows entry-form overflow at {viewport} ({state}) is quarantined here "
-            + "pending W-06 -- if this now passes, the defect is fixed, so delete this test "
-            + $"(offenders reported: {offenders})";
-
-        overflow.Should().BeGreaterThan(0, because);
-        offenders.Should().Contain(
-            "<dd>",
-            "the overflowing element is the `dd` of the entry form's `dl`, whose `1fr` track "
-            + "cannot shrink below the intrinsic width of the description input -- if the `dd` "
-            + "is no longer named, the ledger's F-12 analysis is stale");
+        await LayoutAssertions.AssertNoHorizontalOverflowAsync(
+            session.Page,
+            $"{SitePage.Tool} in the returning-user state at {viewport} with the income card "
+            + "expanded should not overflow (F-12, repaired by W-06)");
     }
 }

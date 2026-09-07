@@ -630,7 +630,16 @@ h1:focus {
 
 #moneyFlows dl {
     display: grid;
-    grid-template-columns: auto 1fr;
+
+    /* F-12. `1fr` is `minmax(auto, 1fr)`, and that `auto` floor is the track's min-content
+       width -- which is the 327px intrinsic width of the description field's `size="30"`
+       (MoneyFlowCard.razor). Against 238px of available space at the 320 floor the track simply
+       refused to shrink, and the row ran 143px past the viewport. `minmax(0, 1fr)` removes the
+       floor from the track; the `min-width: 0` below removes it from the controls inside. Both
+       are needed -- W-05 measured each alone and neither fixes it, and relaxing the FIRST track
+       instead (`minmax(0, auto) 1fr`) makes it worse by collapsing the label column to 0px.
+       This is a no-op at Tablet and Desktop, where the tracks stay 167px 439px. */
+    grid-template-columns: auto minmax(0, 1fr);
     gap: var(--ft-space-sm) var(--ft-space-md);
     align-items: center;
     margin-bottom: var(--ft-space-md);
@@ -648,6 +657,17 @@ h1:focus {
     align-items: center;
     gap: var(--ft-space-sm);
     flex-wrap: wrap;
+}
+
+/* The other half of the F-12 repair -- see the `dl` rule above. A form control is a flex item
+   here, and a flex item's default `min-width: auto` resolves to its content-based minimum,
+   which for `<input size="30">` is 327px. Relaxing the grid track alone just moves the refusal
+   to shrink down one level. Like the track change, this only does anything below ~430px: at
+   Tablet and Desktop the controls are already narrower than the space they have. */
+#moneyFlows dd input,
+#moneyFlows dd select {
+    min-width: 0;
+    max-width: 100%;
 }
 
 /* ============================================================

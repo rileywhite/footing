@@ -62,16 +62,14 @@ public static class Viewports
         AllViewports.Where(viewport => viewport.FullAssertions).Select(viewport => new object[] { viewport });
 
     /// <summary>
-    /// The two narrow viewports. Split out because the tool page has a reproduced overflow
-    /// defect at exactly these widths -- see NarrowViewportOverflowTests, which carries W-05's
-    /// ruling on it -- and W-06 fixes it. Once it is fixed these fold back into <see cref="All"/>.
+    /// The two narrow viewports. Originally split out because the tool page had a reproduced
+    /// overflow defect at exactly these widths; W-06 repaired it, and the layout contract has
+    /// folded back to <see cref="All"/>. This stays because NarrowViewportOverflowTests carries
+    /// W-05's ruling on both OQ-01 hypotheses, which is a claim about these two widths
+    /// specifically and says nothing about Tablet or Desktop.
     /// </summary>
     public static IEnumerable<object[]> AtMostMobile =>
         new[] { MobileFloor, Mobile }.Select(viewport => new object[] { viewport });
-
-    /// <summary>The complement of <see cref="AtMostMobile"/>.</summary>
-    public static IEnumerable<object[]> AtLeastTablet =>
-        new[] { Tablet, Desktop }.Select(viewport => new object[] { viewport });
 
     /// <summary>
     /// Desktop and Mobile only. Used where the two layouts genuinely differ but the middle

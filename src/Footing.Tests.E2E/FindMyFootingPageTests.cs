@@ -30,13 +30,16 @@ public class FindMyFootingPageTests
         return session;
     }
 
-    // D-02 on the tool page, at the viewports where the whole contract currently holds.
+    // D-02 on the tool page, at every viewport in the matrix.
     //
-    // The 320 and 375 entries of the matrix are NOT missing. Their gutter half is asserted by
-    // the test below; their overflow half is in NarrowViewportOverflowTests, split out because
-    // it does not hold there yet.
+    // 320 and 375 were split out of here while F-12's overflow was reproduced and unrepaired:
+    // the contract's overflow half did not hold there, so the gutter half was asserted by a
+    // separate narrow-viewport test and the overflow half was quarantined in
+    // NarrowViewportOverflowTests. W-06 repaired the overflow, so the whole contract holds at
+    // all four widths again and the split is gone -- AssertLayoutContractAsync already covers
+    // the gutter at every viewport, which is what the separate narrow test was for.
     [SkippableTheory]
-    [MemberData(nameof(Viewports.AtLeastTablet), MemberType = typeof(Viewports))]
+    [MemberData(nameof(Viewports.All), MemberType = typeof(Viewports))]
     public async Task FindMyFooting_LayoutContractHolds(Viewport viewport)
     {
         SkipIfUnavailable();
@@ -44,24 +47,9 @@ public class FindMyFootingPageTests
         await SitePage.AssertLayoutContractAsync(session.Page, viewport, SitePage.Tool);
     }
 
-    // D-02(c) at the two narrow viewports. Separated from the overflow assertion (now in
-    // NarrowViewportOverflowTests) so the known overflow defect does not mask the gutter,
-    // which does hold at 320 and 375.
-    [SkippableTheory]
-    [MemberData(nameof(Viewports.AtMostMobile), MemberType = typeof(Viewports))]
-    public async Task FindMyFooting_ContentGutterHolds_AtNarrowViewports(Viewport viewport)
-    {
-        SkipIfUnavailable();
-        await using var session = await OpenToolPageAsync(viewport);
-        await LayoutAssertions.AssertContentGutterAsync(
-            session.Page, SitePage.ContentSelector, SitePage.MinGutterPx, SitePage.TolerancePx);
-    }
-
-    // The narrow-viewport overflow that W-04 reproduced and quarantined here now lives in
-    // NarrowViewportOverflowTests, together with W-05's ruling on both OQ-01 hypotheses and
-    // the returning-user coverage W-04 could not reach. It was moved rather than duplicated so
-    // W-06 has one file to delete; when it does, fold Viewports.AtMostMobile back into
-    // FindMyFooting_LayoutContractHolds above.
+    // W-05's ruling on both OQ-01 hypotheses, and the returning-user coverage W-04 could not
+    // reach, live in NarrowViewportOverflowTests -- including the expanded returning-user state,
+    // which is the one narrow case this class's first-time-user fixture does not reach.
 
     [SkippableTheory]
     [MemberData(nameof(Viewports.Full), MemberType = typeof(Viewports))]
