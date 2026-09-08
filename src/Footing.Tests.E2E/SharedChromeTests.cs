@@ -24,14 +24,17 @@ public class SharedChromeTests
         Skip.If(!_fixture.ServerAvailable, "Server not available");
 
     /// <summary>
-    /// The chrome both pages share. The footer is deliberately absent, and still is after
-    /// F-01's landing half was repaired: the landing page's
-    /// &lt;footer class="ft-landing-footer"&gt; is now a sibling of &lt;main&gt; and does
-    /// expose the contentinfo landmark, but the TOOL page has no footer element at all, so
-    /// there is still nothing to compare it against. Giving the tool page one is new UI -- a
-    /// redesign, since it changes what a sighted user sees -- which under D-10 is Riley's
-    /// call, not this suite's. Adding "footer" to the list below would fail on the tool page
-    /// and the only way to green it is to build that UI; do not.
+    /// The chrome both pages share. The footer is deliberately absent from the list even
+    /// though, since F-01 closed on 2026-09-07, both pages have one: the landing page's
+    /// &lt;footer class="ft-landing-footer"&gt; and the tool page's
+    /// &lt;footer class="ft-tool-footer"&gt; are each a sibling of &lt;main&gt; and each
+    /// expose the contentinfo landmark. They are NOT the same element and are not meant to
+    /// be. The landing footer is a centred flex row of links; the tool footer is one line of
+    /// muted italic text, and it carries a 6rem tail the landing one does not need because
+    /// `.ft-sticky-total` is fixed to the bottom of the tool page only. Comparing them
+    /// property by property would report those intended differences as #62-style breakage.
+    /// What they DO share -- the width box they both take back from main -- is pinned per
+    /// page in LandingFooterTests and ToolFooterTests, where the numbers can say why.
     /// </summary>
     private static readonly string[] ChromeSelectors =
     [

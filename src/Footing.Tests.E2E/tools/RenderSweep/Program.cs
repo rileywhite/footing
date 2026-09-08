@@ -76,6 +76,7 @@ internal static class Program
             await VerifyW11Async(fixture, report);
             await VerifyW15Async(fixture, report);
             await MeasureLandingFooterAsync(fixture, report);
+            await MeasureToolFooterAsync(fixture, report);
             await CheckStickyBarOcclusionAsync(fixture, report);
             Console.WriteLine($"\n{rendered} renders written to {outputDir}");
         }
@@ -560,6 +561,119 @@ internal static class Program
             Console.WriteLine(
                 $"  F-01 {viewport}: landmark={landmark} x={x} w={width} "
               + $"gapAbove={gapAbove} gapBelow={gapBelow} linkY={linkY} docHeight={docHeight}");
+        }
+        report.AppendLine();
+    }
+
+    /// <summary>
+    /// F-01's tool half, measured the same way its landing half is, plus the one question the
+    /// landing footer never has to answer: `.ft-sticky-total` is `position: fixed; bottom: 0`
+    /// on the tool page, so the privacy line -- the bottom-most thing in the document, and the
+    /// entire point of the footer -- can be sitting behind it while every geometry number
+    /// still reads correctly. `CheckStickyBarOcclusionAsync` below does not catch that: it
+    /// only considers CONTROLS, and the line is a `p`. So this measures it directly, scrolled
+    /// to the very end of the document where the risk is, in both colour schemes because a
+    /// muted italic line that renders invisible against a dark background is the other way
+    /// this can be shipped broken with green numbers.
+    /// </summary>
+    private static async Task MeasureToolFooterAsync(PlaywrightFixture fixture, StringBuilder report)
+    {
+        report.AppendLine("## 4c. F-01 -- the tool footer's geometry, and whether its line is readable");
+        report.AppendLine();
+        report.AppendLine("`landmark?` resolves the footer the way an assistive technology does. `line clear of`");
+        report.AppendLine("`bar?` is measured scrolled to the bottom of the document, which is the only place the");
+        report.AppendLine("fixed net-total bar can cover it. `x`/`width` should equal `article.content`'s, which");
+        report.AppendLine("is the claim that promoting the footer out of `main` cost it nothing.");
+        report.AppendLine();
+        report.AppendLine("| viewport | scheme | landmark? | x | width | content x/width | gap above | line text | colour | line bottom | bar top | clear? |");
+        report.AppendLine("|---|---|---|---|---|---|---|---|---|---|---|---|");
+
+        foreach (var viewport in AllViewports)
+        {
+            foreach (var scheme in Schemes)
+            {
+                // Returning user with every category, so the document is long enough that the
+                // footer is actually reached by scrolling rather than sitting in view. Dark is
+                // seeded through `ft-theme` on top of a LIGHT OS preference, per D-04 -- the
+                // same contract the 16 renders run under.
+                var seed = ToolStorage.ReturningUserWithEveryCategory();
+                if (scheme.ThemeSeed is not null)
+                    seed[ToolStorage.ThemeKey] = scheme.ThemeSeed;
+
+                await using var session = await fixture.NewSessionAsync(
+                    viewport, ColorScheme.Light, localStorageSeed: seed);
+                await SitePage.GotoRenderedAsync(session.Page, fixture.BaseUrl, SitePage.Tool);
+                await session.Page.WaitForSelectorAsync(
+                    "#moneyFlows", new() { Timeout = 60000, State = WaitForSelectorState.Attached });
+                await FreezeMotionAsync(session.Page);
+
+                await session.Page.EvaluateAsync("() => window.scrollTo(0, document.body.scrollHeight)");
+                await session.Page.WaitForFunctionAsync(
+                    "() => Math.abs(window.scrollY + window.innerHeight - document.documentElement.scrollHeight) < 2 "
+                  + "|| document.documentElement.scrollHeight <= window.innerHeight");
+
+                // JSON string rather than an object -- F-13, same as everywhere else in this
+                // tool: Playwright .NET returns an EMPTY dictionary rather than throwing.
+                var json = await session.Page.EvaluateAsync<string?>(
+                    """
+                    () => {
+                      const footer = document.querySelector('footer.ft-tool-footer');
+                      const content = document.querySelector('article.content');
+                      const line = footer && footer.querySelector('p');
+                      const bar = document.querySelector('.ft-sticky-total');
+                      if (!footer || !content || !line) return null;
+                      const f = footer.getBoundingClientRect();
+                      const c = content.getBoundingClientRect();
+                      const l = line.getBoundingClientRect();
+                      const barTop = bar ? Math.round(bar.getBoundingClientRect().top) : null;
+                      return JSON.stringify({
+                        landmark: !footer.closest('main, article, section, aside, nav'),
+                        x: Math.round(f.x),
+                        width: Math.round(f.width),
+                        contentX: Math.round(c.x),
+                        contentWidth: Math.round(c.width),
+                        gapAbove: Math.round(f.top - c.bottom),
+                        text: (line.textContent || '').trim(),
+                        color: getComputedStyle(line).color,
+                        lineBottom: Math.round(l.bottom),
+                        barTop,
+                        docHeight: Math.round(document.documentElement.scrollHeight),
+                      });
+                    }
+                    """);
+
+                if (json is null)
+                {
+                    report.AppendLine($"| {viewport} | {scheme.Name} | (footer not found) | | | | | | | | | |");
+                    Console.WriteLine($"  F-01 tool {viewport}/{scheme.Name}: footer not found");
+                    continue;
+                }
+
+                using var m = JsonDocument.Parse(json);
+                var landmark = m.RootElement.GetProperty("landmark").GetBoolean();
+                var x = m.RootElement.GetProperty("x").GetDouble();
+                var width = m.RootElement.GetProperty("width").GetDouble();
+                var contentX = m.RootElement.GetProperty("contentX").GetDouble();
+                var contentWidth = m.RootElement.GetProperty("contentWidth").GetDouble();
+                var gapAbove = m.RootElement.GetProperty("gapAbove").GetDouble();
+                var text = m.RootElement.GetProperty("text").GetString();
+                var color = m.RootElement.GetProperty("color").GetString();
+                var lineBottom = m.RootElement.GetProperty("lineBottom").GetDouble();
+                var barTopElement = m.RootElement.GetProperty("barTop");
+                var barTop = barTopElement.ValueKind == JsonValueKind.Null ? (double?)null : barTopElement.GetDouble();
+                var docHeight = m.RootElement.GetProperty("docHeight").GetDouble();
+                var clear = barTop is null || lineBottom <= barTop;
+
+                report.AppendLine(
+                    $"| {viewport} | {scheme.Name} | {(landmark ? "**contentinfo**" : "no (generic)")} | "
+                  + $"{x}px | {width}px | {contentX}px / {contentWidth}px | {gapAbove}px | \"{text}\" | "
+                  + $"{color} | {lineBottom}px | {(barTop is null ? "(no bar)" : $"{barTop}px")} | "
+                  + $"{(clear ? "yes" : "**NO, covered**")} |");
+                Console.WriteLine(
+                    $"  F-01 tool {viewport}/{scheme.Name}: landmark={landmark} x={x} w={width} "
+                  + $"content={contentX}/{contentWidth} gapAbove={gapAbove} colour={color} "
+                  + $"lineBottom={lineBottom} barTop={barTop} clear={clear} docHeight={docHeight}");
+            }
         }
         report.AppendLine();
     }

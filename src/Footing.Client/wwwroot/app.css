@@ -794,8 +794,10 @@ h1:focus {
    `.ft-landing-content` hands over the vertical half. `.content`'s `padding-bottom: 4rem`
    used to fall below the footer; with the footer outside main it would fall ABOVE it
    instead, dropping the footer 64px and leaving no tail. Zeroing it on the landing article
-   and carrying that 4rem down here puts both back. The modifier is landing-only on purpose:
-   the tool page's `.content` is untouched.
+   and carrying that 4rem down here puts both back. The tool page now needs the same handover
+   for the same reason and has its own modifier, `.ft-tool-content`, below; the two are kept
+   separate rather than merged into one selector because the 4rem means something different
+   on each page -- see the tool footer's block.
 
    The 4rem tail is PADDING and not `margin-bottom`, which is the obvious way to write it and
    is wrong: a last child's bottom margin does not extend the scrollable area, so the document
@@ -830,6 +832,57 @@ h1:focus {
 
 .ft-landing-footer a:hover {
     color: var(--ft-primary);
+}
+
+
+/* ============================================================
+   Tool Page Footer
+   ============================================================ */
+
+/*
+   F-01, tool half. The privacy promise -- "your data never leaves your browser" -- shipped
+   only on the landing page, so the one page where someone actually types their finances was
+   the one page that never made it. This footer carries it there. The `contentinfo` landmark
+   the tool page also gains is a side effect of doing it correctly, not the reason.
+
+   Geometry is the landing footer's recipe, for the landing footer's reason: outside `main`
+   the footer has none of `main`'s `max-width: 54rem; margin: 0 auto; padding: 0 1rem`, and
+   `border-top` is drawn on the BORDER box, which padding is inside of, so it cannot buy the
+   box back with padding and would rule edge to edge. `calc(100% - 2rem)` with a 52rem cap is
+   `main`'s CONTENT box restated: 54rem less two 1rem gutters at the cap, those gutters below
+   it. Measured identical to `article.content` at all four viewports; `ToolFooterTests` pins
+   both that equality and the literals.
+
+   `.ft-tool-content` zeroes `.content { padding-bottom: 4rem }` and the footer's
+   `padding-bottom: 6rem` carries it back plus its own 2rem, exactly as on the landing page --
+   but the 4rem is doing a SECOND job here that it does not do there, which is why the two
+   modifiers stay separate. `.ft-sticky-total` is `position: fixed; bottom: 0`, so the bottom
+   4rem of the tool page is clearance: without it, whatever is last in the document sits
+   behind the bar when you scroll to the end. Leaving `.content`'s padding alone and letting
+   it fall above the footer would have put that clearance in the wrong place -- 64px of gap
+   above the border-top, and the privacy line itself under the bar. Do not "simplify" the
+   6rem to 2rem; the line goes behind the net-total bar at every viewport if you do.
+
+   Tail as PADDING, not `margin-bottom`: a last child's bottom margin does not extend the
+   scrollable area, so the clearance would not exist where it is needed. `p`'s global
+   `margin-bottom: 1rem` (app.css:264) is zeroed for the same arithmetic reason -- the
+   landing footer's child is an inline `a` and never had one.
+*/
+
+.ft-tool-content {
+    padding-bottom: 0;
+}
+
+.ft-tool-footer {
+    width: calc(100% - 2rem);
+    max-width: 52rem;
+    margin: 2rem auto 0;
+    padding: 2rem 0 6rem;
+    border-top: 1px solid var(--ft-bg-topbar-border);
+}
+
+.ft-tool-footer p {
+    margin: 0;
 }
 
 

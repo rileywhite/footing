@@ -12,15 +12,16 @@ namespace Footing.Tests.E2E;
 ///
 /// Three of these were failing when W-13 wrote them, and the tests were written to CATCH them
 /// rather than around them. All three have since been repaired, so their pins are gone and
-/// the invariants are asserted positively -- except for the half of F-01 that is still open,
-/// which is PINNED to its exact state rather than asserted away or skipped: CR-01 means a
-/// permanently red assertion blocks every merge on a protected branch, and AC-01 forbids
-/// skipping. A pin fails in both directions -- a new violation is a regression, and a
-/// violation that disappears means the baseline is stale and must be updated by whoever
-/// repaired it. That is exactly what happened to F-01's landing half below.
+/// the invariants are asserted positively. F-01 was the last one out: its landing half was
+/// repaired first and its tool half was PINNED at zero in the meantime rather than asserted
+/// away or skipped, because CR-01 means a permanently red assertion blocks every merge on a
+/// protected branch and AC-01 forbids skipping. A pin fails in both directions -- a new
+/// violation is a regression, and a violation that disappears means the baseline is stale and
+/// must be updated by whoever repaired it. Both halves have now landed and the pin is gone,
+/// which is the pin working as designed rather than being worked around.
 ///
-///   * F-01 -- `contentinfo`. HALF REPAIRED, and the assertion is now PER PAGE: the landing
-///     page has one, the tool page still has none.
+///   * F-01 -- `contentinfo`. FULLY REPAIRED, and asserted unconditionally: both pages have
+///     exactly one.
 ///     The LANDING page's `footer.ft-landing-footer` used to sit inside `article.content`
 ///     inside `main`, where a `footer` element is generic rather than a landmark, and W-15
 ///     reported rather than repaired it because promoting the footer out of `main` costs it
@@ -29,9 +30,14 @@ namespace Footing.Tests.E2E;
 ///     padding. Riley authorised the promotion together with the CSS that gives the footer
 ///     that box back, so the move is now visually neutral to the pixel; `LandingFooterTests`
 ///     pins the geometry that says so, and this asserts the landmark it bought.
-///     The TOOL page has no footer element at all. Giving it one is new UI -- a redesign
-///     under D-10 -- and remains Riley's call, so its zero stays pinned here. Do NOT "fix"
-///     the pin by adding a tool footer to make the two pages match.
+///     The TOOL page had no footer element at all, and this suite pinned that zero because
+///     giving it one is new UI and so Riley's call under D-10. Riley made that call on
+///     2026-09-07: the tool page now carries `footer.ft-tool-footer` with the privacy line
+///     the landing page had all along ("Everything here stays in your browser"), which is the
+///     actual point of the change -- the landmark is the free side effect of building it
+///     correctly, since no WCAG success criterion requires a `contentinfo` at all.
+///     `ToolFooterTests` pins that footer's geometry the way `LandingFooterTests` pins the
+///     landing one's.
 ///   * F-03 -- REPAIRED by W-15. The tool page went `h1` straight to the `h5` card headers.
 ///     The card headers are now `h2` and the sticky net-total detail heading with them, so
 ///     both pages descend without a skip and this asserts that positively. The LANDING page
@@ -140,33 +146,18 @@ public class StructuralAccessibilityTests
         counts.GetValueOrDefault("navigation").Should().Be(1, $"{where} should have exactly one navigation landmark");
         counts.GetValueOrDefault("main").Should().Be(1, $"{where} should have exactly one main landmark");
 
-        // F-01, and it is PER PAGE on purpose. Asserting contentinfo == 1 everywhere would
-        // fail on the tool page, and the only way to make that pass is to give the tool page
-        // a footer -- new UI, a redesign under D-10, and Riley's call rather than this
-        // suite's. So the landing page asserts the landmark it now has, and the tool page
-        // keeps its zero PINNED, which is what makes the day someone adds a tool footer show
-        // up here as a stale baseline to update rather than as silence.
-        if (path == SitePage.Landing)
-        {
-            counts.GetValueOrDefault("contentinfo").Should().Be(
-                1,
-                $"{where}: F-01 -- the landing footer is a sibling of main and must expose "
-                + "exactly one contentinfo landmark. IF THIS FAILS AT ZERO, footer."
-                + "ft-landing-footer has been moved back inside main/article (where a footer "
-                + "element is generic, not a landmark) -- the element being present in the "
-                + "markup is not enough");
-        }
-        else
-        {
-            counts.GetValueOrDefault("contentinfo").Should().Be(
-                0,
-                $"{where}: F-01 -- the tool page has no footer element at all, so it exposes "
-                + "no contentinfo landmark. Pinned as ABSENT rather than asserted away, so "
-                + "the gate stays green (CR-01) for a defect nothing downstream is authorised "
-                + "to repair: giving the tool page a footer is new UI, a redesign under D-10, "
-                + "and Riley's call. IF THIS FAILS, a tool-page footer was added -- that is "
-                + "the fix: delete this branch and require contentinfo == 1 on both pages");
-        }
+        // F-01, and no longer per page. This used to branch: the landing page asserted 1 and
+        // the tool page PINNED 0, because the tool page had no footer element and adding one
+        // was new UI that only Riley could authorise. Riley authorised it on 2026-09-07, both
+        // pages now carry a footer that is a sibling of main, and the branch is gone rather
+        // than left standing with both arms saying 1.
+        counts.GetValueOrDefault("contentinfo").Should().Be(
+            1,
+            $"{where}: F-01 -- the page's footer is a sibling of main and must expose exactly "
+            + "one contentinfo landmark. IF THIS FAILS AT ZERO, footer.ft-landing-footer "
+            + "(index.html) or footer.ft-tool-footer (MainLayout.razor) has been moved back "
+            + "inside main/article, where a footer element is generic rather than a landmark "
+            + "-- the element being present in the markup is not enough");
     }
 
     // ================================================================================

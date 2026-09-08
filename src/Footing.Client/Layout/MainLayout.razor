@@ -5,7 +5,27 @@
 </header>
 
 <main>
-    <article class="content">
+    <article class="content ft-tool-content">
         @Body
     </article>
 </main>
+
+@*
+    F-01, tool half. The footer is a SIBLING of <main>, not a child of it. A <footer> element
+    exposes the contentinfo landmark only at the top level of the document; nested inside
+    main/article/section/aside/nav it is generic, which is where the landing page's footer
+    used to sit and is the whole of what F-01 was. Enclosing <div>s (index.html's #app) do not
+    count -- only those five elements do.
+
+    The line itself is the point, not the landmark. The privacy promise lived only on the
+    landing page, so the one page where a user actually types their finances never made it,
+    and anyone who bookmarks or deep-links /find-my-footing/ never saw it at all. The landmark
+    is the free side effect.
+
+    Moving the footer out of main costs it main's width box, so .ft-tool-footer reproduces
+    that box itself and .ft-tool-content hands over .content's bottom padding -- see app.css.
+    Footing.Site/index.html carries the identical arrangement for the landing page.
+*@
+<footer class="ft-tool-footer">
+    <p class="ft-privacy-note">Everything here stays in your browser.</p>
+</footer>
