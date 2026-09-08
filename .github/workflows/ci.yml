@@ -31,8 +31,34 @@ jobs:
       - name: Build E2E tests
         run: dotnet build src/Footing.Tests.E2E
 
+      # Keyed on the resolved Microsoft.Playwright version: each release pins a
+      # specific browser build, so a version bump must miss the cache rather than
+      # serve a mismatched Chromium.
+      - name: Resolve Playwright version
+        id: playwright-version
+        run: |
+          version="$(grep -oPm1 '(?<=Include="Microsoft\.Playwright" Version=")[^"]+' src/Footing.Tests.E2E/Footing.Tests.E2E.csproj)"
+          if [ -z "$version" ]; then
+            echo "Could not resolve the Microsoft.Playwright version from src/Footing.Tests.E2E/Footing.Tests.E2E.csproj" >&2
+            exit 1
+          fi
+          echo "Microsoft.Playwright $version"
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+
+      - name: Cache Playwright browsers
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: ${{ runner.os }}-playwright-${{ steps.playwright-version.outputs.version }}
+
+      # No --with-deps: every shared library Chromium needs is already present on
+      # the ubuntu-latest image (apt reported all of them "already the newest
+      # version"; the only additions were supplementary CJK/Cyrillic font packages).
+      # actions/cache restores browser binaries but not apt packages, so keeping
+      # --with-deps here would make cache-hit and cache-miss runs behave
+      # differently. This step is identical on both paths.
       - name: Install Playwright browsers
-        run: pwsh src/Footing.Tests.E2E/bin/Debug/net10.0/playwright.ps1 install --with-deps chromium
+        run: pwsh src/Footing.Tests.E2E/bin/Debug/net10.0/playwright.ps1 install chromium
 
       - name: E2E tests
         run: dotnet test src/Footing.Tests.E2E --no-build
