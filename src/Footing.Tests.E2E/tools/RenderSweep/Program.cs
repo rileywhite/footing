@@ -75,6 +75,7 @@ internal static class Program
             await VerifyW06Async(fixture, report);
             await VerifyW11Async(fixture, report);
             await VerifyW15Async(fixture, report);
+            await MeasureLandingFooterAsync(fixture, report);
             await CheckStickyBarOcclusionAsync(fixture, report);
             Console.WriteLine($"\n{rendered} renders written to {outputDir}");
         }
@@ -465,6 +466,102 @@ internal static class Program
 
         report.AppendLine($"| {path} | {state} | {string.Join(", ", levels)} | {(skip ? "**YES**" : "no")} |");
         Console.WriteLine($"  W-15 {path} ({state}) headings: {string.Join(",", levels)} skip={skip}");
+    }
+
+    // ================================================================================
+    // 4b. F-01: the landing footer's geometry, before and after it becomes a landmark.
+    // ================================================================================
+
+    /// <summary>
+    /// F-01's acceptance bar is visual neutrality, and this is what measures it.
+    ///
+    /// Promoting `footer.ft-landing-footer` out of `article.content` so it exposes the
+    /// `contentinfo` role moves it out of `main`'s width box, and `main` is where its 54rem
+    /// cap and 1rem gutter came from. The repair therefore has to hand the footer that box
+    /// back, and "hand it back" is a claim with numbers behind it: the border box -- the box
+    /// the `border-top` rule is drawn on, which is the only thing the footer paints -- must
+    /// land at exactly the x and width it did as a child of `.content`.
+    ///
+    /// The vertical pair matters for the same reason. `.content`'s `padding-bottom: 4rem`
+    /// used to sit BELOW the footer; once the footer is a sibling of `main` that padding
+    /// lands above it instead, which is worth 64px of drop and 64px of missing tail. So both
+    /// gaps are reported, and deliberately against neighbours that exist on BOTH sides of the
+    /// change rather than against `main` (which the footer is inside before and outside
+    /// after, so a `main`-relative number is not comparable): `.ft-value-section` bottom ->
+    /// footer top, which is the old `margin-top: 2rem`, and footer bottom -> document end,
+    /// which is the old `padding-bottom: 4rem`. `link y` is the absolute document position of
+    /// the footer's one link, so "the links do not move" is a number too.
+    ///
+    /// This measures, it does not assert -- `LandingFooterTests` is where the same numbers
+    /// are pinned. Read as a before/after pair across the change, it is the evidence that the
+    /// pin was not simply written to match whatever the new markup happened to produce.
+    /// </summary>
+    private static async Task MeasureLandingFooterAsync(PlaywrightFixture fixture, StringBuilder report)
+    {
+        report.AppendLine("## 4b. F-01 -- the landing footer's geometry");
+        report.AppendLine();
+        report.AppendLine("`landmark?` is the footer resolved the way an assistive technology resolves it: a");
+        report.AppendLine("`footer` element is `contentinfo` only at the top level of the document, and generic");
+        report.AppendLine("inside `main`/`article`/`section`/`aside`/`nav`.");
+        report.AppendLine();
+        report.AppendLine("| viewport | landmark? | x | width | value-section -> footer | footer -> doc end | link y | doc height |");
+        report.AppendLine("|---|---|---|---|---|---|---|---|");
+
+        foreach (var viewport in AllViewports)
+        {
+            await using var session = await fixture.NewSessionAsync(viewport, ColorScheme.Light);
+            await SitePage.GotoRenderedAsync(session.Page, fixture.BaseUrl, SitePage.Landing);
+            await FreezeMotionAsync(session.Page);
+
+            // JSON string rather than an object: F-13, and the same trap CheckStickyBar-
+            // OcclusionAsync above documents -- Playwright .NET hands back an EMPTY
+            // dictionary rather than throwing.
+            var json = await session.Page.EvaluateAsync<string?>(
+                """
+                () => {
+                  const footer = document.querySelector('footer.ft-landing-footer');
+                  const above = document.querySelector('.ft-value-section');
+                  const link = footer && footer.querySelector('a');
+                  if (!footer || !above || !link) return null;
+                  const f = footer.getBoundingClientRect();
+                  const a = above.getBoundingClientRect();
+                  const scrollY = window.scrollY;
+                  return JSON.stringify({
+                    landmark: !footer.closest('main, article, section, aside, nav'),
+                    x: Math.round(f.x),
+                    width: Math.round(f.width),
+                    gapAbove: Math.round(f.top - a.bottom),
+                    gapBelow: Math.round(document.documentElement.scrollHeight - (f.bottom + scrollY)),
+                    linkY: Math.round(link.getBoundingClientRect().top + scrollY),
+                    docHeight: Math.round(document.documentElement.scrollHeight),
+                  });
+                }
+                """);
+
+            if (json is null)
+            {
+                report.AppendLine($"| {viewport} | (footer not found) | | | | | | |");
+                Console.WriteLine($"  F-01 {viewport}: footer not found");
+                continue;
+            }
+
+            using var measured = JsonDocument.Parse(json);
+            var landmark = measured.RootElement.GetProperty("landmark").GetBoolean();
+            var x = measured.RootElement.GetProperty("x").GetDouble();
+            var width = measured.RootElement.GetProperty("width").GetDouble();
+            var gapAbove = measured.RootElement.GetProperty("gapAbove").GetDouble();
+            var gapBelow = measured.RootElement.GetProperty("gapBelow").GetDouble();
+            var linkY = measured.RootElement.GetProperty("linkY").GetDouble();
+            var docHeight = measured.RootElement.GetProperty("docHeight").GetDouble();
+
+            report.AppendLine(
+                $"| {viewport} | {(landmark ? "**contentinfo**" : "no (generic)")} | {x}px | {width}px | "
+              + $"{gapAbove}px | {gapBelow}px | {linkY}px | {docHeight}px |");
+            Console.WriteLine(
+                $"  F-01 {viewport}: landmark={landmark} x={x} w={width} "
+              + $"gapAbove={gapAbove} gapBelow={gapBelow} linkY={linkY} docHeight={docHeight}");
+        }
+        report.AppendLine();
     }
 
     // ================================================================================

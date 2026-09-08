@@ -24,13 +24,14 @@ public class SharedChromeTests
         Skip.If(!_fixture.ServerAvailable, "Server not available");
 
     /// <summary>
-    /// The chrome both pages share. The footer is deliberately absent -- see finding F-01:
-    /// the tool page has no footer element at all, and the landing page's
-    /// &lt;footer class="ft-landing-footer"&gt; sits inside article.content inside &lt;main&gt;,
-    /// so it is not a contentinfo landmark either. There is nothing on the tool page to
-    /// compare it against. F-01 is reported here, not repaired -- giving the tool page a
-    /// footer is a redesign (it changes what a sighted user sees), which under D-10 is
-    /// Riley's call, not this suite's.
+    /// The chrome both pages share. The footer is deliberately absent, and still is after
+    /// F-01's landing half was repaired: the landing page's
+    /// &lt;footer class="ft-landing-footer"&gt; is now a sibling of &lt;main&gt; and does
+    /// expose the contentinfo landmark, but the TOOL page has no footer element at all, so
+    /// there is still nothing to compare it against. Giving the tool page one is new UI -- a
+    /// redesign, since it changes what a sighted user sees -- which under D-10 is Riley's
+    /// call, not this suite's. Adding "footer" to the list below would fail on the tool page
+    /// and the only way to green it is to build that UI; do not.
     /// </summary>
     private static readonly string[] ChromeSelectors =
     [

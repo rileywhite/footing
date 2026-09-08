@@ -776,12 +776,48 @@ h1:focus {
    Landing Page Footer
    ============================================================ */
 
+/*
+   F-01. The landing footer sits OUTSIDE <main> (index.html) so that it exposes the
+   contentinfo landmark -- a <footer> nested in main/article/section/aside/nav is generic.
+   Everything below exists to make that structural move invisible, because it is a landmark
+   repair and not a redesign; the numbers it has to hit are pinned in LandingFooterTests.
+
+   Outside main the footer loses main's `max-width: 54rem; margin: 0 auto; padding: 0 1rem`,
+   and its `border-top` -- the only thing it paints -- would stretch edge to edge (832px ->
+   1280px at desktop). It cannot take that box back with padding: the border is drawn on the
+   BORDER box, which padding is inside of. So it reproduces main's *content* box directly:
+   52rem is main's 54rem cap less its two 1rem gutters, and `calc(100% - 2rem)` is those
+   gutters below the cap. That is identical to main's content box at every width -- below
+   the cap both give x=16, and above it main's content edge (W-864)/2 + 16 and this one's
+   (W-832)/2 are the same number.
+
+   `.ft-landing-content` hands over the vertical half. `.content`'s `padding-bottom: 4rem`
+   used to fall below the footer; with the footer outside main it would fall ABOVE it
+   instead, dropping the footer 64px and leaving no tail. Zeroing it on the landing article
+   and carrying that 4rem down here puts both back. The modifier is landing-only on purpose:
+   the tool page's `.content` is untouched.
+
+   The 4rem tail is PADDING and not `margin-bottom`, which is the obvious way to write it and
+   is wrong: a last child's bottom margin does not extend the scrollable area, so the document
+   came back 64px shorter with `scrollHeight` flush against the footer's border box (measured,
+   both -- 0.33px at 320 and -0.13px at 1280, against 64px before). Padding is inside the
+   border box and does count. Nothing is painted below the `border-top`, and the flex line is
+   placed by the padding above it, so 2rem of bottom padding or 6rem looks identical; only the
+   scroll extent can tell, which is exactly the thing being preserved.
+*/
+
+.ft-landing-content {
+    padding-bottom: 0;
+}
+
 .ft-landing-footer {
     display: flex;
     justify-content: center;
     gap: 1.5rem;
-    padding: 2rem 0;
-    margin-top: 2rem;
+    width: calc(100% - 2rem);
+    max-width: 52rem;
+    margin: 2rem auto 0;
+    padding: 2rem 0 6rem;
     border-top: 1px solid var(--ft-bg-topbar-border);
 }
 

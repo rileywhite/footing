@@ -54,7 +54,7 @@
     </header>
 
     <main>
-        <article class="content">
+        <article class="content ft-landing-content">
             <div class="ft-hero">
                 <h1>Where Does Your Money Go?</h1>
                 <p class="ft-tagline">
@@ -89,12 +89,19 @@
                 </p>
                 <a href="find-my-footing/" class="btn btn-primary">Get Your Footing</a>
             </div>
-
-            <footer class="ft-landing-footer">
-                <a href="https://www.buymeacoffee.com/rileywhite" target="_blank" rel="noopener noreferrer">Buy Me A Coffee</a>
-            </footer>
         </article>
     </main>
+
+    <!--
+        F-01: the footer is a SIBLING of <main>, not a child of it. A <footer> element only
+        exposes the contentinfo landmark at the top level of the document; nested inside
+        main/article/section/aside/nav it is generic, which is where this one used to sit.
+        Moving it out costs it main's width box, so .ft-landing-footer reproduces that box
+        itself and .ft-landing-content hands over the bottom padding -- see app.css.
+    -->
+    <footer class="ft-landing-footer">
+        <a href="https://www.buymeacoffee.com/rileywhite" target="_blank" rel="noopener noreferrer">Buy Me A Coffee</a>
+    </footer>
 
     <script src="find-my-footing/js/footing.js"></script>
 </body>

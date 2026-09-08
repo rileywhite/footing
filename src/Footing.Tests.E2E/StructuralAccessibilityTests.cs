@@ -11,21 +11,27 @@ namespace Footing.Tests.E2E;
 /// viewport, using the engine W-12 selected.
 ///
 /// Three of these were failing when W-13 wrote them, and the tests were written to CATCH them
-/// rather than around them. W-15 has since repaired two, so their pins are gone and the
-/// invariant is now asserted positively. The one that remains is PINNED to its exact state
-/// rather than asserted away or skipped: CR-01 means a permanently red assertion blocks every
-/// merge on a protected branch, and AC-01 forbids skipping. A pin fails in both directions --
-/// a new violation is a regression, and a violation that disappears means the baseline is
-/// stale and must be updated by whoever repaired it.
+/// rather than around them. All three have since been repaired, so their pins are gone and
+/// the invariants are asserted positively -- except for the half of F-01 that is still open,
+/// which is PINNED to its exact state rather than asserted away or skipped: CR-01 means a
+/// permanently red assertion blocks every merge on a protected branch, and AC-01 forbids
+/// skipping. A pin fails in both directions -- a new violation is a regression, and a
+/// violation that disappears means the baseline is stale and must be updated by whoever
+/// repaired it. That is exactly what happened to F-01's landing half below.
 ///
-///   * F-01 -- no `contentinfo` landmark on either page. STILL REPORTED, not repaired: the
-///     tool page has no footer at all, and the landing page's `footer.ft-landing-footer` sits
-///     inside `article.content` inside `main`, where a `footer` element does not expose the
-///     landmark role. Adding one is a redesign under D-10, so it is Riley's, not W-15's. W-15
-///     measured the obvious repair -- promoting the landing footer to a sibling of `main` --
-///     and it moves the page at every viewport: the footer loses `main`'s 54rem cap and 1rem
-///     gutter, so its `border-top` rule spans the full viewport (832px -> 1280px at desktop)
-///     and the block drops 64px down past `.content`'s bottom padding. Still a redesign.
+///   * F-01 -- `contentinfo`. HALF REPAIRED, and the assertion is now PER PAGE: the landing
+///     page has one, the tool page still has none.
+///     The LANDING page's `footer.ft-landing-footer` used to sit inside `article.content`
+///     inside `main`, where a `footer` element is generic rather than a landmark, and W-15
+///     reported rather than repaired it because promoting the footer out of `main` costs it
+///     `main`'s 54rem cap and 1rem gutter -- the `border-top` rule would span the viewport
+///     (832px -> 1280px at desktop) and the block would drop 64px past `.content`'s bottom
+///     padding. Riley authorised the promotion together with the CSS that gives the footer
+///     that box back, so the move is now visually neutral to the pixel; `LandingFooterTests`
+///     pins the geometry that says so, and this asserts the landmark it bought.
+///     The TOOL page has no footer element at all. Giving it one is new UI -- a redesign
+///     under D-10 -- and remains Riley's call, so its zero stays pinned here. Do NOT "fix"
+///     the pin by adding a tool footer to make the two pages match.
 ///   * F-03 -- REPAIRED by W-15. The tool page went `h1` straight to the `h5` card headers.
 ///     The card headers are now `h2` and the sticky net-total detail heading with them, so
 ///     both pages descend without a skip and this asserts that positively. The LANDING page
@@ -93,9 +99,12 @@ public class StructuralAccessibilityTests
     /// Counts landmark roles as an assistive technology would resolve them.
     ///
     /// `header` and `footer` expose banner/contentinfo ONLY at the top level of the document.
-    /// Nested inside main/article/section/aside/nav they are generic, which is the whole of
-    /// F-01 on the landing page: the footer element exists and looks right in the markup, and
-    /// is not a landmark. A naive `document.querySelector('footer')` would report it present.
+    /// Nested inside main/article/section/aside/nav they are generic, which was the whole of
+    /// F-01 on the landing page: the footer element existed and looked right in the markup,
+    /// and was not a landmark. A naive `document.querySelector('footer')` reported it present
+    /// throughout. That nesting rule is still what this has to enforce -- the landing footer
+    /// is a landmark today only because it is a sibling of `main`, and dropping it back
+    /// inside `main` would restore the defect without removing a single element.
     /// </summary>
     private const string CountLandmarks = """
         () => {
@@ -131,19 +140,33 @@ public class StructuralAccessibilityTests
         counts.GetValueOrDefault("navigation").Should().Be(1, $"{where} should have exactly one navigation landmark");
         counts.GetValueOrDefault("main").Should().Be(1, $"{where} should have exactly one main landmark");
 
-        // F-01, PINNED. There is no contentinfo on either page and this item does not add one.
-        // Asserting the presence it should have would leave the gate red for a defect nothing
-        // downstream is authorised to repair -- adding a tool-page footer is a redesign (D-10),
-        // so it is Riley's call. Pinned as ABSENT so that the moment a real footer landmark
-        // appears this fails and says to delete the pin.
-        counts.GetValueOrDefault("contentinfo").Should().Be(
-            0,
-            $"{where}: F-01 -- neither page exposes a contentinfo landmark today. The tool page "
-            + "has no footer at all; the landing page's footer.ft-landing-footer is inside "
-            + "article.content inside main, where a footer element is generic rather than a "
-            + "landmark. This pins the defect so the gate stays green (CR-01). IF THIS FAILS, a "
-            + "contentinfo landmark was added -- that is the fix: delete this assertion and "
-            + "require contentinfo == 1 instead");
+        // F-01, and it is PER PAGE on purpose. Asserting contentinfo == 1 everywhere would
+        // fail on the tool page, and the only way to make that pass is to give the tool page
+        // a footer -- new UI, a redesign under D-10, and Riley's call rather than this
+        // suite's. So the landing page asserts the landmark it now has, and the tool page
+        // keeps its zero PINNED, which is what makes the day someone adds a tool footer show
+        // up here as a stale baseline to update rather than as silence.
+        if (path == SitePage.Landing)
+        {
+            counts.GetValueOrDefault("contentinfo").Should().Be(
+                1,
+                $"{where}: F-01 -- the landing footer is a sibling of main and must expose "
+                + "exactly one contentinfo landmark. IF THIS FAILS AT ZERO, footer."
+                + "ft-landing-footer has been moved back inside main/article (where a footer "
+                + "element is generic, not a landmark) -- the element being present in the "
+                + "markup is not enough");
+        }
+        else
+        {
+            counts.GetValueOrDefault("contentinfo").Should().Be(
+                0,
+                $"{where}: F-01 -- the tool page has no footer element at all, so it exposes "
+                + "no contentinfo landmark. Pinned as ABSENT rather than asserted away, so "
+                + "the gate stays green (CR-01) for a defect nothing downstream is authorised "
+                + "to repair: giving the tool page a footer is new UI, a redesign under D-10, "
+                + "and Riley's call. IF THIS FAILS, a tool-page footer was added -- that is "
+                + "the fix: delete this branch and require contentinfo == 1 on both pages");
+        }
     }
 
     // ================================================================================
