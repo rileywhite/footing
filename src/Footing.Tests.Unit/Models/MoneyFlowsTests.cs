@@ -14,7 +14,7 @@ public class MoneyFlowsTests
     [Fact]
     public void WeeklyTotalMoneyFlow_SingleItem_ReturnsWeeklyAmount() =>
         TestDataGenerator.CreateMoneyFlows(MoneyFlowDirection.Income,
-                ("Salary", 5200m, Period.Annually))
+                ("Salary", 5217.75m, Period.Annually))
             .WeeklyTotalMoneyFlow.Should().Be(100m);
 
     [Fact]
@@ -29,7 +29,7 @@ public class MoneyFlowsTests
     {
         var flows = TestDataGenerator.CreateMoneyFlows(MoneyFlowDirection.Outgo,
             ("Weekly Bill", 50m, Period.Weekly),
-            ("Annual Bill", 5200m, Period.Annually));
+            ("Annual Bill", 5217.75m, Period.Annually));
         flows.WeeklyTotalMoneyFlow.Should().Be(150m);
     }
 

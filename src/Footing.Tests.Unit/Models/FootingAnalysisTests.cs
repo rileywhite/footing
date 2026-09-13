@@ -67,10 +67,10 @@ public class FootingAnalysisTests
             Inflows = TestDataGenerator.CreateMoneyFlows(MoneyFlowDirection.Income,
                 ("Salary", 2000m, Period.BiWeekly)),
             RecurringBills = TestDataGenerator.CreateMoneyFlows(MoneyFlowDirection.Outgo,
-                ("Rent", 1200m, Period.Monthly)),
+                ("Rent", 1304.4375m, Period.Monthly)),
         };
         var expectedIncome = 2000m / 2m;
-        var expectedBills = 1200m * 12m / 52m;
+        var expectedBills = 300m;
         analysis.WeeklyTotalMoneyFlow.Should().Be(expectedIncome - expectedBills);
     }
 }

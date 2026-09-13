@@ -22,12 +22,12 @@ public class MoneyFlowTests
 
     [Fact]
     public void GetWeeklyAmount_MonthlyPeriod_ConvertsCorrectly() =>
-        TestDataGenerator.CreateMoneyFlow(amount: 520m, period: Period.Monthly)
-            .GetWeeklyAmount().Should().Be(520m * 12m / 52m);
+        TestDataGenerator.CreateMoneyFlow(amount: 4348.125m, period: Period.Monthly)
+            .GetWeeklyAmount().Should().Be(1000m);
 
     [Fact]
-    public void GetWeeklyAmount_AnnualPeriod_DividesByFiftyTwo() =>
-        TestDataGenerator.CreateMoneyFlow(amount: 5200m, period: Period.Annually)
+    public void GetWeeklyAmount_AnnualPeriod_DividesByWeeksPerYear() =>
+        TestDataGenerator.CreateMoneyFlow(amount: 5217.75m, period: Period.Annually)
             .GetWeeklyAmount().Should().Be(100m);
 
     [Fact]

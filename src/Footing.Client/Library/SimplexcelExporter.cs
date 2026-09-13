@@ -145,8 +145,10 @@ public class SimplexcelExporter
             worksheet[rowIndex, 1].Format = DollarFormat;
 
             worksheet[rowIndex, 2] = moneyFlow.Period.PeriodsPerYear();
+            worksheet[rowIndex, 2].Format = BuiltInCellFormat.General;
 
-            worksheet[rowIndex, 3] = Cell.Formula($"$B{rowNum} * $C{rowNum} / 52");
+            // Invariant, so the decimal point in the formula is never a culture's comma.
+            worksheet[rowIndex, 3] = Cell.Formula(FormattableString.Invariant($"$B{rowNum} * $C{rowNum} / {Year.Weeks}"));
             worksheet[rowIndex, 3].Format = DollarFormat;
         }
 
