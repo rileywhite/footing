@@ -2,29 +2,23 @@ namespace Footing.Models;
 
 public static class Extensions
 {
-    public static decimal AsWeekly(this Period source, decimal amount) => source switch
-    {
-        Period.Daily => amount * 7m,
-        Period.Weekly => amount,
-        Period.BiWeekly => amount / 2m,
-        Period.SemiMonthly => amount * 24m / 52m,
-        Period.Monthly => amount * 12m / 52m,
-        Period.Quarterly => amount * 4m / 52m,
-        Period.SemiAnnually => amount * 2m / 52m,
-        Period.Annually => amount / 52m,
-        var unsupported => throw new NotSupportedException($"Unknown Period: {unsupported}"),
-    };
+    public static decimal AsWeekly(this Period source, decimal amount) =>
+        amount * Year.DaysPerWeek / source.DaysPerPeriod();
 
-    public static int PeriodsPerYear(this Period source) => source switch
+    public static decimal PeriodsPerYear(this Period source) =>
+        Year.Days / source.DaysPerPeriod();
+
+    // Every value here is a terminating decimal, so conversions through it stay exact.
+    public static decimal DaysPerPeriod(this Period source) => source switch
     {
-        Period.Daily => 365,
-        Period.Weekly => 52,
-        Period.BiWeekly => 26,
-        Period.SemiMonthly => 24,
-        Period.Monthly => 12,
-        Period.Quarterly => 4,
-        Period.SemiAnnually => 2,
-        Period.Annually => 1,
+        Period.Daily => 1m,
+        Period.Weekly => Year.DaysPerWeek,
+        Period.BiWeekly => 2m * Year.DaysPerWeek,
+        Period.SemiMonthly => Year.Days / 24m,
+        Period.Monthly => Year.Days / 12m,
+        Period.Quarterly => Year.Days / 4m,
+        Period.SemiAnnually => Year.Days / 2m,
+        Period.Annually => Year.Days,
         var unsupported => throw new NotSupportedException($"Unknown Period: {unsupported}"),
     };
 }
