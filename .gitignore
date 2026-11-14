@@ -1,16 +1,8 @@
 .runtime/
-.claude/*
-!.claude/review-profile.json
-!.claude/commands/
-.claude/commands/*
-!.claude/commands/review.md
 .logs/
 __pycache__/
 *.secrets.local
 src/README.md
-
-# Gas City runtime
-.gc/
 
 # Gas Town (added by gt)
 state.json
@@ -22,7 +14,35 @@ scripts/
 .beads-credential-key
 .beads/proxieddb/
 
-# Gas City
+# Gas City and beads
+# gc and bd write agent tooling, runtime state and a local Dolt database into
+# this repo. Everything below is ignored except the lines starting with "!",
+# which are the files meant to be shared.
+
+# beads: the Dolt database, runtime files and the per-machine activity log
+# (interactions.jsonl) stay local. The beads config and project identity are
+# shared.
 .beads/*
-!.beads/identity.toml
 !.beads/.gitignore
+!.beads/README.md
+!.beads/config.yaml
+!.beads/metadata.json
+!.beads/identity.toml
+.beads.gate.lock
+
+# gc runtime and run output: settings, scripts, prompts, per-run artifacts,
+# and the per-bead build plans gc formulas write.
+.gc/
+/gc-plans/
+
+# Agent provider directories. gc installs its skills into each one, with an
+# ownership file that records absolute paths on this machine, and writes its
+# session hooks into .claude/settings.json. None of that is portable, so each
+# directory is ignored and only hand-written project files are re-admitted.
+.codex/*
+.gemini/*
+.claude/*
+!.claude/review-profile.json
+!.claude/commands/
+.claude/commands/*
+!.claude/commands/review.md
